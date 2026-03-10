@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALIAS — AI Username Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#06070a;
+  --bg2:#0d0f14;
+  --bg3:#13161e;
+  --border:#1e2230;
+  --border2:#2a2f42;
+  --accent:#e8ff47;
+  --accent2:#c8e000;
+  --text:#eeeef5;
+  --text2:#7a7f9a;
+  --text3:#4a4f66;
+  --red:#ff4757;
+  --blue:#4ecdc4;
+  --purple:#a78bfa;
+  --orange:#ff8c42;
+}
+
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ── Noise texture overlay ── */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity:.4;
+}
+
+/* ── Grid lines ── */
+body::after{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(232,255,71,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(232,255,71,.025) 1px,transparent 1px);
+  background-size:60px 60px;
+}
+
+.wrap{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:0 1.5rem}
+
+/* ── Header ── */
+header{
+  padding:3rem 0 2rem;
+  display:flex;align-items:flex-end;justify-content:space-between;
+  border-bottom:1px solid var(--border);
+  margin-bottom:3.5rem;
+}
+
+.logo{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(3rem,8vw,5.5rem);
+  letter-spacing:4px;
+  line-height:1;
+  color:var(--accent);
+  text-shadow:0 0 60px rgba(232,255,71,.3);
+}
+
+.logo-sub{
+  font-family:'DM Mono',monospace;
+  font-size:.65rem;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  color:var(--text3);
+  margin-left:3px;
+  margin-bottom:.4rem;
+}
+
+.header-right{
+  text-align:right;
+  font-family:'DM Mono',monospace;
+  font-size:.6rem;
+  color:var(--text3);
+  letter-spacing:2px;
+  line-height:1.8;
+  text-transform:uppercase;
+}
+
+/* ── Main input area ── */
+.input-section{margin-bottom:3rem}
+
+.prompt-label{
+  font-family:'DM Mono',monospace;
+  font-size:.65rem;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  color:var(--accent);
+  margin-bottom:1rem;
+  display:flex;align-items:center;gap:.5rem;
+}
+.prompt-label::before{content:'//';color:var(--text3)}
+
+textarea{
+  width:100%;
+  background:var(--bg2);
+  border:1px solid var(--border2);
+  border-radius:4px;
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  font-size:1.05rem;
+  font-weight:300;
+  padding:1.2rem 1.4rem;
+  resize:none;
+  outline:none;
+  transition:border-color .2s,box-shadow .2s;
+  line-height:1.6;
+  min-height:110px;
+}
+textarea:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 1px rgba(232,255,71,.15), inset 0 0 30px rgba(232,255,71,.02);
+}
+textarea::placeholder{color:var(--text3)}
+
+/* ── Style tags ── */
+.style-row{
+  display:flex;flex-wrap:wrap;gap:.5rem;
+  margin:1.2rem 0 1.5rem;
+}
+
+.style-tag{
+  font-family:'DM Mono',monospace;
+  font-size:.62rem;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  padding:.35rem .8rem;
+  border:1px solid var(--border2);
+  border-radius:2px;
+  background:transparent;
+  color:var(--text2);
+  cursor:pointer;
+  transition:all .15s;
+  user-select:none;
+}
+.style-tag:hover{border-color:var(--accent);color:var(--accent)}
+.style-tag.active{
+  background:var(--accent);color:var(--bg);
+  border-color:var(--accent);
+  font-weight:500;
+}
+
+/* ── Generate button ── */
+.btn-row{display:flex;gap:1rem;align-items:center}
+
+.btn-generate{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.4rem;
+  letter-spacing:3px;
+  padding:.7rem 2.5rem;
+  background:var(--accent);
+  color:var(--bg);
+  border:none;
+  border-radius:3px;
+  cursor:pointer;
+  transition:all .15s;
+  position:relative;
+  overflow:hidden;
+}
+.btn-generate::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);
+  transform:translateX(-100%);
+  transition:transform .4s;
+}
+.btn-generate:hover::after{transform:translateX(100%)}
+.btn-generate:hover{background:var(--accent2);transform:translateY(-1px);box-shadow:0 8px 30px rgba(232,255,71,.25)}
+.btn-generate:active{transform:translateY(0)}
+.btn-generate:disabled{opacity:.4;cursor:not-allowed;transform:none}
+
+.btn-more{
+  font-family:'DM Mono',monospace;
+  font-size:.7rem;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  padding:.7rem 1.5rem;
+  background:transparent;
+  color:var(--text2);
+  border:1px solid var(--border2);
+  border-radius:3px;
+  cursor:pointer;
+  transition:all .15s;
+  display:none;
+}
+.btn-more:hover{border-color:var(--accent);color:var(--accent)}
+.btn-more:disabled{opacity:.3;cursor:not-allowed}
+
+.gen-hint{
+  font-family:'DM Mono',monospace;
+  font-size:.6rem;
+  color:var(--text3);
+  letter-spacing:1px;
+}
+
+/* ── Loading ── */
+.loading{
+  display:none;
+  align-items:center;gap:1rem;
+  padding:2rem 0;
+  font-family:'DM Mono',monospace;
+  font-size:.7rem;
+  color:var(--text2);
+  letter-spacing:2px;
+  text-transform:uppercase;
+}
+.loading.show{display:flex}
+
+.loader{
+  display:flex;gap:4px;
+}
+.loader span{
+  width:6px;height:6px;
+  background:var(--accent);
+  border-radius:50%;
+  animation:pulse 1.2s ease-in-out infinite;
+}
+.loader span:nth-child(2){animation-delay:.2s}
+.loader span:nth-child(3){animation-delay:.4s}
+@keyframes pulse{0%,80%,100%{opacity:.2;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+
+/* ── Results ── */
+#results{margin-top:1rem}
+
+.results-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:1.5rem;
+  padding-bottom:1rem;
+  border-bottom:1px solid var(--border);
+}
+
+.results-label{
+  font-family:'DM Mono',monospace;
+  font-size:.65rem;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  color:var(--text3);
+}
+
+.results-count{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.1rem;
+  letter-spacing:2px;
+  color:var(--accent);
+}
+
+.names-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:.75rem;
+}
+
+/* ── Name card ── */
+.name-card{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:4px;
+  padding:1.2rem 1.4rem;
+  display:flex;flex-direction:column;gap:.6rem;
+  cursor:pointer;
+  transition:all .2s;
+  position:relative;
+  overflow:hidden;
+  animation:fadeUp .4s ease both;
+}
+.name-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--accent),transparent);
+  opacity:0;transition:opacity .2s;
+}
+.name-card:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,0,0,.4)}
+.name-card:hover::before{opacity:.6}
+.name-card.copied{border-color:var(--accent);background:rgba(232,255,71,.04)}
+
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(16px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+.name-text{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.8rem;
+  letter-spacing:2px;
+  color:var(--text);
+  line-height:1.1;
+  word-break:break-all;
+}
+
+.name-style{
+  font-family:'DM Mono',monospace;
+  font-size:.58rem;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  padding:.2rem .5rem;
+  border-radius:2px;
+  display:inline-flex;
+  align-items:center;
+  width:fit-content;
+}
+
+.name-why{
+  font-size:.82rem;
+  color:var(--text2);
+  line-height:1.5;
+  font-weight:300;
+}
+
+.copy-hint{
+  font-family:'DM Mono',monospace;
+  font-size:.58rem;
+  color:var(--text3);
+  letter-spacing:1px;
+  margin-top:.2rem;
+  transition:color .2s;
+}
+.name-card:hover .copy-hint{color:var(--accent)}
+.name-card.copied .copy-hint{color:var(--accent)}
+
+/* Style colors */
+.style-short{background:rgba(78,205,196,.1);color:var(--blue)}
+.style-multi{background:rgba(167,139,250,.1);color:var(--purple)}
+.style-coined{background:rgba(255,140,66,.1);color:var(--orange)}
+.style-clean{background:rgba(232,255,71,.1);color:var(--accent)}
+.style-dark{background:rgba(255,71,87,.1);color:var(--red)}
+.style-abstract{background:rgba(167,139,250,.1);color:var(--purple)}
+
+/* ── Error ── */
+.error-msg{
+  font-family:'DM Mono',monospace;
+  font-size:.75rem;
+  color:var(--red);
+  padding:1rem 1.2rem;
+  border:1px solid rgba(255,71,87,.2);
+  border-radius:4px;
+  background:rgba(255,71,87,.05);
+  display:none;
+  letter-spacing:1px;
+}
+.error-msg.show{display:block}
+
+/* ── Footer ── */
+footer{
+  margin-top:6rem;
+  padding:2rem 0 3rem;
+  border-top:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;
+}
+.footer-text{
+  font-family:'DM Mono',monospace;
+  font-size:.58rem;
+  color:var(--text3);
+  letter-spacing:2px;
+  text-transform:uppercase;
+}
+
+/* ── Previous names sidebar strip ── */
+.history-strip{
+  position:fixed;right:0;top:50%;transform:translateY(-50%);
+  width:3px;background:var(--border);
+  height:200px;border-radius:2px;
+  display:none;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+@media(max-width:600px){
+  header{flex-direction:column;align-items:flex-start;gap:1rem}
+  .names-grid{grid-template-columns:1fr}
+  .btn-row{flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <div class="logo">ALIAS</div>
+      <div class="logo-sub">AI Username Generator</div>
+    </div>
+    <div class="header-right">
+      Powered by Claude AI<br>
+      Every name is unique<br>
+      No repeats
+    </div>
+  </header>
+
+  <section class="input-section">
+    <div class="prompt-label">Describe yourself, your vibe, or your brand</div>
+    <textarea id="prompt" placeholder="e.g. dark aesthetic gamer who loves philosophy and neon lights, building a startup in crypto, minimalist photographer obsessed with Japan..." rows="4"></textarea>
+
+    <div class="style-row">
+      <span class="style-label" style="font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--text3);display:flex;align-items:center;margin-right:.3rem">Style:</span>
+      <button class="style-tag active" data-style="all">All Styles</button>
+      <button class="style-tag" data-style="short">Short & Punchy</button>
+      <button class="style-tag" data-style="multi">Multi-Word</button>
+      <button class="style-tag" data-style="coined">Coined Words</button>
+      <button class="style-tag" data-style="dark">Dark / Mysterious</button>
+      <button class="style-tag" data-style="clean">Clean / Minimal</button>
+      <button class="style-tag" data-style="abstract">Abstract</button>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-generate" id="btnGenerate" onclick="generate()">Generate Names</button>
+      <button class="btn-more" id="btnMore" onclick="generateMore()">+ More Names</button>
+      <span class="gen-hint" id="genHint"></span>
+    </div>
+  </section>
+
+  <div class="loading" id="loading">
+    <div class="loader"><span></span><span></span><span></span></div>
+    <span id="loadingText">Generating names...</span>
+  </div>
+
+  <div class="error-msg" id="errorMsg"></div>
+
+  <div id="results"></div>
+
+  <footer>
+    <div class="footer-text">ALIAS — AI Username Generator</div>
+    <div class="footer-text">Click any name to copy</div>
+  </footer>
+
+</div>
+
+<script>
+let allNames = [];
+let selectedStyle = 'all';
+let isLoading = false;
+let totalGenerated = 0;
+
+// Style tag toggle
+document.querySelectorAll('.style-tag').forEach(tag => {
+  tag.addEventListener('click', () => {
+    document.querySelectorAll('.style-tag').forEach(t => t.classList.remove('active'));
+    tag.classList.add('active');
+    selectedStyle = tag.dataset.style;
+  });
+});
+
+// Enter to generate
+document.getElementById('prompt').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) generate();
+});
+
+function showError(msg) {
+  const el = document.getElementById('errorMsg');
+  el.textContent = msg;
+  el.classList.add('show');
+}
+function hideError() {
+  document.getElementById('errorMsg').classList.remove('show');
+}
+
+function setLoading(state, text = 'Generating names...') {
+  isLoading = state;
+  document.getElementById('loading').classList.toggle('show', state);
+  document.getElementById('loadingText').textContent = text;
+  document.getElementById('btnGenerate').disabled = state;
+  document.getElementById('btnMore').disabled = state;
+}
+
+async function callClaude(prompt) {
+  const styleInstructions = {
+    all: 'Mix ALL styles freely: short punchy words, multi-word phrases (2-4 words joined with dots/underscores/camelCase or as one word), coined/invented words, dark mysterious names, clean minimal names, and abstract concepts.',
+    short: 'Focus on SHORT and PUNCHY names: 1-2 syllable words, sharp and memorable, easy to say.',
+    multi: 'Focus on MULTI-WORD names: 2-4 words combined creatively. Can use dots, underscores, camelCase, or smash them together. E.g. "voidpilot", "the.quiet.storm", "neon_ghost_protocol".',
+    coined: 'Focus on INVENTED/COINED words: portmanteaus, made-up words that sound real, blend two concepts into one new word. Should sound like a brand name.',
+    dark: 'Focus on DARK and MYSTERIOUS names: shadow, void, abyss, glitch, corrupted, haunting vibes. Evocative and edgy.',
+    clean: 'Focus on CLEAN and MINIMAL names: elegant, simple, timeless. Could work as a brand. Nothing too edgy.',
+    abstract: 'Focus on ABSTRACT names: concepts, philosophies, paradoxes, things that make you think. Intellectually intriguing.'
+  };
+
+  const systemPrompt = `You are the world's most creative username generator. You create usernames that are genuinely original, memorable, and evocative — not generic.
+
+Rules:
+- Generate exactly 10 usernames
+- ${styleInstructions[selectedStyle]}
+- Each name must feel INTENTIONAL and UNIQUE, not random
+- Avoid clichés: no "shadow_wolf", "dark_knight", "epic_gamer" type garbage
+- No numbers at the end unless it's part of the concept
+- Think like a poet, a brand designer, and a hacker combined
+- Names can use: dots, underscores, camelCase, all lowercase, or creative capitalization
+- Some names can be 4 words if they flow well (e.g. "quiet.before.the.storm")
+
+For each name, respond in this EXACT JSON format (array of objects):
+[
+  {
+    "name": "theusername",
+    "style": "short|multi|coined|dark|clean|abstract",
+    "why": "One sentence explaining the vibe or meaning. Be poetic but brief."
+  }
+]
+
+Only output the JSON array. No markdown, no explanation, nothing else.`;
+
+  const userPrompt = `Generate 10 creative usernames for someone who describes themselves as: "${prompt}"
+
+Previously generated names to avoid repeating: ${allNames.slice(-20).join(', ') || 'none yet'}`;
+
+  const response = await fetch('/api/generate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userPrompt }]
+    })
+  });
+
+  const data = await response.json();
+  if (data.error) throw new Error(data.error.message);
+  
+  const text = data.content[0].text.trim().replace(/```json|```/g, '').trim();
+  return JSON.parse(text);
+}
+
+function styleClass(style) {
+  const map = { short: 'style-short', multi: 'style-multi', coined: 'style-coined', dark: 'style-dark', clean: 'style-clean', abstract: 'style-abstract' };
+  return map[style] || 'style-clean';
+}
+
+function styleLabel(style) {
+  const map = { short: 'Short', multi: 'Multi-Word', coined: 'Coined', dark: 'Dark', clean: 'Clean', abstract: 'Abstract' };
+  return map[style] || style;
+}
+
+function copyName(card, name) {
+  navigator.clipboard.writeText(name).then(() => {
+    card.classList.add('copied');
+    card.querySelector('.copy-hint').textContent = '✓ copied!';
+    setTimeout(() => {
+      card.classList.remove('copied');
+      card.querySelector('.copy-hint').textContent = 'click to copy';
+    }, 2000);
+  });
+}
+
+function renderNames(names, append = false) {
+  const container = document.getElementById('results');
+  
+  if (!append) {
+    container.innerHTML = `
+      <div class="results-header">
+        <div class="results-label">Generated Names</div>
+        <div class="results-count" id="nameCount">${names.length} names</div>
+      </div>
+      <div class="names-grid" id="namesGrid"></div>
+    `;
+  } else {
+    document.getElementById('nameCount').textContent = `${totalGenerated} names`;
+  }
+
+  const grid = document.getElementById('namesGrid');
+  
+  names.forEach((item, i) => {
+    const card = document.createElement('div');
+    card.className = 'name-card';
+    card.style.animationDelay = `${i * 0.05}s`;
+    card.innerHTML = `
+      <div class="name-text">${item.name}</div>
+      <span class="name-style ${styleClass(item.style)}">${styleLabel(item.style)}</span>
+      <div class="name-why">${item.why}</div>
+      <div class="copy-hint">click to copy</div>
+    `;
+    card.addEventListener('click', () => copyName(card, item.name));
+    grid.appendChild(card);
+  });
+}
+
+async function generate() {
+  const prompt = document.getElementById('prompt').value.trim();
+  if (!prompt) {
+    document.getElementById('prompt').focus();
+    return;
+  }
+  if (isLoading) return;
+
+  hideError();
+  allNames = [];
+  totalGenerated = 0;
+  document.getElementById('results').innerHTML = '';
+  document.getElementById('btnMore').style.display = 'none';
+
+  setLoading(true, 'Thinking of names...');
+
+  try {
+    const names = await callClaude(prompt);
+    allNames = names.map(n => n.name);
+    totalGenerated = names.length;
+    renderNames(names, false);
+    document.getElementById('btnMore').style.display = 'block';
+    document.getElementById('genHint').textContent = 'Ctrl+Enter to regenerate';
+  } catch (e) {
+    showError('Error: ' + e.message);
+  } finally {
+    setLoading(false);
+  }
+}
+
+async function generateMore() {
+  const prompt = document.getElementById('prompt').value.trim();
+  if (!prompt || isLoading) return;
+
+  hideError();
+  setLoading(true, 'Generating more...');
+
+  try {
+    const names = await callClaude(prompt);
+    const newNames = names.map(n => n.name);
+    allNames = [...allNames, ...newNames];
+    totalGenerated += names.length;
+    renderNames(names, true);
+  } catch (e) {
+    showError('Error: ' + e.message);
+  } finally {
+    setLoading(false);
+  }
+}
+</script>
+</body>
+</html>
