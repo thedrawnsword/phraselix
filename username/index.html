@@ -388,30 +388,29 @@ function renderNames(names, append = false) {
   });
 }
 
-function isBadInput(text) {
-  const t = text.toLowerCase();
-  const banned = [
-    // cuss words
-    'fuck','shit','ass','bitch','dick','cock','pussy','cunt','bastard','damn','hell',
-    'piss','crap','slut','whore','nigga','nigger','faggot','retard',
-    // sexual
-    'sex','porn','nude','naked','nsfw','xxx','horny','boob','tit','penis','vagina',
-    'anal','blowjob','orgasm','fetish','erotic','hentai','onlyfans',
-    // violence/hate
-    'kill','murder','rape','suicide','terrorist','nazi','racist',
-    // +18 indicators
-    '18+','adult','explicit','sexual',
-  ];
-  return banned.some(word => {
-    const regex = new RegExp('\\b' + word + '\\b', 'i');
-    return regex.test(t);
+async function isBadInput(text) {
+  const response = await fetch('/api/generate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      system: `You are a content moderator. Your only job is to check if the user input is appropriate for a username generator tool aimed at all ages.
+
+Reject if the input contains or implies: sexual content, porn, nudity, explicit adult content, extreme violence, hate speech, racial slurs, suicide, terrorism, or anything inappropriate for a public platform.
+
+Respond with ONLY one word: SAFE or UNSAFE. Nothing else.`,
+      messages: [{ role: 'user', content: text }]
+    })
   });
+  const data = await response.json();
+  if (data.error) return false; // if check fails, let it through
+  const result = data.content[0].text.trim().toUpperCase();
+  return result.includes('UNSAFE');
 }
 async function generate() {
   const prompt = document.getElementById('prompt').value.trim();
   if (!prompt) { document.getElementById('prompt').focus(); return; }
   if (isLoading) return;
-  if (isBadInput(prompt)) {
+  if (await isBadInput(prompt)) {
     showError("Keep it clean — Phraselix isn't that kind of tool.");
     return;
   }
