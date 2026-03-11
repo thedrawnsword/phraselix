@@ -388,29 +388,41 @@ function renderNames(names, append = false) {
   });
 }
 
-async function isBadInput(text) {
-  const response = await fetch('/api/generate', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      system: `You are a content moderator. Your only job is to check if the user input is appropriate for a username generator tool aimed at all ages.
-
-Reject if the input contains or implies: sexual content, porn, nudity, explicit adult content, extreme violence, hate speech, racial slurs, suicide, terrorism, or anything inappropriate for a public platform.
-
-Respond with ONLY one word: SAFE or UNSAFE. Nothing else.`,
-      messages: [{ role: 'user', content: text }]
-    })
-  });
-  const data = await response.json();
-  if (data.error) return false; // if check fails, let it through
-  const result = data.content[0].text.trim().toUpperCase();
-  return result.includes('UNSAFE');
+function isBadInput(text) {
+  const t = text.toLowerCase().replace(/[^a-z0-9 ]/g, '');
+  const banned = [
+    // sexual / adult
+    'porn','porno','pornstar','pornhub','onlyfans','only fans','sex','sexy','sexual',
+    'nude','naked','nsfw','xxx','18+','adult','explicit','erotic','hentai',
+    'horny','boob','boobs','tit','tits','dick','cock','pussy','vagina','penis',
+    'anal','blowjob','handjob','cumshot','orgasm','fetish','bdsm','kink',
+    'stripper','escort','prostitute','hooker','camgirl','webcam model',
+    // cuss
+    'fuck','shit','bitch','cunt','asshole','bastard','slut','whore',
+    'nigga','nigger','faggot','retard','piss','crap',
+    // violence / hate
+    'kill','murder','rape','suicide','terrorist','nazis','nazi','racist','racism',
+    'genocide','pedophile','pedo','molest','abuse',
+  ];
+  // check exact words and partials
+  for (const word of banned) {
+    if (t.includes(word)) return true;
+  }
+  // check for leet speak / substitutions: p0rn, s3x, etc
+  const leet = text.toLowerCase()
+    .replace(/0/g,'o').replace(/1/g,'i').replace(/3/g,'e')
+    .replace(/4/g,'a').replace(/5/g,'s').replace(/8/g,'b')
+    .replace(/\$/g,'s').replace(/@/g,'a').replace(/!/g,'i');
+  for (const word of banned) {
+    if (leet.includes(word)) return true;
+  }
+  return false;
 }
 async function generate() {
   const prompt = document.getElementById('prompt').value.trim();
   if (!prompt) { document.getElementById('prompt').focus(); return; }
   if (isLoading) return;
-  if (await isBadInput(prompt)) {
+  if (isBadInput(prompt)) {
     showError("Keep it clean — Phraselix isn't that kind of tool.");
     return;
   }
