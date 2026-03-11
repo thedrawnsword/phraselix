@@ -25,10 +25,10 @@ header{padding:1.4rem 0;display:flex;align-items:center;justify-content:space-be
 .logo:hover{opacity:1;}
 .back-btn{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--text3);text-decoration:none;transition:color .2s;display:flex;align-items:center;gap:.4rem;}
 .back-btn:hover{color:var(--accent);}
-.hero-tagline{padding:3.5rem 0 3rem;text-align:center;border-bottom:1px solid var(--border);margin-bottom:3rem;}
-.tagline-text{font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,5vw,3.2rem);letter-spacing:3px;line-height:1.15;color:var(--text);animation:fadeInUp .5s ease both;}
+.hero-tagline{padding:2rem 0 1.8rem;text-align:center;border-bottom:1px solid var(--border);margin-bottom:2.5rem;}
+.tagline-text{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.8rem,6vw,5rem);letter-spacing:3px;line-height:1.1;color:var(--text);animation:fadeInUp .5s ease both;}
 .tagline-text em{font-style:normal;color:var(--accent);text-shadow:0 0 40px rgba(232,255,71,.3);}
-.tagline-sub{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--text3);margin-top:1rem;animation:fadeInUp .5s ease .1s both;}
+.tagline-sub{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--text3);margin-top:.6rem;animation:fadeInUp .5s ease .1s both;}
 @keyframes fadeInUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 .input-section{margin-bottom:3rem}
 .prompt-label{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;}
@@ -105,8 +105,7 @@ footer{margin-top:6rem;padding:2rem 0 3rem;border-top:1px solid var(--border);di
   </header>
 
   <div class="hero-tagline">
-    <div class="tagline-text" id="taglineText"></div>
-    <div class="tagline-sub">AI Username Generator</div>
+    <div class="tagline-text" id="taglineText">Your vibe. Translated into a <em>name.</em></div>
   </div>
 
   <section class="input-section">
@@ -415,13 +414,13 @@ async function generateMore() {
 <script defer src="/_vercel/insights/script.js">
 // Rotating taglines
 const taglines = [
-  'Describe yourself.<br>Get a name that <em>hits.</em>',
-  'Stop using your<br>birth year as a <em>username.</em>',
-  'Your vibe.<br>Translated into a <em>name.</em>',
-  'Type anything.<br>Get something <em>fire.</em>',
-  'The name you've been<br>looking for <em>is here.</em>',
-  'Sound like yourself.<br>But <em>better.</em>',
-  'Every name is made<br>for <em>you specifically.</em>',
+  'Describe yourself. Get a name that <em>hits.</em>',
+  'Stop using your birth year as a <em>username.</em>',
+  'Your vibe. Translated into a <em>name.</em>',
+  'Type anything. Get something <em>fire.</em>',
+  'The name you've been looking for <em>is here.</em>',
+  'Sound like yourself. But <em>better.</em>',
+  'Every name is made <em>for you specifically.</em>',
 ];
 document.getElementById('taglineText').innerHTML = taglines[Math.floor(Math.random() * taglines.length)];
 </script>
