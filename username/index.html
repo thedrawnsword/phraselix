@@ -496,9 +496,11 @@ function renderNames(names, append = false) {
     if (append) grid.insertBefore(card, grid.firstChild);
     else grid.appendChild(card);
   });
-  // Always update count based on actual cards in grid
-  const countEl = document.getElementById('nameCount');
-  if (countEl) countEl.textContent = document.querySelectorAll('.name-card').length + ' names';
+  // Count after DOM updates
+  setTimeout(() => {
+    const countEl = document.getElementById('nameCount');
+    if (countEl) countEl.textContent = document.querySelectorAll('.name-card').length + ' names';
+  }, 50);
 }
 
 function isBadInput(text) {
