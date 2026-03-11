@@ -3,411 +3,617 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Phraselix — AI Username Generator</title>
+<title>Phraselix — Tools</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
 :root{
-  --bg:#06070a;--bg2:#0d0f14;--bg3:#13161e;
-  --border:#1e2230;--border2:#2a2f42;
-  --accent:#e8ff47;--accent2:#c8e000;
-  --text:#eeeef5;--text2:#7a7f9a;--text3:#4a4f66;
-  --red:#ff4757;--blue:#4ecdc4;--purple:#a78bfa;--orange:#ff8c42;
+  --bg:#07080c;
+  --accent:#e8ff47;
+  --accent2:#c8e000;
+  --text:#eeeef5;
+  --text2:#6b7090;
+  --text3:#2e3350;
+  --border:#181b27;
+  --border2:#242840;
+  --card:#0c0e15;
 }
+
 html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
-body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");opacity:.4;}
-body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(232,255,71,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(232,255,71,.025) 1px,transparent 1px);background-size:60px 60px;}
-.wrap{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:0 1.5rem}
-header{padding:3rem 0 2rem;display:flex;align-items:flex-end;justify-content:space-between;border-bottom:1px solid var(--border);margin-bottom:3.5rem;}
-.logo{font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,5.5rem);letter-spacing:4px;line-height:1;color:var(--accent);text-shadow:0 0 60px rgba(232,255,71,.3);}
-.logo-sub{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--text3);margin-left:3px;margin-bottom:.4rem;}
-.header-right{text-align:right;font-family:'DM Mono',monospace;font-size:.6rem;color:var(--text3);letter-spacing:2px;line-height:1.8;text-transform:uppercase;}
-.input-section{margin-bottom:3rem}
-.prompt-label{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;}
-.prompt-label::before{content:'//';color:var(--text3)}
-textarea{width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:4px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:1.05rem;font-weight:300;padding:1.2rem 1.4rem;resize:none;outline:none;transition:border-color .2s,box-shadow .2s;line-height:1.6;min-height:110px;}
-textarea:focus{border-color:var(--accent);box-shadow:0 0 0 1px rgba(232,255,71,.15),inset 0 0 30px rgba(232,255,71,.02);}
-textarea::placeholder{color:var(--text3)}
-.style-section{margin:1.2rem 0 1.5rem;}
-.style-hint{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:.7rem;}
-.style-hint span{color:var(--accent);opacity:.7}
-.style-row{display:flex;flex-wrap:wrap;gap:.5rem;}
-.style-tag{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:1.5px;text-transform:uppercase;padding:.35rem .8rem;border:1px solid var(--border2);border-radius:2px;background:transparent;color:var(--text2);cursor:pointer;transition:all .15s;user-select:none;}
-.style-tag:hover{border-color:var(--accent);color:var(--accent)}
-.style-tag.active{background:var(--accent);color:var(--bg);border-color:var(--accent);font-weight:500;}
-.style-tag.active-multi{border-color:var(--blue);color:var(--blue);background:rgba(78,205,196,.08);}
-.selected-summary{font-family:'DM Mono',monospace;font-size:.58rem;color:var(--text3);letter-spacing:1px;margin-top:.6rem;min-height:1rem;}
-.selected-summary.lit{color:var(--accent);opacity:.8}
-.btn-row{display:flex;gap:1rem;align-items:center}
-.btn-generate{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:3px;padding:.7rem 2.5rem;background:var(--accent);color:var(--bg);border:none;border-radius:3px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden;}
-.btn-generate::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);transform:translateX(-100%);transition:transform .4s;}
-.btn-generate:hover::after{transform:translateX(100%)}
-.btn-generate:hover{background:var(--accent2);transform:translateY(-1px);box-shadow:0 8px 30px rgba(232,255,71,.25)}
-.btn-generate:active{transform:translateY(0)}
-.btn-generate:disabled{opacity:.4;cursor:not-allowed;transform:none}
-.btn-more{font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:2px;text-transform:uppercase;padding:.7rem 1.5rem;background:transparent;color:var(--text2);border:1px solid var(--border2);border-radius:3px;cursor:pointer;transition:all .15s;display:none;}
-.btn-more:hover{border-color:var(--accent);color:var(--accent)}
-.btn-more:disabled{opacity:.3;cursor:not-allowed}
-.gen-hint{font-family:'DM Mono',monospace;font-size:.6rem;color:var(--text3);letter-spacing:1px;}
-.loading{display:none;align-items:center;gap:1rem;padding:2rem 0;font-family:'DM Mono',monospace;font-size:.7rem;color:var(--text2);letter-spacing:2px;text-transform:uppercase;}
-.loading.show{display:flex}
-.loader{display:flex;gap:4px;}
-.loader span{width:6px;height:6px;background:var(--accent);border-radius:50%;animation:pulse 1.2s ease-in-out infinite;}
-.loader span:nth-child(2){animation-delay:.2s}
-.loader span:nth-child(3){animation-delay:.4s}
-@keyframes pulse{0%,80%,100%{opacity:.2;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
-#results{margin-top:1rem}
-.results-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--border);}
-.results-label{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--text3);}
-.results-count{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;color:var(--accent);}
-.names-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:.75rem;}
-.name-card{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:1.2rem 1.4rem;display:flex;flex-direction:column;gap:.6rem;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;animation:fadeUp .4s ease both;}
-.name-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:0;transition:opacity .2s;}
-.name-card:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,0,0,.4)}
-.name-card:hover::before{opacity:.6}
-.name-card.copied{border-color:var(--accent);background:rgba(232,255,71,.04)}
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-.name-text{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:2px;color:var(--text);line-height:1.1;word-break:break-all;}
-.name-style{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:2px;text-transform:uppercase;padding:.2rem .5rem;border-radius:2px;display:inline-flex;align-items:center;width:fit-content;}
-.name-why{font-size:.82rem;color:var(--text2);line-height:1.5;font-weight:300;}
-.copy-hint{font-family:'DM Mono',monospace;font-size:.58rem;color:var(--text3);letter-spacing:1px;margin-top:.2rem;transition:color .2s;}
-.name-card:hover .copy-hint{color:var(--accent)}
-.name-card.copied .copy-hint{color:var(--accent)}
-.style-short{background:rgba(78,205,196,.1);color:var(--blue)}
-.style-multi{background:rgba(167,139,250,.1);color:var(--purple)}
-.style-coined{background:rgba(255,140,66,.1);color:var(--orange)}
-.style-clean{background:rgba(232,255,71,.1);color:var(--accent)}
-.style-dark{background:rgba(255,71,87,.1);color:var(--red)}
-.style-abstract{background:rgba(167,139,250,.1);color:var(--purple)}
-.error-msg{font-family:'DM Mono',monospace;font-size:.75rem;color:var(--red);padding:1rem 1.2rem;border:1px solid rgba(255,71,87,.2);border-radius:4px;background:rgba(255,71,87,.05);display:none;letter-spacing:1px;}
-.error-msg.show{display:block}
-footer{margin-top:6rem;padding:2rem 0 3rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
-.footer-text{font-family:'DM Mono',monospace;font-size:.58rem;color:var(--text3);letter-spacing:2px;text-transform:uppercase;}
-::-webkit-scrollbar{width:4px}
-::-webkit-scrollbar-track{background:var(--bg)}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
-@media(max-width:600px){header{flex-direction:column;align-items:flex-start;gap:1rem}.names-grid{grid-template-columns:1fr}.btn-row{flex-wrap:wrap}}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Syne',sans-serif;
+  min-height:100vh;
+  overflow-x:hidden;
+  cursor:none;
+}
+
+/* ── Custom cursor ── */
+.cursor{
+  position:fixed;width:8px;height:8px;
+  background:var(--accent);border-radius:50%;
+  pointer-events:none;z-index:9999;
+  transform:translate(-50%,-50%);
+  transition:transform .1s,width .2s,height .2s,opacity .2s;
+  mix-blend-mode:difference;
+}
+.cursor-ring{
+  position:fixed;width:32px;height:32px;
+  border:1px solid rgba(232,255,71,.3);border-radius:50%;
+  pointer-events:none;z-index:9998;
+  transform:translate(-50%,-50%);
+  transition:transform .15s ease,width .3s,height .3s,border-color .3s;
+}
+body:has(a:hover) .cursor,.cursor.hover{width:16px;height:16px;}
+body:has(a:hover) .cursor-ring,.cursor-ring.hover{width:48px;height:48px;border-color:rgba(232,255,71,.6);}
+
+/* ── Noise + grid overlay ── */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+}
+body::after{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    linear-gradient(rgba(232,255,71,.018) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(232,255,71,.018) 1px,transparent 1px);
+  background-size:80px 80px;
+}
+
+/* ── Glow blobs ── */
+.blob{
+  position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;
+  animation:drift 20s ease-in-out infinite;
+}
+.blob1{width:600px;height:600px;background:rgba(232,255,71,.04);top:-200px;right:-100px;animation-delay:0s;}
+.blob2{width:400px;height:400px;background:rgba(100,150,255,.03);bottom:-100px;left:-100px;animation-delay:-8s;}
+.blob3{width:300px;height:300px;background:rgba(232,255,71,.025);top:50%;left:50%;animation-delay:-4s;}
+@keyframes drift{
+  0%,100%{transform:translate(0,0) scale(1)}
+  33%{transform:translate(30px,-20px) scale(1.05)}
+  66%{transform:translate(-20px,30px) scale(.95)}
+}
+
+/* ── Layout ── */
+.wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 2rem;}
+
+/* ── Header ── */
+header{
+  padding:3.5rem 0 0;
+  display:grid;
+  grid-template-columns:1fr auto;
+  align-items:end;
+  gap:2rem;
+}
+
+.brand{display:flex;flex-direction:column;gap:.4rem;}
+.brand-logo{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(3.5rem,7vw,6rem);
+  letter-spacing:5px;
+  line-height:1;
+  color:var(--accent);
+  text-shadow:0 0 80px rgba(232,255,71,.25);
+}
+.brand-tag{
+  font-family:'DM Mono',monospace;
+  font-size:.6rem;
+  letter-spacing:4px;
+  text-transform:uppercase;
+  color:var(--text2);
+}
+
+.header-meta{
+  font-family:'DM Mono',monospace;
+  font-size:.58rem;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:var(--text3);
+  text-align:right;
+  line-height:2;
+  padding-bottom:.4rem;
+}
+.header-meta span{color:var(--accent);opacity:.6;}
+
+/* ── Divider ── */
+.divider{
+  height:1px;
+  background:linear-gradient(90deg,transparent,var(--border2),var(--accent),var(--border2),transparent);
+  opacity:.4;
+  margin:2.5rem 0;
+}
+
+/* ── Hero text ── */
+.hero{
+  padding:2rem 0 4rem;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:4rem;
+  align-items:center;
+}
+.hero-left{}
+.hero-title{
+  font-size:clamp(2.2rem,4vw,3.2rem);
+  font-weight:800;
+  line-height:1.1;
+  letter-spacing:-1px;
+  margin-bottom:1.2rem;
+}
+.hero-title em{
+  font-style:normal;
+  color:var(--accent);
+  text-shadow:0 0 40px rgba(232,255,71,.3);
+}
+.hero-desc{
+  font-family:'DM Mono',monospace;
+  font-size:.72rem;
+  color:var(--text2);
+  line-height:2;
+  letter-spacing:.5px;
+  max-width:380px;
+}
+
+.hero-right{
+  display:flex;
+  flex-direction:column;
+  gap:1rem;
+  align-items:flex-end;
+}
+.stat{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:.2rem;
+}
+.stat-num{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:3.5rem;
+  letter-spacing:2px;
+  line-height:1;
+  color:var(--text);
+  opacity:.15;
+}
+.stat-label{
+  font-family:'DM Mono',monospace;
+  font-size:.55rem;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  color:var(--text3);
+}
+
+/* ── Section label ── */
+.section-label{
+  font-family:'DM Mono',monospace;
+  font-size:.6rem;
+  letter-spacing:4px;
+  text-transform:uppercase;
+  color:var(--text3);
+  display:flex;
+  align-items:center;
+  gap:1rem;
+  margin-bottom:2rem;
+}
+.section-label::before{content:'//';color:var(--accent);opacity:.5;}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border2);}
+
+/* ── Tool grid ── */
+.tools-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:1px;
+  background:var(--border);
+  border:1px solid var(--border);
+  border-radius:6px;
+  overflow:hidden;
+  margin-bottom:1px;
+}
+
+.tool-card{
+  background:var(--card);
+  padding:2.2rem 2rem;
+  display:flex;
+  flex-direction:column;
+  gap:1.2rem;
+  cursor:pointer;
+  position:relative;
+  overflow:hidden;
+  transition:background .2s;
+  text-decoration:none;
+  color:inherit;
+}
+.tool-card::before{
+  content:'';
+  position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(232,255,71,.04),transparent);
+  opacity:0;
+  transition:opacity .3s;
+}
+.tool-card::after{
+  content:'';
+  position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--accent);
+  transform:scaleX(0);
+  transform-origin:left;
+  transition:transform .4s cubic-bezier(.16,1,.3,1);
+}
+.tool-card:hover{background:#0f1118;}
+.tool-card:hover::before{opacity:1;}
+.tool-card:hover::after{transform:scaleX(1);}
+.tool-card:hover .tool-arrow{transform:translate(4px,-4px);opacity:1;}
+.tool-card:hover .tool-num{opacity:.25;}
+
+.tool-card.coming-soon{cursor:default;}
+.tool-card.coming-soon:hover::after{transform:scaleX(0);}
+.tool-card.coming-soon *{opacity:.35;}
+.tool-card.coming-soon .soon-badge{opacity:1;}
+
+.tool-num{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:3.5rem;
+  line-height:1;
+  color:var(--text);
+  opacity:.06;
+  transition:opacity .3s;
+  position:absolute;
+  top:1.5rem;right:1.8rem;
+  letter-spacing:2px;
+}
+
+.tool-icon{
+  width:40px;height:40px;
+  border:1px solid var(--border2);
+  border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.2rem;
+  background:rgba(232,255,71,.03);
+  transition:border-color .2s,background .2s;
+  flex-shrink:0;
+}
+.tool-card:hover .tool-icon{
+  border-color:rgba(232,255,71,.2);
+  background:rgba(232,255,71,.06);
+}
+
+.tool-body{flex:1;}
+.tool-name{
+  font-size:1.25rem;
+  font-weight:700;
+  letter-spacing:-.5px;
+  margin-bottom:.5rem;
+  color:var(--text);
+}
+.tool-desc{
+  font-family:'DM Mono',monospace;
+  font-size:.62rem;
+  color:var(--text2);
+  line-height:1.8;
+  letter-spacing:.3px;
+}
+
+.tool-footer{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-top:.5rem;
+}
+.tool-tag{
+  font-family:'DM Mono',monospace;
+  font-size:.52rem;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  padding:.2rem .6rem;
+  border-radius:2px;
+  border:1px solid var(--border2);
+  color:var(--text3);
+}
+.tool-tag.live{border-color:rgba(232,255,71,.25);color:rgba(232,255,71,.6);}
+.tool-tag.live::before{content:'● ';font-size:.4rem;vertical-align:middle;}
+
+.tool-arrow{
+  font-size:1rem;
+  color:var(--accent);
+  opacity:0;
+  transition:transform .2s,opacity .2s;
+}
+
+.soon-badge{
+  font-family:'DM Mono',monospace;
+  font-size:.5rem;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  padding:.2rem .6rem;
+  border-radius:2px;
+  border:1px solid var(--border2);
+  color:var(--text3);
+}
+
+/* ── Bottom strip ── */
+.bottom-strip{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:2rem 0 4rem;
+  margin-top:1rem;
+}
+.bottom-left{
+  font-family:'DM Mono',monospace;
+  font-size:.58rem;
+  color:var(--text3);
+  letter-spacing:2px;
+  text-transform:uppercase;
+  line-height:2;
+}
+.bottom-left span{color:var(--accent);opacity:.5;}
+.bottom-right{
+  font-family:'DM Mono',monospace;
+  font-size:.55rem;
+  color:var(--text3);
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  text-align:right;
+  line-height:2.2;
+}
+
+/* ── Scanline effect ── */
+.scanline{
+  position:fixed;inset:0;z-index:999;pointer-events:none;
+  background:repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,.015) 2px,
+    rgba(0,0,0,.015) 4px
+  );
+}
+
+/* ── Scroll reveal ── */
+.reveal{
+  opacity:0;
+  transform:translateY(24px);
+  transition:opacity .6s cubic-bezier(.16,1,.3,1),transform .6s cubic-bezier(.16,1,.3,1);
+}
+.reveal.visible{opacity:1;transform:translateY(0);}
+
+@media(max-width:900px){
+  .tools-grid{grid-template-columns:repeat(2,1fr);}
+  .hero{grid-template-columns:1fr;gap:2rem;}
+  .hero-right{flex-direction:row;align-items:flex-start;}
+  .stat-num{font-size:2.5rem;}
+}
+@media(max-width:600px){
+  .tools-grid{grid-template-columns:1fr;}
+  header{grid-template-columns:1fr;}
+  .header-meta{text-align:left;}
+  .hero-right{display:none;}
+  .bottom-strip{flex-direction:column;align-items:flex-start;gap:1rem;}
+}
 </style>
 </head>
 <body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="scanline"></div>
+<div class="blob blob1"></div>
+<div class="blob blob2"></div>
+<div class="blob blob3"></div>
+
 <div class="wrap">
-  <header>
-    <div>
-      <div class="logo">Phraselix</div>
-      <div class="logo-sub">AI Username Generator</div>
+
+  <header class="reveal">
+    <div class="brand">
+      <div class="brand-logo">Phraselix</div>
+      <div class="brand-tag">AI-Powered Creative Tools</div>
     </div>
-    <div class="header-right">
-      Powered by Claude AI<br>
-      Every name is unique<br>
-      No repeats
+    <div class="header-meta">
+      Tools: <span>01 / active</span><br>
+      Status: <span>online</span><br>
+      Version: <span>1.0</span>
     </div>
   </header>
 
-  <section class="input-section">
-    <div class="prompt-label">Describe yourself, your vibe, or your brand</div>
-    <textarea id="prompt" placeholder="e.g. dark aesthetic gamer who loves philosophy and neon lights, building a startup in crypto, minimalist photographer obsessed with Japan..." rows="4"></textarea>
+  <div class="divider"></div>
 
-    <div class="style-section">
-      <div class="style-hint">Style <span>— pick one or combine multiple</span></div>
-      <div class="style-row">
-        <button class="style-tag active" data-style="all">All Styles</button>
-        <button class="style-tag" data-style="short">Short & Punchy</button>
-        <button class="style-tag" data-style="multi">Multi-Word</button>
-        <button class="style-tag" data-style="coined">Coined Words</button>
-        <button class="style-tag" data-style="dark">Dark / Mysterious</button>
-        <button class="style-tag" data-style="clean">Clean / Minimal</button>
-        <button class="style-tag" data-style="abstract">Abstract</button>
+  <section class="hero reveal">
+    <div class="hero-left">
+      <div class="hero-title">
+        Tools built for<br>
+        people who care<br>
+        about <em>identity.</em>
       </div>
-      <div class="selected-summary" id="selectedSummary"></div>
+      <div class="hero-desc">
+        A growing suite of AI-powered tools.<br>
+        Every tool is obsessed with one thing —<br>
+        making you sound like yourself,<br>
+        but better.
+      </div>
     </div>
-
-    <div class="btn-row">
-      <button class="btn-generate" id="btnGenerate" onclick="generate()">Generate Names</button>
-      <button class="btn-more" id="btnMore" onclick="generateMore()">+ More Names</button>
-      <span class="gen-hint" id="genHint"></span>
+    <div class="hero-right">
+      <div class="stat">
+        <div class="stat-num">∞</div>
+        <div class="stat-label">Unique names possible</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">0</div>
+        <div class="stat-label">Generic results, ever</div>
+      </div>
     </div>
   </section>
 
-  <div class="loading" id="loading">
-    <div class="loader"><span></span><span></span><span></span></div>
-    <span id="loadingText">Crafting your names...</span>
-  </div>
-  <div class="error-msg" id="errorMsg"></div>
-  <div id="results"></div>
+  <div class="section-label reveal">Available Tools</div>
 
-  <footer>
-    <div class="footer-text">Phraselix — AI Username Generator</div>
-    <div class="footer-text">Click any name to copy</div>
-  </footer>
+  <div class="tools-grid reveal">
+
+    <!-- TOOL 1 — LIVE -->
+    <a class="tool-card" href="/index.html">
+      <div class="tool-num">01</div>
+      <div class="tool-icon">⬡</div>
+      <div class="tool-body">
+        <div class="tool-name">Username Generator</div>
+        <div class="tool-desc">
+          Describe your vibe. Get names so
+          good you'll wonder how they're
+          not already taken.
+        </div>
+      </div>
+      <div class="tool-footer">
+        <span class="tool-tag live">Live</span>
+        <span class="tool-arrow">↗</span>
+      </div>
+    </a>
+
+    <!-- TOOL 2 — COMING SOON -->
+    <div class="tool-card coming-soon">
+      <div class="tool-num">02</div>
+      <div class="tool-icon">◈</div>
+      <div class="tool-body">
+        <div class="tool-name">Bio Generator</div>
+        <div class="tool-desc">
+          Turn your personality into a
+          profile bio that actually sounds
+          like a human wrote it.
+        </div>
+      </div>
+      <div class="tool-footer">
+        <span class="soon-badge">Coming Soon</span>
+      </div>
+    </div>
+
+    <!-- TOOL 3 — COMING SOON -->
+    <div class="tool-card coming-soon">
+      <div class="tool-num">03</div>
+      <div class="tool-icon">◇</div>
+      <div class="tool-body">
+        <div class="tool-name">Brand Name Forge</div>
+        <div class="tool-desc">
+          From concept to coined word.
+          Names for startups, products,
+          and projects that stick.
+        </div>
+      </div>
+      <div class="tool-footer">
+        <span class="soon-badge">Coming Soon</span>
+      </div>
+    </div>
+
+    <!-- TOOL 4 — COMING SOON -->
+    <div class="tool-card coming-soon">
+      <div class="tool-num">04</div>
+      <div class="tool-icon">⬠</div>
+      <div class="tool-body">
+        <div class="tool-name">Tag Line Writer</div>
+        <div class="tool-desc">
+          One sentence that says everything.
+          Slogans and taglines that land
+          in under five words.
+        </div>
+      </div>
+      <div class="tool-footer">
+        <span class="soon-badge">Coming Soon</span>
+      </div>
+    </div>
+
+    <!-- TOOL 5 — COMING SOON -->
+    <div class="tool-card coming-soon">
+      <div class="tool-num">05</div>
+      <div class="tool-icon">⬡</div>
+      <div class="tool-body">
+        <div class="tool-name">Aesthetic Translator</div>
+        <div class="tool-desc">
+          Describe a feeling, a mood, a color.
+          Get words, names, and phrases
+          that match your exact energy.
+        </div>
+      </div>
+      <div class="tool-footer">
+        <span class="soon-badge">Coming Soon</span>
+      </div>
+    </div>
+
+    <!-- TOOL 6 — COMING SOON -->
+    <div class="tool-card coming-soon">
+      <div class="tool-num">06</div>
+      <div class="tool-icon">◉</div>
+      <div class="tool-body">
+        <div class="tool-name">Your Tool Here</div>
+        <div class="tool-desc">
+          Got an idea for a tool that
+          should exist? Something is
+          being built right now.
+        </div>
+      </div>
+      <div class="tool-footer">
+        <span class="soon-badge">Coming Soon</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="bottom-strip reveal">
+    <div class="bottom-left">
+      Phraselix <span>—</span> Built with Claude AI<br>
+      Free to use <span>—</span> No account needed
+    </div>
+    <div class="bottom-right">
+      Every tool. One obsession.<br>
+      Sound like yourself.
+    </div>
+  </div>
+
 </div>
 
 <script>
-let allNames = [];
-let isLoading = false;
-let totalGenerated = 0;
-let selectedStyles = new Set();
+// Custom cursor
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+let mx = 0, my = 0, rx = 0, ry = 0;
 
-const labelMap = {
-  all:'All Styles', short:'Short & Punchy', multi:'Multi-Word',
-  coined:'Coined Words', dark:'Dark / Mysterious', clean:'Clean / Minimal', abstract:'Abstract'
-};
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx + 'px';
+  cursor.style.top = my + 'px';
+});
 
-function updateStyleUI() {
-  document.querySelectorAll('.style-tag').forEach(tag => {
-    tag.classList.remove('active','active-multi');
-    const s = tag.dataset.style;
-    if (s === 'all') {
-      if (selectedStyles.size === 0) tag.classList.add('active');
-    } else {
-      if (selectedStyles.has(s)) {
-        selectedStyles.size === 1 ? tag.classList.add('active') : tag.classList.add('active-multi');
-      }
+function animateRing() {
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
+  ring.style.left = rx + 'px';
+  ring.style.top = ry + 'px';
+  requestAnimationFrame(animateRing);
+}
+animateRing();
+
+document.querySelectorAll('a, button, .tool-card:not(.coming-soon)').forEach(el => {
+  el.addEventListener('mouseenter', () => { cursor.classList.add('hover'); ring.classList.add('hover'); });
+  el.addEventListener('mouseleave', () => { cursor.classList.remove('hover'); ring.classList.remove('hover'); });
+});
+
+// Scroll reveal
+const observer = new IntersectionObserver(entries => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => entry.target.classList.add('visible'), i * 80);
+      observer.unobserve(entry.target);
     }
   });
-  const summary = document.getElementById('selectedSummary');
-  if (selectedStyles.size === 0) {
-    summary.textContent = '';
-    summary.classList.remove('lit');
-  } else {
-    summary.textContent = 'Generating: ' + [...selectedStyles].map(s => labelMap[s]).join(' + ');
-    summary.classList.add('lit');
-  }
-}
+}, { threshold: 0.1 });
 
-document.querySelectorAll('.style-tag').forEach(tag => {
-  tag.addEventListener('click', () => {
-    const s = tag.dataset.style;
-    if (s === 'all') { selectedStyles.clear(); }
-    else { selectedStyles.has(s) ? selectedStyles.delete(s) : selectedStyles.add(s); }
-    updateStyleUI();
-  });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Card stagger animation
+document.querySelectorAll('.tool-card').forEach((card, i) => {
+  card.style.opacity = '0';
+  card.style.transform = 'translateY(20px)';
+  card.style.transition = `opacity .5s ease ${i * 0.07}s, transform .5s cubic-bezier(.16,1,.3,1) ${i * 0.07}s, background .2s`;
+  setTimeout(() => {
+    card.style.opacity = card.classList.contains('coming-soon') ? '' : '1';
+    card.style.transform = 'translateY(0)';
+  }, 400 + i * 70);
 });
-
-updateStyleUI();
-
-document.getElementById('prompt').addEventListener('keydown', e => {
-  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) generate();
-});
-
-function showError(msg) { const el = document.getElementById('errorMsg'); el.textContent = msg; el.classList.add('show'); }
-function hideError() { document.getElementById('errorMsg').classList.remove('show'); }
-function setLoading(state, text='Crafting your names...') {
-  isLoading = state;
-  document.getElementById('loading').classList.toggle('show', state);
-  document.getElementById('loadingText').textContent = text;
-  document.getElementById('btnGenerate').disabled = state;
-  document.getElementById('btnMore').disabled = state;
-}
-
-function buildStyleInstruction() {
-  const defs = {
-    short:`SHORT & PUNCHY — rules:
-  - Maximum 6 characters total. Count every character.
-  - Single word ONLY. Zero dots, underscores, spaces, or hyphens.
-  - Hard consonants (k, x, v, z, r) create punch. Short vowels create speed.
-  - Must feel complete and intentional — like it was always meant to exist.
-  - Perfect examples: "vexr", "zael", "drusk", "blynk", "noxe", "ryft", "svek", "quyl", "drex"
-  - FAIL = anything over 6 chars or containing any separator`,
-
-    multi:`MULTI-WORD — rules:
-  - Minimum 2 words, maximum 4 words connected with dots, underscores, or camelCase.
-  - Each word must carry its own meaning or feeling.
-  - The combination should create something greater than its parts.
-  - Think: poetic phrases, contradictions, vivid imagery, narrative fragments.
-  - Perfect examples: "cold.sun.rising", "neon_ghost_protocol", "quiet.before.the.storm", "signal.lost", "hollow.ground.theory"
-  - FAIL = single word with no separator`,
-
-    coined:`COINED WORDS — rules:
-  - Zero real English words. Every name must be a brand-new invention that has NEVER existed.
-  - Method: take 2 concepts from the person's description, extract their syllables, blend them into something new.
-  - Must sound phonetically natural — easy to say, satisfying to pronounce.
-  - Must feel like a premium brand — the kind people say "how is this not taken?" about.
-  - Perfect examples: "veltrox", "nyxara", "crudine", "phosphyne", "aetheryn", "zyvren", "phraselix"
-  - FAIL = using any existing English word`,
-
-    dark:`DARK / MYSTERIOUS — rules:
-  - Must radiate dark, eerie, mysterious, or corrupted energy.
-  - Draw from: void, null, glitch, static, echo, ash, hollow, decay, abyss, rot, ghost, error, entropy, silence, fracture.
-  - Can be single words OR multi-word with dots/underscores — whatever hits harder.
-  - Darkness must feel atmospheric and specific, NOT generic edgy.
-  - Perfect examples: "null.spectre", "voidrot", "ashen.signal", "errorghost", "static.decay", "hollow.core", "the.last.echo"
-  - FAIL = darkwolf, shadowknight, or any generic wolf/shadow/night name`,
-
-    clean:`CLEAN / MINIMAL — rules:
-  - Must feel elegant, premium, and timeless — like a high-end brand or design studio.
-  - Short smooth syllables. Easy to pronounce in any language.
-  - No aggressive sounds, no dark concepts, nothing edgy.
-  - Think: architectural simplicity, Scandinavian design, Apple-level naming.
-  - Perfect examples: "celo", "forma", "auren", "liso", "vela", "orin", "sove", "navi", "lune", "kova"
-  - FAIL = anything dark, aggressive, or longer than 3 syllables`,
-
-    abstract:`ABSTRACT — rules:
-  - Must represent abstract concepts, paradoxes, or philosophical ideas.
-  - Should provoke a thought — make the reader go "what does that mean?" in a good way.
-  - Reference: philosophy, physics, mathematics, consciousness, time, identity, logic.
-  - Can use dots or underscores to create phrase-like names.
-  - Perfect examples: "false.horizon", "entropy.boy", "quiet_theorem", "nullspace", "the.unnamed", "observer.effect", "infinite.regress"
-  - FAIL = literal, obvious, or surface-level names`
-  };
-
-  const styles = selectedStyles.size === 0 ? null : [...selectedStyles];
-
-  if (!styles) {
-    return `Generate a perfect MIX of all styles — spread evenly across the 10 names:
-  - 2 ultra-short (4-6 chars, single word, no separators) e.g. "vexr", "zael", "noxe"
-  - 2 multi-word (dots/underscores) e.g. "cold.signal", "void_pilot"
-  - 2 coined/invented brand-like words e.g. "veltrox", "phraselix"
-  - 2 dark/mysterious e.g. "null.spectre", "ashen.signal"
-  - 2 abstract/philosophical e.g. "false.horizon", "quiet_theorem"`;
-  }
-
-  if (styles.length === 1) {
-    return `Generate ALL 10 names in this ONE style only:\n\n${defs[styles[0]]}`;
-  }
-
-  const perStyle = Math.floor(10 / styles.length);
-  const extra = 10 % styles.length;
-  let out = `Generate ONLY these styles — no others. Distribute exactly as shown:\n`;
-  styles.forEach((s, i) => {
-    const n = perStyle + (i < extra ? 1 : 0);
-    out += `\n[${labelMap[s].toUpperCase()} — exactly ${n} names]\n${defs[s]}\n`;
-  });
-  out += `\nDO NOT generate any style not listed above. Every name must match one of the listed styles.`;
-  return out;
-}
-
-async function callClaude(userPrompt) {
-  const styleInstruction = buildStyleInstruction();
-
-  const systemPrompt = `You are Phraselix — the world's most sophisticated AI username generator. Built by linguists, brand designers, poets, and hackers. Your single goal: generate usernames so perfectly crafted that people react with "how is this not taken yet?"
-
-━━━ WHAT MAKES A PERFECT USERNAME ━━━
-
-PHONETIC BEAUTY — The name must sound satisfying when spoken aloud. Consider rhythm, consonant flow, syllable weight. Hard sounds (k, x, v, z) create power. Soft sounds (l, n, m) create elegance. The ending is what people remember — make it land perfectly.
-
-VISUAL APPEAL — How does it look written as a username? x, y, z, k, v are visually striking letters. Symmetry and balance matter. It should look cool in a bio, on a profile, in a game lobby.
-
-SEMANTIC DEPTH — The best names carry meaning but not obvious meaning. They reference something real (a concept, emotion, phenomenon) in a way that feels fresh and unexpected. Like "phraselix" — you can almost feel what it means, but it has never existed before.
-
-THE "HOW IS THIS NOT TAKEN" FACTOR — The holy grail. Achieved when a name feels inevitable — like it should have existed and been taken long ago. Comes from the perfect intersection of familiarity and originality.
-
-IDENTITY FIT — Each name must feel made specifically for THIS person. Reflect their description non-literally. If someone says "I love philosophy", don't name them "philosopher99". Find what philosophy FEELS like and encode that into a name.
-
-━━━ TECHNIQUES TO USE ━━━
-
-PORTMANTEAU — Blend start of one word + end of another. Best with contrasting concepts. e.g. "phrase" + "felix" = "phraselix"
-SUFFIX ELEVATION — Real concept word + brand suffix (-ix, -ex, -yr, -on, -ara, -ine, -yx). Transforms common into original.
-PHONETIC SCULPTING — Build a word purely from sound. Target a specific emotional response. Pure phonetic impact.
-CONCEPTUAL COLLISION — Two unrelated concepts from the person's description, smashed together. Weirder = more memorable.
-LINGUISTIC BORROWING — Latin, Greek, Japanese, Arabic, Norse word related to the person. Slightly altered to make it unique.
-PHRASE COMPRESSION — Compress a whole phrase's meaning into one coined word. Or fragment a phrase and keep the most evocative part.
-INVERSION — Flip the expected. "signal_found" becomes "signal.lost". "bright_mind" becomes "hollow.bright".
-
-━━━ ABSOLUTE FORBIDDEN LIST ━━━
-
-NEVER generate:
-- Names with numbers (name123, user99, x420)
-- Generic gamer names (darkwolf, shadowknight, epicgamer, xXnameXx, coolpro)
-- Simple adjective + animal or noun (silent_wolf, golden_eagle)
-- Anything that sounds algorithmically generated with no intention
-- Any of these already used names: ${allNames.slice(-30).join(', ') || 'none yet'}
-
-━━━ STYLE REQUIREMENT — THIS IS THE LAW ━━━
-
-${styleInstruction}
-
-━━━ OUTPUT ━━━
-
-Respond ONLY with a valid JSON array. No markdown. No explanation. No text before or after. Just raw JSON:
-[
-  {
-    "name": "theusername",
-    "style": "short|multi|coined|dark|clean|abstract",
-    "why": "One sentence capturing the specific feeling. Poetic and precise — never generic."
-  }
-]`;
-
-  const response = await fetch('/api/generate', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      system: systemPrompt,
-      messages: [{ role: 'user', content: `Generate 10 perfect usernames for: "${userPrompt}"\n\nEach name should make them think: "how is this not taken yet?"` }]
-    })
-  });
-
-  const data = await response.json();
-  if (data.error) throw new Error(data.error.message);
-  const text = data.content[0].text.trim().replace(/```json|```/g, '').trim();
-  return JSON.parse(text);
-}
-
-function styleClass(s) {
-  return {short:'style-short',multi:'style-multi',coined:'style-coined',dark:'style-dark',clean:'style-clean',abstract:'style-abstract'}[s] || 'style-clean';
-}
-function styleDisplay(s) {
-  return {short:'Short',multi:'Multi-Word',coined:'Coined',dark:'Dark',clean:'Clean',abstract:'Abstract'}[s] || s;
-}
-function copyName(card, name) {
-  navigator.clipboard.writeText(name).then(() => {
-    card.classList.add('copied');
-    card.querySelector('.copy-hint').textContent = '✓ copied!';
-    setTimeout(() => { card.classList.remove('copied'); card.querySelector('.copy-hint').textContent = 'click to copy'; }, 2000);
-  });
-}
-function renderNames(names, append = false) {
-  const container = document.getElementById('results');
-  if (!append) {
-    container.innerHTML = `<div class="results-header"><div class="results-label">Generated Names</div><div class="results-count" id="nameCount">${names.length} names</div></div><div class="names-grid" id="namesGrid"></div>`;
-  } else {
-    document.getElementById('nameCount').textContent = `${totalGenerated} names`;
-  }
-  const grid = document.getElementById('namesGrid');
-  names.forEach((item, i) => {
-    const card = document.createElement('div');
-    card.className = 'name-card';
-    card.style.animationDelay = `${i * 0.05}s`;
-    card.innerHTML = `<div class="name-text">${item.name}</div><span class="name-style ${styleClass(item.style)}">${styleDisplay(item.style)}</span><div class="name-why">${item.why}</div><div class="copy-hint">click to copy</div>`;
-    card.addEventListener('click', () => copyName(card, item.name));
-    if (append) grid.insertBefore(card, grid.firstChild);
-    else grid.appendChild(card);
-  });
-}
-async function generate() {
-  const prompt = document.getElementById('prompt').value.trim();
-  if (!prompt) { document.getElementById('prompt').focus(); return; }
-  if (isLoading) return;
-  hideError();
-  allNames = []; totalGenerated = 0;
-  document.getElementById('results').innerHTML = '';
-  document.getElementById('btnMore').style.display = 'none';
-  setLoading(true, 'Crafting your names...');
-  try {
-    const names = await callClaude(prompt);
-    allNames = names.map(n => n.name);
-    totalGenerated = names.length;
-    renderNames(names, false);
-    document.getElementById('btnMore').style.display = 'block';
-    document.getElementById('genHint').textContent = 'Ctrl+Enter to regenerate';
-  } catch(e) { showError('Error: ' + e.message); }
-  finally { setLoading(false); }
-}
-async function generateMore() {
-  const prompt = document.getElementById('prompt').value.trim();
-  if (!prompt || isLoading) return;
-  hideError();
-  setLoading(true, 'Generating more...');
-  try {
-    const names = await callClaude(prompt);
-    allNames = [...allNames, ...names.map(n => n.name)];
-    totalGenerated += names.length;
-    renderNames(names, true);
-  } catch(e) { showError('Error: ' + e.message); }
-  finally { setLoading(false); }
-}
 </script>
-<script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>
