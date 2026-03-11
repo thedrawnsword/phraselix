@@ -20,10 +20,16 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
 body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");opacity:.4;}
 body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(232,255,71,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(232,255,71,.025) 1px,transparent 1px);background-size:60px 60px;}
 .wrap{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:0 1.5rem}
-header{padding:3rem 0 2rem;display:flex;align-items:flex-end;justify-content:space-between;border-bottom:1px solid var(--border);margin-bottom:3.5rem;}
-.logo{font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,5.5rem);letter-spacing:4px;line-height:1;color:var(--accent);text-shadow:0 0 60px rgba(232,255,71,.3);}
-.logo-sub{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--text3);margin-left:3px;margin-bottom:.4rem;}
-.header-right{text-align:right;font-family:'DM Mono',monospace;font-size:.6rem;color:var(--text3);letter-spacing:2px;line-height:1.8;text-transform:uppercase;}
+header{padding:1.4rem 0;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);margin-bottom:0;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:4px;line-height:1;color:var(--accent);opacity:.65;transition:opacity .2s;text-decoration:none;}
+.logo:hover{opacity:1;}
+.back-btn{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--text3);text-decoration:none;transition:color .2s;display:flex;align-items:center;gap:.4rem;}
+.back-btn:hover{color:var(--accent);}
+.hero-tagline{padding:3.5rem 0 3rem;text-align:center;border-bottom:1px solid var(--border);margin-bottom:3rem;}
+.tagline-text{font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,5vw,3.2rem);letter-spacing:3px;line-height:1.15;color:var(--text);animation:fadeInUp .5s ease both;}
+.tagline-text em{font-style:normal;color:var(--accent);text-shadow:0 0 40px rgba(232,255,71,.3);}
+.tagline-sub{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--text3);margin-top:1rem;animation:fadeInUp .5s ease .1s both;}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 .input-section{margin-bottom:3rem}
 .prompt-label{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;}
 .prompt-label::before{content:'//';color:var(--text3)}
@@ -94,16 +100,14 @@ footer{margin-top:6rem;padding:2rem 0 3rem;border-top:1px solid var(--border);di
 <body>
 <div class="wrap">
   <header>
-    <div>
-      <div class="logo">Phraselix</div>
-      <div class="logo-sub">AI Username Generator</div>
-    </div>
-    <div class="header-right">
-      Powered by Claude AI<br>
-      Every name is unique<br>
-      No repeats
-    </div>
+    <a class="logo" href="/">Phraselix</a>
+    <a class="back-btn" href="/">← All Tools</a>
   </header>
+
+  <div class="hero-tagline">
+    <div class="tagline-text" id="taglineText"></div>
+    <div class="tagline-sub">AI Username Generator</div>
+  </div>
 
   <section class="input-section">
     <div class="prompt-label">Describe yourself, your vibe, or your brand</div>
@@ -408,6 +412,18 @@ async function generateMore() {
   finally { setLoading(false); }
 }
 </script>
-<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/insights/script.js">
+// Rotating taglines
+const taglines = [
+  'Describe yourself.<br>Get a name that <em>hits.</em>',
+  'Stop using your<br>birth year as a <em>username.</em>',
+  'Your vibe.<br>Translated into a <em>name.</em>',
+  'Type anything.<br>Get something <em>fire.</em>',
+  'The name you've been<br>looking for <em>is here.</em>',
+  'Sound like yourself.<br>But <em>better.</em>',
+  'Every name is made<br>for <em>you specifically.</em>',
+];
+document.getElementById('taglineText').innerHTML = taglines[Math.floor(Math.random() * taglines.length)];
+</script>
 </body>
 </html>
