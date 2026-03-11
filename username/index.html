@@ -94,10 +94,16 @@ footer{margin-top:6rem;padding:2rem 0 3rem;border-top:1px solid var(--border);di
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-track{background:var(--bg)}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+/* ── Custom cursor ── */
+.cursor{position:fixed;width:8px;height:8px;background:var(--accent);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:difference;}
+.cursor-ring{position:fixed;width:32px;height:32px;border:1px solid rgba(232,255,71,.3);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .3s,height .3s,border-color .3s;}
+body{cursor:none;}
 @media(max-width:600px){header{flex-direction:column;align-items:flex-start;gap:1rem}.names-grid{grid-template-columns:1fr}.btn-row{flex-wrap:wrap}}
 </style>
 </head>
 <body>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
 <div class="wrap">
   <header>
     <a class="logo" href="/">Phraselix</a>
@@ -423,6 +429,25 @@ const taglines = [
   'Sound like yourself. But <em>better.</em>',
   'Every name is made <em>for you specifically.</em>',
 ];
+
+// Custom cursor
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  cursor.style.left=mx+'px';cursor.style.top=my+'px';
+});
+function animRing(){
+  rx+=(mx-rx)*.12;ry+=(my-ry)*.12;
+  ring.style.left=rx+'px';ring.style.top=ry+'px';
+  requestAnimationFrame(animRing);
+}
+animRing();
+document.querySelectorAll('a,button,.name-card').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{ring.style.width='48px';ring.style.height='48px';ring.style.borderColor='rgba(232,255,71,.6)';});
+  el.addEventListener('mouseleave',()=>{ring.style.width='32px';ring.style.height='32px';ring.style.borderColor='rgba(232,255,71,.3)';});
+});
 document.getElementById('taglineText').innerHTML = taglines[Math.floor(Math.random() * taglines.length)];
 
 const placeholders = [
