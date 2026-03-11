@@ -110,7 +110,7 @@ footer{margin-top:6rem;padding:2rem 0 3rem;border-top:1px solid var(--border);di
 
   <section class="input-section">
     <div class="prompt-label">Describe yourself, your vibe, or your brand</div>
-    <textarea id="prompt" placeholder="e.g. a hacker who collects vintage synths and reads Nietzsche at 3am" rows="4"></textarea>
+    <textarea id="prompt" placeholder="Describe your vibe..." rows="4"></textarea>
 
     <div class="style-section">
       <div class="style-hint">Style <span>— pick one or combine multiple</span></div>
@@ -425,23 +425,33 @@ const taglines = [
 document.getElementById('taglineText').innerHTML = taglines[Math.floor(Math.random() * taglines.length)];
 
 const placeholders = [
-  "e.g. a hacker who collects vintage synths and reads Nietzsche at 3am",
-  "e.g. chaotic creative, obsessed with brutalist architecture and lo-fi beats",
-  "e.g. building an AI startup, minimalist, reads too much, hates small talk",
-  "e.g. underground DJ who codes by day and disappears on weekends",
-  "e.g. dark academia energy, writes poetry, addicted to black coffee",
-  "e.g. glitch artist who loves quantum physics and broken machines",
-  "e.g. competitive gamer with a philosophy degree and too many tabs open",
-  "e.g. streetwear designer, skater, obsessed with Japanese street culture",
-  "e.g. crypto founder, ex-military, reads stoicism, never sleeps",
-  "e.g. introverted genius, ambient music, mountain hiker, terrible at texting",
-  "e.g. visual artist who thinks in systems and dreams in color palettes",
-  "e.g. speed runner, meme historian, unironically loves medieval history",
-  "e.g. neon aesthetics, cyberpunk fiction writer, drinks too much energy drinks",
-  "e.g. marine biologist who makes dark techno music on weekends",
-  "e.g. ex-chess prodigy turned streetwear brand owner in Berlin",
+  "a hacker who collects vintage synths and reads Nietzsche at 3am",
+  "chaotic creative, obsessed with brutalist architecture and lo-fi beats",
+  "building an AI startup, minimalist, reads too much, hates small talk",
+  "underground DJ who codes by day and disappears on weekends",
+  "dark academia energy, writes poetry, addicted to black coffee",
+  "glitch artist who loves quantum physics and broken machines",
+  "competitive gamer with a philosophy degree and too many tabs open",
+  "streetwear designer, skater, sneakerhead who never sleeps before 4am",
+  "crypto founder, ex-military, reads stoicism, laughs at nothing",
+  "introverted genius, ambient music, mountain hiker, terrible at texting",
+  "visual artist who thinks in systems and dreams in color palettes",
+  "speed runner, meme historian, unironically loves medieval history",
+  "neon aesthetics, cyberpunk fiction writer, drinks too much energy drinks",
+  "marine biologist who makes dark techno music on weekends",
+  "ex-chess prodigy turned streetwear brand owner in Berlin",
+  "film score composer who only works at night and hates social media",
+  "former pro gamer now building tools nobody asked for but everyone needs",
+  "tattoo artist obsessed with sacred geometry and horror films",
+  "self-taught coder, nihilist, makes beats in a room with no windows",
+  "philosopher by day, DJ by night, broke but happy",
 ];
-document.getElementById('prompt').placeholder = placeholders[Math.floor(Math.random() * placeholders.length)];
+// Pick random but never same as last
+const used = sessionStorage.getItem('lastPlaceholder');
+let idx;
+do { idx = Math.floor(Math.random() * placeholders.length); } while (placeholders[idx] === used);
+sessionStorage.setItem('lastPlaceholder', placeholders[idx]);
+document.getElementById('prompt').placeholder = placeholders[idx];
 </script>
 </body>
 </html>
