@@ -290,7 +290,7 @@ function buildStyleInstruction() {
   return out;
 }
 
-async function callClaude(userPrompt) {
+async function generateNames(userPrompt) {
   const styleInstruction = buildStyleInstruction();
 
   const systemPrompt = `You are Phraselix — the world's most sophisticated AI username generator. Built by linguists, brand designers, poets, and hackers. Your single goal: generate usernames so perfectly crafted that people react with "how is this not taken yet?"
@@ -397,7 +397,7 @@ async function generate() {
   document.getElementById('btnMore').style.display = 'none';
   setLoading(true, 'Crafting your names...');
   try {
-    const names = await callClaude(prompt);
+    const names = await generateNames(prompt);
     allNames = names.map(n => n.name);
     totalGenerated = names.length;
     renderNames(names, false);
@@ -412,7 +412,7 @@ async function generateMore() {
   hideError();
   setLoading(true, 'Generating more...');
   try {
-    const names = await callClaude(prompt);
+    const names = await generateNames(prompt);
     allNames = [...allNames, ...names.map(n => n.name)];
     totalGenerated += names.length;
     renderNames(names, true);
