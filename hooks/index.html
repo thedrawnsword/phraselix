@@ -458,27 +458,43 @@ function buildSystemPrompt() {
     twitter: 'X/Twitter: Title is the tweet — max 240 chars, no hashtag spam (max 2). Hook is the opening line that makes people click "read more". Conversational tone.'
   };
 
-  return `You are a viral content strategist for ${platformNames[selectedPlatform]}.
+  return `You are MrBeast's title writer, a viral TikToker, and a YouTube growth expert combined. You write titles that make people STOP scrolling and click immediately.
 
-DEFINITIONS (these are different things):
-- TITLE = the video title / caption text the viewer reads before clicking. Short, punchy, intriguing.
-- HOOK = the first spoken sentence in the video itself — what the creator SAYS out loud in the first 2 seconds to stop people from scrolling.
+Platform: ${platformNames[selectedPlatform]}
+Tone: ${selectedTone}
 
 ${platformGuides[selectedPlatform]}
 
-Tone: ${selectedTone}
+WHAT MAKES A GREAT TITLE:
+- Curiosity gap: reader NEEDS to watch to get the answer
+- Specific details: "72 hours" beats "a long time", "broke" beats "low budget"
+- Human voice: sounds like a real person, not a news headline
+- Emotional pull: makes them feel something before they even click
 
-RULES:
-- Titles: specific not generic. Bad: "My morning routine". Good: "I wake up at 4am broke and this changed everything"
-- Hooks: spoken words, first sentence only, creates immediate curiosity or pattern interrupt
-- Never use: "game-changer", "life-changing", "you won't believe"
+GREAT TITLE EXAMPLES (study these):
+- "I animated this for 3 months and almost quit"
+- "POV: you finished it at 3am and nobody knows yet"
+- "I gave myself 72 hours to finish this or I delete everything"
+- "Nobody told me animation would feel like this"
+- "the fight scene took 600 hours. here is every second of it"
 
-Respond ONLY with valid JSON, no markdown, no extra text:
-{"titles":["title1"],"hooks":["hook1"],"hashtags":["#tag1","#tag2","#tag3","#tag4","#tag5","#tag6"],"caption":"ready to post caption"}`;
+NEVER WRITE LIKE THESE:
+- "Creating a fight scene animation" — describes it like Wikipedia
+- "My animation process" — generic and boring
+- "How to animate characters" — tutorial tone, not creator tone
+- Anything with "game-changer", "life-changing", "you won't believe"
+
+Respond ONLY with valid JSON, no markdown, nothing else:
+{"titles":["title1","title2"],"hashtags":["#tag1","#tag2","#tag3","#tag4","#tag5","#tag6"],"caption":"1-2 sentence ready-to-post caption"}`;
 }
 
 function buildUserMsg(prompt) {
-  return `Video: "${prompt}"\nPlatform: ${platformNames[selectedPlatform]}\nTone: ${selectedTone}\nGenerate ${selectedCount} titles and ${selectedCount} hooks.`;
+  return `Video idea: "${prompt}"
+Platform: ${platformNames[selectedPlatform]}
+Tone: ${selectedTone}
+
+Write exactly ${selectedCount} titles a real creator with 1M+ followers would actually post. Make each one feel different — vary the angle, structure, and emotion.`;
+}
 }
 
 // ── Render ──
