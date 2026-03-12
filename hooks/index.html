@@ -122,6 +122,45 @@ header{display:flex;align-items:center;justify-content:space-between;padding:1.5
 .loader span:nth-child(3){animation-delay:.4s}
 @keyframes pulse{0%,80%,100%{opacity:.2;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
 
+
+/* ── Favorites bar ── */
+.fav-bar{display:none;align-items:center;justify-content:space-between;padding:.8rem 1.2rem;background:var(--bg2);border:1px solid var(--border2);border-radius:4px;margin-bottom:1rem;gap:1rem;}
+.fav-bar.show{display:flex;}
+.fav-bar-left{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--text2);}
+.fav-bar-left span{color:var(--accent);}
+.fav-action{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:1.5px;text-transform:uppercase;padding:.3rem .8rem;border:1px solid var(--border2);border-radius:2px;background:none;color:var(--text2);cursor:pointer;transition:all .15s;}
+.fav-action:hover{border-color:var(--accent);color:var(--accent);}
+.fav-action.primary{border-color:var(--accent);color:var(--accent);}
+.fav-action.primary:hover{background:var(--accent);color:var(--bg);}
+
+/* ── Favorites panel ── */
+.fav-panel{position:fixed;right:0;top:0;height:100vh;width:340px;background:#0d0f14;border-left:1px solid var(--border2);z-index:1000;transform:translateX(100%);transition:transform .3s cubic-bezier(.16,1,.3,1);display:flex;flex-direction:column;overflow:hidden;}
+.fav-panel.open{transform:translateX(0);}
+.fav-panel-header{padding:1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.fav-panel-title{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:3px;color:var(--accent);}
+.fav-panel-close{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--text3);background:none;border:1px solid var(--border2);padding:.3rem .7rem;border-radius:2px;cursor:pointer;transition:all .15s;}
+.fav-panel-close:hover{border-color:var(--accent);color:var(--accent);}
+.fav-panel-body{flex:1;overflow-y:auto;padding:1rem;}
+.fav-panel-body::-webkit-scrollbar{width:3px}
+.fav-panel-body::-webkit-scrollbar-thumb{background:var(--border2)}
+.fav-item{background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:.8rem 1rem;margin-bottom:.5rem;display:flex;align-items:flex-start;justify-content:space-between;gap:.8rem;animation:fadeUp .3s ease both;}
+.fav-item-content{flex:1;}
+.fav-item-type{font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:.3rem;}
+.fav-item-text{font-size:.85rem;color:var(--text);line-height:1.4;}
+.fav-item-actions{display:flex;gap:.3rem;flex-shrink:0;}
+.fav-item-btn{font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:1px;text-transform:uppercase;padding:.2rem .5rem;border:1px solid var(--border2);border-radius:2px;background:none;color:var(--text3);cursor:pointer;transition:all .15s;}
+.fav-item-btn:hover{border-color:var(--accent);color:var(--accent);}
+.fav-item-btn.remove:hover{border-color:var(--red);color:var(--red);}
+.fav-panel-empty{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--text3);letter-spacing:2px;text-align:center;padding:3rem 1rem;text-transform:uppercase;line-height:2;}
+.fav-panel-footer{padding:1rem 1.5rem;border-top:1px solid var(--border);display:flex;gap:.6rem;flex-shrink:0;}
+.fav-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;opacity:0;pointer-events:none;transition:opacity .3s;}
+.fav-overlay.show{opacity:1;pointer-events:all;}
+
+/* ── Fav btn on card ── */
+.fav-btn{position:absolute;top:.9rem;right:.9rem;background:none;border:none;cursor:pointer;font-size:1rem;opacity:.25;transition:opacity .2s,transform .2s;padding:.2rem;color:var(--accent);}
+.fav-btn:hover{opacity:.8;transform:scale(1.2);}
+.fav-btn.saved{opacity:1;}
+.hook-card{position:relative;}
 /* ── Results ── */
 #results{margin-top:1.5rem;}
 
@@ -254,8 +293,26 @@ footer{margin-top:5rem;padding:2rem 0 3rem;border-top:1px solid var(--border);di
     <span id="loadingText">Crafting your hook...</span>
   </div>
 
+  <div class="fav-bar" id="favBar">
+    <div class="fav-bar-left">Favorites: <span id="favCount">0</span></div>
+    <div class="fav-bar-right">
+      <button class="fav-action primary" onclick="openFavPanel()">View Favorites ♥</button>
+    </div>
+  </div>
   <div class="error-msg" id="errorMsg"></div>
   <div id="results"></div>
+  <div class="fav-overlay" id="favOverlay" onclick="closeFavPanel()"></div>
+  <div class="fav-panel" id="favPanel">
+    <div class="fav-panel-header">
+      <div class="fav-panel-title">Favorites</div>
+      <button class="fav-panel-close" onclick="closeFavPanel()">✕ Close</button>
+    </div>
+    <div class="fav-panel-body" id="favPanelBody"></div>
+    <div class="fav-panel-footer">
+      <button class="fav-action primary" style="flex:1" onclick="shareFavs()">Share Favorites ↗</button>
+      <button class="fav-action" onclick="clearFavs()">Clear All</button>
+    </div>
+  </div>
   <button class="btn-more" id="btnMore" onclick="generateMore()">↺ Generate New Set</button>
 
   <footer>
@@ -401,33 +458,24 @@ function buildSystemPrompt() {
     twitter: 'X/Twitter: Title is the tweet — max 240 chars, no hashtag spam (max 2). Hook is the opening line that makes people click "read more". Conversational tone.'
   };
 
-  return `You are the world's best content strategist and viral content expert. You understand exactly what makes content stop the scroll on every platform.
-
-Platform: ${platformNames[selectedPlatform]}
-Tone: ${selectedTone}
+  return `You are a viral content strategist. Generate EXACTLY ${selectedCount} titles and EXACTLY ${selectedCount} hooks for ${platformNames[selectedPlatform]} with a ${selectedTone} tone.
 
 ${platformGuides[selectedPlatform]}
 
-Your job: Generate titles, hooks, and hashtags so good that creators feel like they finally understand what was missing.
-
 RULES:
-- Titles must be specific, not generic. "My morning routine" is bad. "I wake up at 4am broke and this changed everything" is good.
-- Hooks are the FIRST LINE spoken or shown — they must create curiosity, pattern interrupt, or emotional reaction
-- Never use cringe buzzwords: "game-changer", "life-changing", "you won't believe"
-- Hashtags must be real and relevant, not random
-- Match the ${selectedTone} tone throughout
+- Be specific not generic. Bad: "My morning routine". Good: "I wake up at 4am broke and this changed everything"
+- Hooks = the very first line spoken or shown, must create immediate curiosity
+- Never use: "game-changer", "life-changing", "you won't believe"
+- Hashtags must be real and relevant
 
-Respond ONLY with valid JSON, no other text:
-{
-  "titles": [exactly selectedCount titles],
-  "hooks": [exactly selectedCount hooks],
-  "hashtags": ["#tag1", "#tag2", ...up to 12 tags],
-  "caption": "A ready-to-post caption combining the best title + hook in 2-3 sentences"
-}`;
+CRITICAL: You MUST return exactly ${selectedCount} titles and exactly ${selectedCount} hooks, no more no less.
+
+Respond ONLY with valid JSON, no markdown, no extra text:
+{"titles":["title1"],"hooks":["hook1"],"hashtags":["#tag1","#tag2","#tag3","#tag4","#tag5","#tag6"],"caption":"ready to post caption"}`;
 }
 
 function buildUserMsg(prompt) {
-  return `Video idea: "${prompt}"\n\nPlatform: ${platformNames[selectedPlatform]}\nTone: ${selectedTone}\n\nGenerate the titles, hooks, hashtags and caption.`;
+  return `Video: "${prompt}"\nPlatform: ${platformNames[selectedPlatform]}\nTone: ${selectedTone}\nGenerate EXACTLY ${selectedCount} titles and EXACTLY ${selectedCount} hooks.`;
 }
 
 // ── Render ──
@@ -435,7 +483,7 @@ function renderResults(data) {
   const container = document.getElementById('results');
   const platform = platformNames[selectedPlatform];
 
-  container.innerHTML = `<div class="results-header"><div class="results-label">Generated for</div><div class="results-platform">${platform}</div></div>`;
+  container.innerHTML = `<div class="results-header"><div class="results-label">Generated for</div><div style="display:flex;align-items:center;gap:1rem"><button onclick="shareResults()" style="font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:1.5px;text-transform:uppercase;padding:.25rem .7rem;border:1px solid var(--border2);border-radius:2px;background:none;color:var(--text3);cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text3)'">Share ↗</button><div class="results-platform">${platform}</div></div></div>`;
 
   // Titles
   if (data.titles?.length) {
@@ -476,19 +524,77 @@ function makeCard(type, label, content, typeClass) {
   card.className = 'hook-card';
   const delay = {title: 0, hook: 0.15, caption: 0.35}[type] || 0;
   card.style.animationDelay = delay + 's';
-  card.innerHTML = `<div class="card-type ${typeClass}">${label}</div><div class="card-content">${content}</div><div class="card-copy">click to copy</div>`;
+  const item = { type, label, content };
+  const isFaved = getFavs().some(f => f.content === content);
+  card.innerHTML = `<button class="fav-btn ${isFaved ? 'saved' : ''}" title="Save to favorites">♥</button><div class="card-type ${typeClass}">${label}</div><div class="card-content">${content}</div><div class="card-copy">click to copy</div>`;
+  card.querySelector('.fav-btn').addEventListener('click', e => { e.stopPropagation(); toggleFav(card, item); });
   card.addEventListener('click', () => {
     navigator.clipboard.writeText(content).then(() => {
       card.classList.add('copied');
       card.querySelector('.card-copy').textContent = '✓ copied!';
-      setTimeout(() => {
-        card.classList.remove('copied');
-        card.querySelector('.card-copy').textContent = 'click to copy';
-      }, 2000);
+      setTimeout(() => { card.classList.remove('copied'); card.querySelector('.card-copy').textContent = 'click to copy'; }, 2000);
     });
   });
   return card;
 }
+
+// ── Favorites ──
+function getFavs() { try { return JSON.parse(localStorage.getItem('phraselix_hook_favs') || '[]'); } catch { return []; } }
+function saveFavs(favs) { localStorage.setItem('phraselix_hook_favs', JSON.stringify(favs)); updateFavBar(); }
+function toggleFav(card, item) {
+  let favs = getFavs();
+  const idx = favs.findIndex(f => f.content === item.content);
+  const btn = card.querySelector('.fav-btn');
+  if (idx > -1) { favs.splice(idx, 1); btn.classList.remove('saved'); showToast('Removed from favorites'); }
+  else { favs.push(item); btn.classList.add('saved'); showToast('Saved to favorites ♥'); }
+  saveFavs(favs);
+}
+function clearFavs() { saveFavs([]); document.querySelectorAll('.fav-btn').forEach(b => b.classList.remove('saved')); showToast('Favorites cleared'); }
+function updateFavBar() {
+  const favs = getFavs();
+  document.getElementById('favCount').textContent = favs.length;
+  document.getElementById('favBar').classList.toggle('show', favs.length > 0);
+  if (document.getElementById('favPanel').classList.contains('open')) renderFavPanel();
+}
+function openFavPanel() { renderFavPanel(); document.getElementById('favPanel').classList.add('open'); document.getElementById('favOverlay').classList.add('show'); }
+function closeFavPanel() { document.getElementById('favPanel').classList.remove('open'); document.getElementById('favOverlay').classList.remove('show'); }
+function renderFavPanel() {
+  const favs = getFavs();
+  const body = document.getElementById('favPanelBody');
+  if (!favs.length) { body.innerHTML = '<div class="fav-panel-empty">No favorites yet.<br>Hit ♥ on any card<br>to save it here.</div>'; return; }
+  body.innerHTML = '';
+  favs.forEach(item => {
+    const el = document.createElement('div');
+    el.className = 'fav-item';
+    el.innerHTML = `<div class="fav-item-content"><div class="fav-item-type">${item.label || item.type}</div><div class="fav-item-text">${item.content}</div></div><div class="fav-item-actions"><button class="fav-item-btn" onclick="copyToClipboard('${item.content.replace(/'/g,"\'")}',this)">Copy</button><button class="fav-item-btn remove" onclick="removeFavFromPanel('${item.content.replace(/'/g,"\'")}')">✕</button></div>`;
+    body.appendChild(el);
+  });
+}
+function removeFavFromPanel(content) {
+  saveFavs(getFavs().filter(f => f.content !== content));
+  renderFavPanel();
+  document.querySelectorAll('.fav-btn').forEach(btn => {
+    const cardContent = btn.closest('.hook-card')?.querySelector('.card-content')?.textContent;
+    if (cardContent === content) btn.classList.remove('saved');
+  });
+}
+function copyToClipboard(text, btn) {
+  navigator.clipboard.writeText(text).then(() => { const o = btn.textContent; btn.textContent = '✓'; setTimeout(() => btn.textContent = o, 1500); });
+}
+function shareResults() {
+  const cards = [...document.querySelectorAll('.card-content')].map(c => c.textContent).slice(0, 6);
+  if (!cards.length) return;
+  const url = window.location.origin + window.location.pathname + '?shared=' + encodeURIComponent(cards.join('|||'));
+  navigator.clipboard.writeText(url).then(() => showToast('Link copied — share it!'));
+}
+function shareFavs() {
+  const favs = getFavs();
+  if (!favs.length) return;
+  const url = window.location.origin + window.location.pathname + '?shared=' + encodeURIComponent(favs.map(f => f.content).join('|||'));
+  navigator.clipboard.writeText(url).then(() => showToast('Link copied — share it!'));
+}
+
+updateFavBar();
 
 function copyTag(el, tag) {
   navigator.clipboard.writeText(tag).then(() => {
