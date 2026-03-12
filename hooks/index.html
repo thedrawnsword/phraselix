@@ -467,13 +467,13 @@ function buildSystemPrompt() {
   };
 
   const platformRules = {
-    tiktok: `TIKTOK RULES: Max 60 chars. Use "POV:", "the way...", "telling my..." formats. Raw and unfiltered wins. Lowercase feels more human. No hashtags in the title itself.`,
+    tiktok: `TIKTOK RULES: Max 60 chars. Raw and unfiltered wins. Lowercase feels more human. No hashtags in title itself. Sound like you're texting your group chat.`,
     instagram: `INSTAGRAM REELS RULES: Punchy opener that works as caption AND title. 1 line max. Emoji optional but only if it adds meaning. Relatable over polished.`,
     youtube: `YOUTUBE RULES: 50-70 chars. Front-load the keyword. Numbers and brackets boost CTR — e.g. "[HONEST]", "(I almost quit)". Active verbs. "I survived" beats "I spent". Stakes must feel real.`,
     twitter: `X/TWITTER RULES: The title IS the tweet. Max 240 chars but shorter wins. Conversational. 1-2 hashtags MAX. Leave an open loop that forces people to click "read more".`
   };
 
-  return `You are the best title writer on the internet. You've studied MrBeast's leaked playbook, gone viral on TikTok, and grown YouTube channels to millions. You write titles that create an ITCH people can only scratch by clicking.
+  return `You are the best title writer on the internet. You write titles that make people stop scrolling and need to click.
 
 Platform: ${platformNames[selectedPlatform]}
 Tone: ${selectedTone}
@@ -481,29 +481,32 @@ Tone: ${selectedTone}
 ${platformRules[selectedPlatform]}
 ${toneGuides[selectedTone]}
 
-THE SCIENCE OF CLICK-WORTHY TITLES:
-1. CURIOSITY GAP — The title hints at something interesting but doesn't give it away. "I animated this for 3 months" is good. "I animated this for 3 months and almost deleted everything" is better — now they HAVE to know what happened.
-2. EXTREME LANGUAGE — "I survived" beats "I spent". "Broke me" beats "was hard". "Nobody told me" beats "I learned". Always use the most emotionally charged version.
-3. SPECIFICITY — "72 hours" not "a long time". "Frame 847" not "one scene". Numbers make it real.
-4. HUMAN VOICE — Sounds like a real person texting, not a journalist writing a headline. Lowercase often helps on TikTok.
-5. OPEN LOOP — End the title in a way that creates a question in their head. Don't resolve the tension — leave it open.
+CRITICAL RULE — WRITE ABOUT THE VIDEO, NOT A POV OF THE VIEWER:
+The title must be FROM THE CREATOR about their video. NOT a "POV:" format unless the user's video is literally a POV video.
+- WRONG: "POV: you watch two characters fight" — this is describing watching the video
+- WRONG: "POV: you're animating at 3am" — this is a viewer POV, not about the video
+- RIGHT: "I animated two characters fighting for 3 months" — this is FROM the creator
+- RIGHT: "nobody told me animating fights would take THIS long" — creator voice
+- RIGHT: "this fight scene almost made me quit animation" — creator stakes
 
-GREAT TITLE FORMULAS THAT ACTUALLY WORK:
-- "[Time] + [thing] + [unexpected emotional outcome]" → "72 hours on one fight scene and it nearly broke me"
-- "POV: [relatable moment]" → "POV: you finish the animation at 4am and nobody's awake to see it"
-- "I [extreme verb] [thing] [twist]" → "I deleted 3 months of work and started over"  
+The title should answer: "What is the CREATOR telling me about THEIR video?" — not "what is the viewer experiencing?"
+
+MORE GREAT FORMULAS:
+- "I [extreme verb] [thing] [twist]" → "I almost deleted 3 months of animation work"
 - "[Number] + [thing] + [curiosity hook]" → "600 frames. one punch. here's why it took 2 weeks"
-- "Nobody told me [truth]" → "Nobody told me 2D animation would feel like THIS"
+- "Nobody told me [truth]" → "Nobody told me 2D animation fights take this long"
 - "Stop [doing thing]" → "Stop animating fight scenes until you watch this"
+- "[Time] on [specific thing]" → "72 hours on a 4-second fight scene"
+- "[Thing] + [unexpected result]" → "I animated two characters fighting and it broke my brain"
 
 NEVER WRITE:
-- Describing the video like a Wikipedia article ("Creating a fight scene animation")
-- Generic titles ("My animation process", "How I make videos")  
+- Describing the video like Wikipedia ("Creating a fight scene animation", "Two characters in combat")
+- Generic titles ("My animation process", "How I make videos")
+- POV format UNLESS the video is literally a POV video
 - Fake hype ("This will CHANGE YOUR LIFE", "INSANE results")
-- Solved tension (don't give away the ending or the answer in the title)
 
 Respond ONLY with valid JSON, nothing else, no markdown:
-{"titles":["title1","title2"],"hashtags":["#tag1","#tag2","#tag3","#tag4","#tag5","#tag6"],"caption":"1-2 sentence ready-to-post caption that adds context to the best title. Sounds human, not corporate."}`;
+{"titles":["title1","title2"],"hashtags":["#tag1","#tag2","#tag3","#tag4","#tag5","#tag6"],"caption":"1-2 sentence ready-to-post caption that sounds like a real human wrote it."}`;
 }
 
 function buildUserMsg(prompt) {
@@ -511,248 +514,7 @@ function buildUserMsg(prompt) {
 Platform: ${platformNames[selectedPlatform]}
 Tone: ${selectedTone}
 
-Write exactly ${selectedCount} titles. Each one must use a DIFFERENT formula and angle — don't repeat the same structure. Make them compete with each other so the creator has real choices.`;
-}
-// ── Render ──
-function renderResults(data) {
-  const container = document.getElementById('results');
-  const platform = platformNames[selectedPlatform];
-
-  container.innerHTML = `<div class="results-header"><div class="results-label">Generated for</div><div style="display:flex;align-items:center;gap:1rem"><button onclick="shareResults()" style="font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:1.5px;text-transform:uppercase;padding:.25rem .7rem;border:1px solid var(--border2);border-radius:2px;background:none;color:var(--text3);cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text3)'">Share ↗</button><div class="results-platform">${platform}</div></div></div>`;
-
-  // Titles
-  if (data.titles?.length) {
-    const toneLabel = selectedTone.charAt(0).toUpperCase() + selectedTone.slice(1);
-    data.titles.slice(0, selectedCount).forEach((title, i) => {
-      container.appendChild(makeCard('title', `${toneLabel} Title ${i + 1}`, title, 'type-title'));
-    });
-  }
-
-  // Hashtags
-  if (data.hashtags?.length) {
-    const card = document.createElement('div');
-    card.className = 'hook-card';
-    card.style.animationDelay = '0.3s';
-    card.innerHTML = `
-      <div class="card-type type-tags">Hashtags</div>
-      <div class="tags-wrap">${data.hashtags.map(t => `<span class="tag-pill" onclick="copyTag(this,'${t}')">${t}</span>`).join('')}</div>
-      <div class="card-copy" id="tagsCopy">click a tag to copy it</div>`;
-    container.appendChild(card);
-  }
-
-  // Caption
-  if (data.caption) {
-    container.appendChild(makeCard('caption', 'Ready-to-post Caption', data.caption, 'type-caption'));
-  }
-}
-
-function makeCard(type, label, content, typeClass) {
-  const card = document.createElement('div');
-  card.className = 'hook-card';
-  const delay = {title: 0, hook: 0.15, caption: 0.35}[type] || 0;
-  card.style.animationDelay = delay + 's';
-  const item = { type, label, content };
-  const isFaved = getFavs().some(f => f.content === content);
-  card.innerHTML = `<button class="fav-btn ${isFaved ? 'saved' : ''}" title="Save to favorites">♥</button><div class="card-type ${typeClass}">${label}</div><div class="card-content">${content}</div><div class="card-copy">click to copy</div>`;
-  card.querySelector('.fav-btn').addEventListener('click', e => { e.stopPropagation(); toggleFav(card, item); });
-  card.addEventListener('click', () => {
-    navigator.clipboard.writeText(content).then(() => {
-      card.classList.add('copied');
-      card.querySelector('.card-copy').textContent = '✓ copied!';
-      setTimeout(() => { card.classList.remove('copied'); card.querySelector('.card-copy').textContent = 'click to copy'; }, 2000);
-    });
-  });
-  return card;
-}
-
-// ── Favorites ──
-function getFavs() { try { return JSON.parse(localStorage.getItem('phraselix_hook_favs') || '[]'); } catch { return []; } }
-function saveFavs(favs) { localStorage.setItem('phraselix_hook_favs', JSON.stringify(favs)); updateFavBar(); }
-function toggleFav(card, item) {
-  let favs = getFavs();
-  const idx = favs.findIndex(f => f.content === item.content);
-  const btn = card.querySelector('.fav-btn');
-  if (idx > -1) { favs.splice(idx, 1); btn.classList.remove('saved'); showToast('Removed from favorites'); }
-  else { favs.push(item); btn.classList.add('saved'); showToast('Saved to favorites ♥'); }
-  saveFavs(favs);
-}
-function clearFavs() { saveFavs([]); document.querySelectorAll('.fav-btn').forEach(b => b.classList.remove('saved')); showToast('Favorites cleared'); }
-function updateFavBar() {
-  const favs = getFavs();
-  document.getElementById('favCount').textContent = favs.length;
-  document.getElementById('favBar').classList.toggle('show', favs.length > 0);
-  if (document.getElementById('favPanel').classList.contains('open')) renderFavPanel();
-}
-function openFavPanel() { renderFavPanel(); document.getElementById('favPanel').classList.add('open'); document.getElementById('favOverlay').classList.add('show'); }
-function closeFavPanel() { document.getElementById('favPanel').classList.remove('open'); document.getElementById('favOverlay').classList.remove('show'); }
-function renderFavPanel() {
-  const favs = getFavs();
-  const body = document.getElementById('favPanelBody');
-  if (!favs.length) { body.innerHTML = '<div class="fav-panel-empty">No favorites yet.<br>Hit ♥ on any card<br>to save it here.</div>'; return; }
-  body.innerHTML = '';
-  favs.forEach(item => {
-    const el = document.createElement('div');
-    el.className = 'fav-item';
-    el.innerHTML = `<div class="fav-item-content"><div class="fav-item-type">${item.label || item.type}</div><div class="fav-item-text">${item.content}</div></div><div class="fav-item-actions"><button class="fav-item-btn" onclick="copyToClipboard('${item.content.replace(/'/g,"\'")}',this)">Copy</button><button class="fav-item-btn remove" onclick="removeFavFromPanel('${item.content.replace(/'/g,"\'")}')">✕</button></div>`;
-    body.appendChild(el);
-  });
-}
-function removeFavFromPanel(content) {
-  saveFavs(getFavs().filter(f => f.content !== content));
-  renderFavPanel();
-  document.querySelectorAll('.fav-btn').forEach(btn => {
-    const cardContent = btn.closest('.hook-card')?.querySelector('.card-content')?.textContent;
-    if (cardContent === content) btn.classList.remove('saved');
-  });
-}
-function copyToClipboard(text, btn) {
-  navigator.clipboard.writeText(text).then(() => { const o = btn.textContent; btn.textContent = '✓'; setTimeout(() => btn.textContent = o, 1500); });
-}
-function shareResults() {
-  const cards = [...document.querySelectorAll('.card-content')].map(c => c.textContent).slice(0, 6);
-  if (!cards.length) return;
-  const url = window.location.origin + window.location.pathname + '?shared=' + encodeURIComponent(cards.join('|||'));
-  navigator.clipboard.writeText(url).then(() => showToast('Link copied — share it!'));
-}
-function shareFavs() {
-  const favs = getFavs();
-  if (!favs.length) return;
-  const url = window.location.origin + window.location.pathname + '?shared=' + encodeURIComponent(favs.map(f => f.content).join('|||'));
-  navigator.clipboard.writeText(url).then(() => showToast('Link copied — share it!'));
-}
-
-updateFavBar();
-
-function copyTag(el, tag) {
-  navigator.clipboard.writeText(tag).then(() => {
-    el.style.background = 'rgba(0,245,212,.25)';
-    showToast(tag + ' copied!');
-    setTimeout(() => el.style.background = '', 1500);
-  });
-}
-
-// ── Helpers ──
-function setLoading(state, text = 'Crafting your hook...') {
-  isLoading = state;
-  document.getElementById('loading').classList.toggle('show', state);
-  document.getElementById('loadingText').textContent = text;
-  document.getElementById('btnGenerate').disabled = state;
-}
-function showError(msg) { const el = document.getElementById('errorMsg'); el.textContent = msg; el.classList.add('show'); }
-function hideError() { document.getElementById('errorMsg').classList.remove('show'); }
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2000);
-}
-
-// ── Custom cursor ──
-const cursor = document.getElementById('cursor');
-const ring = document.getElementById('cursorRing');
-let mx = 0, my = 0, rx = 0, ry = 0;
-document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; cursor.style.left = mx + 'px'; cursor.style.top = my + 'px'; });
-function animRing() { rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12; ring.style.left = rx + 'px'; ring.style.top = ry + 'px'; requestAnimationFrame(animRing); }
-animRing();
-document.querySelectorAll('a,button,.hook-card,.tag-pill').forEach(el => {
-  el.addEventListener('mouseenter', () => { ring.style.width = '48px'; ring.style.height = '48px'; ring.style.borderColor = 'rgba(232,255,71,.6)'; });
-  el.addEventListener('mouseleave', () => { ring.style.width = '32px'; ring.style.height = '32px'; ring.style.borderColor = 'rgba(232,255,71,.3)'; });
-});
-
-// ── Touch ripple ──
-document.addEventListener('touchstart', e => {
-  const touch = e.touches[0];
-  const ripple = document.createElement('div');
-  ripple.className = 'ripple';
-  ripple.style.left = touch.clientX + 'px';
-  ripple.style.top = touch.clientY + 'px';
-  document.body.appendChild(ripple);
-  setTimeout(() => ripple.remove(), 500);
-}, { passive: true });
-
-document.addEventListener('touchstart', e => {
-  const card = e.target.closest('.hook-card');
-  if (card) {
-    card.style.transition = 'transform .1s, background .1s';
-    card.style.transform = 'scale(.98)';
-    setTimeout(() => card.style.transform = '', 150);
-  }
-}, { passive: true });
-</script>
-<script defer src="/_vercel/insights/script.js"></script>
-</body>
-</html>  const toneGuides = {
-    viral: `VIRAL TONE — trigger curiosity gaps and FOMO:
-- Use time pressure: "I spent X hours/days/months on this"
-- Open loops: "here's what happened", "it didn't go as planned"
-- Specificity beats vague: "72 hours" not "a long time"
-- POV format works well: "POV: you just finished your first animation"
-- Examples: "I gave myself 7 days to finish this or I delete it", "nobody told me it would feel like this", "I animated this for 3 months straight"`,
-
-    funny: `FUNNY TONE — make it absurd, self-aware, or relatable comedy:
-- Lean into the irony or stupidity of the situation
-- Exaggerate for comedic effect
-- Self-deprecating humor works huge
-- Examples: "I tried to animate a fight scene and made a potato war", "bro spent 40 hours on a 3 second clip", "my animation looks like it was made in 2003 and I'm proud of it"
-- NEVER make it try-hard — funny titles should feel effortless`,
-
-    emotional: `EMOTIONAL TONE — but match the emotion to the CONTENT TYPE:
-- For action/fighting content: pride, grind, tension, accomplishment — NOT sadness
-- For personal vlogs: vulnerability, growth, honest reflection
-- For art/animation: the process struggle, the breakthrough moment
-- Examples for action: "the moment it finally looked RIGHT", "3 months of work came down to this one frame"
-- Examples for personal: "I almost gave up before this happened"
-- NEVER: "I cried when it was done" for a fight scene — that's the wrong emotion`,
-
-    informative: `INFORMATIVE TONE — front-load the value, be searchable:
-- Lead with the keyword/topic
-- Promise a specific outcome or insight
-- Use numbers and brackets: "5 things", "[beginner guide]", "(no experience needed)"
-- Examples: "How I animated a full fight scene in 7 days [step by step]", "5 animation mistakes I made so you don't have to", "the exact process behind this fight scene"`,
-
-    controversial: `CONTROVERSIAL TONE — challenge opinions, spark debate:
-- Take a strong stance people will react to
-- "Stop doing X", "Nobody talks about Y", "The truth about Z"
-- Create two sides: people who agree AND disagree both click
-- Examples: "Stop making smooth animations. Nobody watches them.", "This is why 90% of fight animations look bad", "Hand-drawn will always beat AI. I'll die on this hill."`
-  };
-
-  return `You are a world-class content title writer who has studied what makes creators grow to millions of followers. You understand that the RIGHT title formula depends on BOTH the platform AND the tone — they work together.
-
-Platform: ${platformNames[selectedPlatform]}
-Tone: ${selectedTone}
-
-${platformGuides[selectedPlatform]}
-
-TONE RULES FOR THIS TITLE:
-${toneGuides[selectedTone]}
-
-UNIVERSAL RULES (apply to all titles):
-- Sound like a REAL HUMAN CREATOR, not a copywriter or journalist
-- Be specific: use numbers, time, details — never vague generics
-- Create a curiosity gap: the viewer needs to watch to get the answer
-- Never describe the video like a Wikipedia article ("creating a fight scene animation")
-- Never use: "game-changer", "life-changing", "you won't believe", "amazing"
-- Each title should feel DIFFERENT — vary structure, angle, and emotion
-
-WHAT KILLS A TITLE:
-❌ "Creating a brutal fight scene that ends in death" — describes it, no curiosity
-❌ "My animation process" — boring, tells them everything
-❌ "I spent 4 months animating this fight and cried when it was done" — wrong emotion for the content
-✅ "I gave myself 72 hours to finish this fight scene or I quit"
-✅ "Nobody told me animating fights would be THIS hard"
-✅ "POV: you've been working on one fight scene for 3 months"
-
-Respond ONLY with valid JSON, no markdown, nothing else:
-{"titles":["title1","title2"],"hashtags":["#tag1","#tag2","#tag3","#tag4","#tag5","#tag6"],"caption":"1-2 sentence ready-to-post caption that feels human"}`;
-}
-
-function buildUserMsg(prompt) {
-  return `Video idea: "${prompt}"
-Platform: ${platformNames[selectedPlatform]}
-Tone: ${selectedTone}
-
-Write exactly ${selectedCount} titles. Each one should use a DIFFERENT angle, structure, or emotional trigger. Make them feel like something a real creator with 500k+ followers would actually post — not what an AI thinks sounds good.`;
+Write exactly ${selectedCount} titles FROM THE CREATOR'S PERSPECTIVE about their own video. Each title must use a completely DIFFERENT formula — vary the angle, structure, and emotion. No POV format unless the video itself is a POV.`;
 }
 // ── Render ──
 function renderResults(data) {
