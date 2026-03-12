@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Phraselix — Hook Generator</title>
+<title>Phraselix — Title Generator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -235,8 +235,8 @@ footer{margin-top:5rem;padding:2rem 0 3rem;border-top:1px solid var(--border);di
 
   <section class="hero">
     <div class="hero-eyebrow">Content Tool — 02</div>
-    <h1 class="hero-title">STOP POSTING<br><span>BORING</span> CONTENT</h1>
-    <p class="hero-sub">Describe your video. Get scroll-stopping titles, hooks, and hashtags that actually work.</p>
+    <h1 class="hero-title">TITLES THAT<br>STOP THE <span>SCROLL</span></h1>
+    <p class="hero-sub">Describe your video. Get scroll-stopping titles and hashtags that people actually click.</p>
   </section>
 
   <!-- Platform -->
@@ -285,7 +285,7 @@ footer{margin-top:5rem;padding:2rem 0 3rem;border-top:1px solid var(--border);di
 
     <!-- Generate -->
   <button class="btn-generate" id="btnGenerate" onclick="generate()">
-    <span>⚡ Generate Hook</span>
+    <span>⚡ Generate Titles</span>
   </button>
 
   <div class="loading" id="loading">
@@ -313,11 +313,11 @@ footer{margin-top:5rem;padding:2rem 0 3rem;border-top:1px solid var(--border);di
       <button class="fav-action" onclick="clearFavs()">Clear All</button>
     </div>
   </div>
-  <button class="btn-more" id="btnMore" onclick="generateMore()">↺ Generate New Set</button>
+  <button class="btn-more" id="btnMore" onclick="generateMore()">↺ Generate New Titles</button>
 
   <footer>
     <span class="footer-text">Phraselix — Content Tools</span>
-    <span class="footer-text">Hook Generator</span>
+    <span class="footer-text">Title Generator</span>
   </footer>
 </div>
 
@@ -417,7 +417,7 @@ async function generate() {
   if (!prompt) { document.getElementById('prompt').focus(); return; }
   if (isLoading) return;
 
-  setLoading(true, 'Crafting your hook...');
+  setLoading(true, 'Crafting your titles...');
   hideError();
   document.getElementById('results').innerHTML = '';
   document.getElementById('btnMore').style.display = 'none';
@@ -437,7 +437,7 @@ async function generate() {
 async function generateMore() {
   const prompt = document.getElementById('prompt').value.trim();
   if (!prompt || isLoading) return;
-  setLoading(true, 'Generating fresh hooks...');
+  setLoading(true, 'Generating fresh titles...');
   hideError();
   document.getElementById('results').innerHTML = '';
   try {
@@ -458,24 +458,27 @@ function buildSystemPrompt() {
     twitter: 'X/Twitter: Title is the tweet — max 240 chars, no hashtag spam (max 2). Hook is the opening line that makes people click "read more". Conversational tone.'
   };
 
-  return `You are a viral content strategist. Generate EXACTLY ${selectedCount} titles and EXACTLY ${selectedCount} hooks for ${platformNames[selectedPlatform]} with a ${selectedTone} tone.
+  return `You are a viral content strategist for ${platformNames[selectedPlatform]}.
+
+DEFINITIONS (these are different things):
+- TITLE = the video title / caption text the viewer reads before clicking. Short, punchy, intriguing.
+- HOOK = the first spoken sentence in the video itself — what the creator SAYS out loud in the first 2 seconds to stop people from scrolling.
 
 ${platformGuides[selectedPlatform]}
 
-RULES:
-- Be specific not generic. Bad: "My morning routine". Good: "I wake up at 4am broke and this changed everything"
-- Hooks = the very first line spoken or shown, must create immediate curiosity
-- Never use: "game-changer", "life-changing", "you won't believe"
-- Hashtags must be real and relevant
+Tone: ${selectedTone}
 
-CRITICAL: You MUST return exactly ${selectedCount} titles and exactly ${selectedCount} hooks, no more no less.
+RULES:
+- Titles: specific not generic. Bad: "My morning routine". Good: "I wake up at 4am broke and this changed everything"
+- Hooks: spoken words, first sentence only, creates immediate curiosity or pattern interrupt
+- Never use: "game-changer", "life-changing", "you won't believe"
 
 Respond ONLY with valid JSON, no markdown, no extra text:
 {"titles":["title1"],"hooks":["hook1"],"hashtags":["#tag1","#tag2","#tag3","#tag4","#tag5","#tag6"],"caption":"ready to post caption"}`;
 }
 
 function buildUserMsg(prompt) {
-  return `Video: "${prompt}"\nPlatform: ${platformNames[selectedPlatform]}\nTone: ${selectedTone}\nGenerate EXACTLY ${selectedCount} titles and EXACTLY ${selectedCount} hooks.`;
+  return `Video: "${prompt}"\nPlatform: ${platformNames[selectedPlatform]}\nTone: ${selectedTone}\nGenerate ${selectedCount} titles and ${selectedCount} hooks.`;
 }
 
 // ── Render ──
@@ -487,17 +490,9 @@ function renderResults(data) {
 
   // Titles
   if (data.titles?.length) {
-    data.titles.forEach((title, i) => {
-      const toneLabel = selectedTone.charAt(0).toUpperCase() + selectedTone.slice(1);
+    const toneLabel = selectedTone.charAt(0).toUpperCase() + selectedTone.slice(1);
+    data.titles.slice(0, selectedCount).forEach((title, i) => {
       container.appendChild(makeCard('title', `${toneLabel} Title ${i + 1}`, title, 'type-title'));
-    });
-  }
-
-  // Hooks
-  if (data.hooks?.length) {
-    data.hooks.forEach((hook, i) => {
-      const toneLabel = selectedTone.charAt(0).toUpperCase() + selectedTone.slice(1);
-      container.appendChild(makeCard('hook', `${toneLabel} Hook ${i + 1}`, hook, 'type-hook'));
     });
   }
 
