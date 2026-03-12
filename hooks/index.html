@@ -91,6 +91,19 @@ header{display:flex;align-items:center;justify-content:space-between;padding:1.5
 .option-pill:hover{border-color:var(--accent);color:var(--accent);}
 .option-pill.active{background:rgba(232,255,71,.08);border-color:var(--accent);color:var(--accent);}
 
+
+/* ── Count picker ── */
+.count-section{margin:.8rem 0 1.2rem;}
+.count-hint{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:.7rem;}
+.count-row{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;}
+.count-btn{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:1px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border2);border-radius:3px;background:transparent;color:var(--text2);cursor:pointer;transition:all .15s;user-select:none;}
+.count-btn:hover{border-color:var(--accent);color:var(--accent);}
+.count-btn.active{background:var(--accent);color:var(--bg);border-color:var(--accent);font-weight:700;}
+.count-btn.locked{opacity:.3;cursor:not-allowed;}
+.count-btn.locked:hover{border-color:var(--border2);color:var(--text2);}
+.count-locked-tip{font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-top:.5rem;display:none;}
+.count-locked-tip.show{display:block;}
+@media(max-width:600px){.count-btn{width:28px;height:28px;font-size:.85rem;}.count-row{gap:.25rem;}}
 /* ── Generate button ── */
 .btn-generate{width:100%;padding:1.1rem;background:var(--accent);border:none;border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:3px;color:var(--bg);cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
 .btn-generate::before{content:'';position:absolute;inset:0;background:var(--accent2);opacity:0;transition:opacity .3s;}
@@ -219,7 +232,19 @@ footer{margin-top:5rem;padding:2rem 0 3rem;border-top:1px solid var(--border);di
     <button class="option-pill" data-tone="controversial">Controversial</button>
   </div>
 
-  <!-- Generate -->
+  <div class="count-section">
+    <div class="count-hint">How many results — pick a number</div>
+    <div class="count-row">
+      <button class="count-btn" data-count="1">1</button>
+      <button class="count-btn" data-count="2">2</button>
+      <button class="count-btn active" data-count="3">3</button>
+      <button class="count-btn locked" data-count="4">4</button>
+      <button class="count-btn locked" data-count="5">5</button>
+    </div>
+    <div class="count-locked-tip" id="countLockedTip">✦ More results coming with premium — soon</div>
+  </div>
+
+    <!-- Generate -->
   <button class="btn-generate" id="btnGenerate" onclick="generate()">
     <span>⚡ Generate Hook</span>
   </button>
@@ -240,6 +265,22 @@ footer{margin-top:5rem;padding:2rem 0 3rem;border-top:1px solid var(--border);di
 </div>
 
 <script>
+
+// ── Count picker ──
+let selectedCount = 3;
+document.querySelectorAll('.count-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (btn.classList.contains('locked')) {
+      document.getElementById('countLockedTip').classList.add('show');
+      setTimeout(() => document.getElementById('countLockedTip').classList.remove('show'), 2500);
+      return;
+    }
+    document.querySelectorAll('.count-btn:not(.locked)').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedCount = parseInt(btn.dataset.count);
+  });
+});
+
 // ── State ──
 let selectedPlatform = 'tiktok';
 let selectedTone = 'viral';
@@ -378,8 +419,8 @@ RULES:
 
 Respond ONLY with valid JSON, no other text:
 {
-  "titles": ["title1", "title2", "title3"],
-  "hooks": ["hook1", "hook2", "hook3"],
+  "titles": [exactly selectedCount titles],
+  "hooks": [exactly selectedCount hooks],
   "hashtags": ["#tag1", "#tag2", ...up to 12 tags],
   "caption": "A ready-to-post caption combining the best title + hook in 2-3 sentences"
 }`;
@@ -399,14 +440,16 @@ function renderResults(data) {
   // Titles
   if (data.titles?.length) {
     data.titles.forEach((title, i) => {
-      container.appendChild(makeCard('title', `Title ${i + 1}`, title, 'type-title'));
+      const toneLabel = selectedTone.charAt(0).toUpperCase() + selectedTone.slice(1);
+      container.appendChild(makeCard('title', `${toneLabel} Title ${i + 1}`, title, 'type-title'));
     });
   }
 
   // Hooks
   if (data.hooks?.length) {
     data.hooks.forEach((hook, i) => {
-      container.appendChild(makeCard('hook', `Hook ${i + 1}`, hook, 'type-hook'));
+      const toneLabel = selectedTone.charAt(0).toUpperCase() + selectedTone.slice(1);
+      container.appendChild(makeCard('hook', `${toneLabel} Hook ${i + 1}`, hook, 'type-hook'));
     });
   }
 
