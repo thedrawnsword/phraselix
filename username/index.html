@@ -90,7 +90,6 @@ textarea::placeholder{color:var(--text3)}
 .style-dark{background:rgba(255,71,87,.1);color:var(--red)}
 .style-abstract{background:rgba(167,139,250,.1);color:var(--purple)}
 
-
 /* ── Count picker ── */
 .count-section{margin:.8rem 0 1.5rem;}
 .count-hint{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:.7rem;}
@@ -120,7 +119,6 @@ textarea::placeholder{color:var(--text3)}
 .fav-action:hover{border-color:var(--accent);color:var(--accent);}
 .fav-action.primary{border-color:var(--accent);color:var(--accent);}
 .fav-action.primary:hover{background:var(--accent);color:var(--bg);}
-
 
 /* ── Favorites Panel ── */
 .fav-panel{position:fixed;right:0;top:0;height:100vh;width:340px;background:#0d0f14;border-left:1px solid var(--border2);z-index:1000;transform:translateX(100%);transition:transform .3s cubic-bezier(.16,1,.3,1);display:flex;flex-direction:column;overflow:hidden;}
@@ -203,7 +201,7 @@ body{cursor:none;}
         <button class="count-btn locked" data-count="9">9</button>
         <button class="count-btn locked" data-count="10">10</button>
       </div>
-      <div class="count-locked-tip" id="countLockedTip">✦ More names coming with premium — soon</div>
+      <div class="count-locked-tip" id="countLockedTip">More names coming with premium — soon</div>
     </div>
 
     <div class="style-section">
@@ -231,11 +229,11 @@ body{cursor:none;}
     <div class="loader"><span></span><span></span><span></span></div>
     <span id="loadingText">Crafting your names...</span>
   </div>
-  <div class="shared-banner" id="sharedBanner">✦ Someone shared these names with you</div>
+  <div class="shared-banner" id="sharedBanner">Shared names via Phraselix</div>
   <div class="fav-bar" id="favBar">
     <div class="fav-bar-left">Favorites: <span id="favCount">0</span></div>
     <div class="fav-bar-right">
-      <button class="fav-action primary" onclick="openFavPanel()">View Favorites ♥</button>
+      <button class="fav-action primary" onclick="openFavPanel()">View Favorites</button>
     </div>
   </div>
   <div class="error-msg" id="errorMsg"></div>
@@ -246,11 +244,11 @@ body{cursor:none;}
   <div class="fav-panel" id="favPanel">
     <div class="fav-panel-header">
       <div class="fav-panel-title">Favorites</div>
-      <button class="fav-panel-close" onclick="closeFavPanel()">✕ Close</button>
+      <button class="fav-panel-close" onclick="closeFavPanel()">Close</button>
     </div>
     <div class="fav-panel-body" id="favPanelBody"></div>
     <div class="fav-panel-footer">
-      <button class="fav-action primary" style="flex:1" onclick="shareFavs()">Share Favorites ↗</button>
+      <button class="fav-action primary" style="flex:1" onclick="shareFavs()">Share Favorites</button>
       <button class="fav-action" onclick="clearFavs()">Clear All</button>
     </div>
   </div>
@@ -323,7 +321,9 @@ function setLoading(state, text='Crafting your names...') {
   document.getElementById('btnMore').disabled = state;
 }
 
-function buildStyleInstruction() {
+// FIX 1: buildStyleInstruction now takes `count` so the distribution math
+// always matches exactly what we ask the model to generate.
+function buildStyleInstruction(count) {
   const defs = {
     short:`SHORT & PUNCHY — rules:
   - Maximum 6 characters total. Count every character.
@@ -377,35 +377,50 @@ function buildStyleInstruction() {
   const styles = selectedStyles.size === 0 ? null : [...selectedStyles];
 
   if (!styles) {
-    return `Generate a perfect MIX of all styles — spread evenly across the 10 names:
-  - 2 ultra-short (4-6 chars, single word, no separators) e.g. "vexr", "zael", "noxe"
-  - 2 multi-word (dots/underscores) e.g. "cold.signal", "void_pilot"
-  - 2 coined/invented brand-like words e.g. "veltrox", "phraselix"
-  - 2 dark/mysterious e.g. "null.spectre", "ashen.signal"
-  - 2 abstract/philosophical e.g. "false.horizon", "quiet_theorem"`;
+    // "All Styles" — distribute count across style buckets as evenly as possible
+    const styleKeys = ['short','multi','coined','dark','clean','abstract'];
+    const perStyle = Math.floor(count / styleKeys.length);
+    const extra = count % styleKeys.length;
+    // Build a readable allocation string
+    const alloc = styleKeys.map((s, i) => {
+      const n = perStyle + (i < extra ? 1 : 0);
+      return n > 0 ? `${n} ${labelMap[s]}` : null;
+    }).filter(Boolean).join(', ');
+
+    return `Generate a perfect MIX of all styles — exactly ${count} names total distributed like this: ${alloc}.
+  - Short & Punchy: 4-6 chars, single word, no separators. e.g. "vexr", "zael", "noxe"
+  - Multi-Word: dots/underscores. e.g. "cold.signal", "void_pilot"
+  - Coined: invented brand-like words. e.g. "veltrox", "phraselix"
+  - Dark: e.g. "null.spectre", "ashen.signal"
+  - Clean: e.g. "celo", "forma", "auren"
+  - Abstract: e.g. "false.horizon", "quiet_theorem"`;
   }
 
   if (styles.length === 1) {
-    return `Generate ALL 10 names in this ONE style only:\n\n${defs[styles[0]]}`;
+    return `Generate ALL ${count} names in this ONE style only:\n\n${defs[styles[0]]}`;
   }
 
-  const perStyle = Math.floor(10 / styles.length);
-  const extra = 10 % styles.length;
-  let out = `Generate ONLY these styles — no others. Distribute exactly as shown:\n`;
+  // Multiple styles — distribute count across them
+  const perStyle = Math.floor(count / styles.length);
+  const extra = count % styles.length;
+  let out = `Generate ONLY these styles — no others. Distribute EXACTLY ${count} names as shown:\n`;
   styles.forEach((s, i) => {
     const n = perStyle + (i < extra ? 1 : 0);
-    out += `\n[${labelMap[s].toUpperCase()} — exactly ${n} names]\n${defs[s]}\n`;
+    if (n > 0) {
+      out += `\n[${labelMap[s].toUpperCase()} — exactly ${n} names]\n${defs[s]}\n`;
+    }
   });
   out += `\nDO NOT generate any style not listed above. Every name must match one of the listed styles.`;
   return out;
 }
 
-async function generateNames(userPrompt) {
-  const styleInstruction = buildStyleInstruction();
+async function generateNames(userPrompt, count) {
+  // FIX 1 continued: pass `count` into buildStyleInstruction and into the user message
+  const styleInstruction = buildStyleInstruction(count);
 
   const systemPrompt = `You are Phraselix — the world's most sophisticated AI username generator. Built by linguists, brand designers, poets, and hackers. Your single goal: generate usernames so perfectly crafted that people react with "how is this not taken yet?"
 
-━━━ WHAT MAKES A PERFECT USERNAME ━━━
+WHAT MAKES A PERFECT USERNAME
 
 PHONETIC BEAUTY — The name must sound satisfying when spoken aloud. Consider rhythm, consonant flow, syllable weight. Hard sounds (k, x, v, z) create power. Soft sounds (l, n, m) create elegance. The ending is what people remember — make it land perfectly.
 
@@ -417,7 +432,7 @@ THE "HOW IS THIS NOT TAKEN" FACTOR — The holy grail. Achieved when a name feel
 
 IDENTITY FIT — Each name must feel made specifically for THIS person. Reflect their description non-literally. If someone says "I love philosophy", don't name them "philosopher99". Find what philosophy FEELS like and encode that into a name.
 
-━━━ TECHNIQUES TO USE ━━━
+TECHNIQUES TO USE
 
 PORTMANTEAU — Blend start of one word + end of another. Best with contrasting concepts. e.g. "phrase" + "felix" = "phraselix"
 SUFFIX ELEVATION — Real concept word + brand suffix (-ix, -ex, -yr, -on, -ara, -ine, -yx). Transforms common into original.
@@ -427,7 +442,7 @@ LINGUISTIC BORROWING — Latin, Greek, Japanese, Arabic, Norse word related to t
 PHRASE COMPRESSION — Compress a whole phrase's meaning into one coined word. Or fragment a phrase and keep the most evocative part.
 INVERSION — Flip the expected. "signal_found" becomes "signal.lost". "bright_mind" becomes "hollow.bright".
 
-━━━ ABSOLUTE FORBIDDEN LIST ━━━
+ABSOLUTE FORBIDDEN LIST
 
 NEVER generate:
 - Names with numbers (name123, user99, x420)
@@ -436,11 +451,11 @@ NEVER generate:
 - Anything that sounds algorithmically generated with no intention
 - Any of these already used names: ${allNames.slice(-30).join(', ') || 'none yet'}
 
-━━━ STYLE REQUIREMENT — THIS IS THE LAW ━━━
+STYLE REQUIREMENT — THIS IS THE LAW
 
 ${styleInstruction}
 
-━━━ OUTPUT ━━━
+OUTPUT
 
 Respond ONLY with a valid JSON array. No markdown. No explanation. No text before or after. Just raw JSON:
 [
@@ -456,7 +471,11 @@ Respond ONLY with a valid JSON array. No markdown. No explanation. No text befor
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       system: systemPrompt,
-      messages: [{ role: 'user', content: `Generate ${selectedCount} perfect usernames for: "${userPrompt}"\n\nEach name should make them think: "how is this not taken yet?"` }]
+      messages: [{
+        role: 'user',
+        // FIX 1 continued: user message now uses the correct `count` variable
+        content: `Generate exactly ${count} perfect usernames for: "${userPrompt}"\n\nEach name should make them think: "how is this not taken yet?"`
+      }]
     })
   });
 
@@ -475,14 +494,14 @@ function styleDisplay(s) {
 function copyName(card, name) {
   navigator.clipboard.writeText(name).then(() => {
     card.classList.add('copied');
-    card.querySelector('.copy-hint').textContent = '✓ copied!';
+    card.querySelector('.copy-hint').textContent = 'copied!';
     setTimeout(() => { card.classList.remove('copied'); card.querySelector('.copy-hint').textContent = 'click to copy'; }, 2000);
   });
 }
 function renderNames(names, append = false) {
   const container = document.getElementById('results');
   if (!append) {
-    container.innerHTML = `<div class="results-header"><div class="results-label">Generated Names</div><div style="display:flex;align-items:center;gap:1rem"><button onclick="shareResults()" style="font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:1.5px;text-transform:uppercase;padding:.25rem .7rem;border:1px solid var(--border2);border-radius:2px;background:none;color:var(--text3);cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text3)'">Share ↗</button><div class="results-count" id="nameCount">0 names</div></div></div><div class="names-grid" id="namesGrid"></div>`;
+    container.innerHTML = `<div class="results-header"><div class="results-label">Generated Names</div><div style="display:flex;align-items:center;gap:1rem"><button onclick="shareResults()" style="font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:1.5px;text-transform:uppercase;padding:.25rem .7rem;border:1px solid var(--border2);border-radius:2px;background:none;color:var(--text3);cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text3)'">Share</button><div class="results-count" id="nameCount">0 names</div></div></div><div class="names-grid" id="namesGrid"></div>`;
   }
   const grid = document.getElementById('namesGrid');
   names.forEach((item, i) => {
@@ -490,13 +509,12 @@ function renderNames(names, append = false) {
     card.className = 'name-card';
     card.style.animationDelay = `${i * 0.05}s`;
     const isFaved = getFavs().some(f => f.name === item.name);
-    card.innerHTML = `<button class="fav-btn ${isFaved ? 'saved' : ''}" title="Save to favorites">♥</button><div class="name-text">${item.name}</div><span class="name-style ${styleClass(item.style)}">${styleDisplay(item.style)}</span><div class="name-why">${item.why}</div><div class="copy-hint">click to copy</div>`;
+    card.innerHTML = `<button class="fav-btn ${isFaved ? 'saved' : ''}" title="Save to favorites">&#9829;</button><div class="name-text">${item.name}</div><span class="name-style ${styleClass(item.style)}">${styleDisplay(item.style)}</span><div class="name-why">${item.why}</div><div class="copy-hint">click to copy</div>`;
     card.querySelector('.fav-btn').addEventListener('click', (e) => { e.stopPropagation(); toggleFav(card, item); });
     card.addEventListener('click', () => copyName(card, item.name));
-    if (append) grid.insertBefore(card, grid.firstChild);
+    if (append) grid.appendChild(card);
     else grid.appendChild(card);
   });
-  // Count after DOM updates
   setTimeout(() => {
     const countEl = document.getElementById('nameCount');
     if (countEl) countEl.textContent = document.querySelectorAll('.name-card').length + ' names';
@@ -506,33 +524,25 @@ function renderNames(names, append = false) {
 function isBadInput(text) {
   const t = text.toLowerCase().replace(/[^a-z0-9 ]/g, '');
   const banned = [
-    // sexual / adult
     'porn','porno','pornstar','pornhub','onlyfans','only fans','sex','sexy','sexual',
-    'nude','naked','nsfw','xxx','18+','adult','explicit','erotic','hentai',
+    'nude','naked','nsfw','xxx','adult','explicit','erotic','hentai',
     'horny','boob','boobs','tit','tits','dick','cock','pussy','vagina','penis',
     'anal','blowjob','handjob','cumshot','orgasm','fetish','bdsm','kink',
     'stripper','escort','prostitute','hooker','camgirl','webcam model',
-    // cuss
     'fuck','shit','bitch','cunt','asshole','bastard','slut','whore',
     'nigga','nigger','faggot','retard','piss','crap',
-    // violence / hate
     'kill','murder','rape','suicide','terrorist','nazis','nazi','racist','racism',
     'genocide','pedophile','pedo','molest','abuse',
   ];
-  // check exact words and partials
-  for (const word of banned) {
-    if (t.includes(word)) return true;
-  }
-  // check for leet speak / substitutions: p0rn, s3x, etc
+  for (const word of banned) { if (t.includes(word)) return true; }
   const leet = text.toLowerCase()
     .replace(/0/g,'o').replace(/1/g,'i').replace(/3/g,'e')
     .replace(/4/g,'a').replace(/5/g,'s').replace(/8/g,'b')
     .replace(/\$/g,'s').replace(/@/g,'a').replace(/!/g,'i');
-  for (const word of banned) {
-    if (leet.includes(word)) return true;
-  }
+  for (const word of banned) { if (leet.includes(word)) return true; }
   return false;
 }
+
 async function generate() {
   const prompt = document.getElementById('prompt').value.trim();
   if (!prompt) { document.getElementById('prompt').focus(); return; }
@@ -547,10 +557,17 @@ async function generate() {
   document.getElementById('btnMore').style.display = 'none';
   setLoading(true, 'Crafting your names...');
   try {
-    let names = await generateNames(prompt);
-    // Remove duplicates by name
+    // FIX 1: pass selectedCount so generateNames asks for the right number
+    let names = await generateNames(prompt, selectedCount);
+    // Deduplicate
     const seen = new Set();
-    names = names.filter(n => { if (seen.has(n.name.toLowerCase())) return false; seen.add(n.name.toLowerCase()); return true; });
+    names = names.filter(n => {
+      if (seen.has(n.name.toLowerCase())) return false;
+      seen.add(n.name.toLowerCase());
+      return true;
+    });
+    // Trim to exactly selectedCount in case the model returned extras
+    names = names.slice(0, selectedCount);
     allNames = names.map(n => n.name);
     totalGenerated = allNames.length;
     renderNames(names, false);
@@ -559,24 +576,52 @@ async function generate() {
   } catch(e) { showError('Error: ' + e.message); }
   finally { setLoading(false); }
 }
+
 async function generateMore() {
   const prompt = document.getElementById('prompt').value.trim();
   if (!prompt || isLoading) return;
   hideError();
+
+  // FIX 2: Retry loop — if all names come back as duplicates, try again
+  // up to MAX_RETRIES times before giving up.
+  const MAX_RETRIES = 3;
+  let attempt = 0;
+  let newNames = [];
+
   setLoading(true, 'Generating more...');
   try {
-    let names = await generateNames(prompt);
-    const existing = new Set(allNames.map(n => n.toLowerCase()));
-    names = names.filter(n => {
-      if (existing.has(n.name.toLowerCase())) return false;
-      existing.add(n.name.toLowerCase());
-      return true;
-    });
-    allNames = [...allNames, ...names.map(n => n.name)];
+    while (attempt < MAX_RETRIES) {
+      attempt++;
+      if (attempt > 1) {
+        document.getElementById('loadingText').textContent = `Retrying... (${attempt}/${MAX_RETRIES})`;
+      }
+
+      // FIX 1 + 2: ask for selectedCount names (not hardcoded 10)
+      let names = await generateNames(prompt, selectedCount);
+
+      // Filter out names already shown
+      const existing = new Set(allNames.map(n => n.toLowerCase()));
+      newNames = names.filter(n => {
+        if (existing.has(n.name.toLowerCase())) return false;
+        existing.add(n.name.toLowerCase());
+        return true;
+      });
+
+      if (newNames.length > 0) break; // Got at least one fresh name — done
+    }
+
+    if (newNames.length === 0) {
+      showError('All generated names were already shown. Try changing your description or style for more variety.');
+      return;
+    }
+
+    // Trim to selectedCount in case extras slipped through
+    newNames = newNames.slice(0, selectedCount);
+    allNames = [...allNames, ...newNames.map(n => n.name)];
     totalGenerated = allNames.length;
-    renderNames(names, true);
+    renderNames(newNames, true);
     const countEl = document.getElementById('nameCount');
-    if (countEl) countEl.textContent = totalGenerated + ' names';
+    if (countEl) countEl.textContent = document.querySelectorAll('.name-card').length + ' names';
   } catch(e) { showError('Error: ' + e.message); }
   finally { setLoading(false); }
 }
@@ -613,7 +658,7 @@ document.querySelectorAll('a,button,.name-card').forEach(el=>{
   el.addEventListener('mouseleave',()=>{ring.style.width='32px';ring.style.height='32px';ring.style.borderColor='rgba(232,255,71,.3)';});
 });
 
-// ── Touch ripple for mobile ──
+// Touch ripple
 document.addEventListener('touchstart', e => {
   const touch = e.touches[0];
   const ripple = document.createElement('div');
@@ -624,7 +669,7 @@ document.addEventListener('touchstart', e => {
   setTimeout(() => ripple.remove(), 500);
 }, { passive: true });
 
-// ── Card pulse on tap ──
+// Card pulse on tap
 document.addEventListener('touchstart', e => {
   const card = e.target.closest('.name-card');
   if (card) {
@@ -638,8 +683,7 @@ document.addEventListener('touchstart', e => {
   }
 }, { passive: true });
 
-
-// ── Count picker ──
+// Count picker
 document.querySelectorAll('.count-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     if (btn.classList.contains('locked')) {
@@ -653,7 +697,7 @@ document.querySelectorAll('.count-btn').forEach(btn => {
   });
 });
 
-// ── Favorites Panel ──
+// Favorites Panel
 function openFavPanel() {
   renderFavPanel();
   document.getElementById('favPanel').classList.add('open');
@@ -667,7 +711,7 @@ function renderFavPanel() {
   const favs = getFavs();
   const body = document.getElementById('favPanelBody');
   if (!favs.length) {
-    body.innerHTML = '<div class="fav-panel-empty">No favorites yet.<br>Hit ♥ on any name<br>to save it here.</div>';
+    body.innerHTML = '<div class="fav-panel-empty">No favorites yet.<br>Hit the heart on any name<br>to save it here.</div>';
     return;
   }
   body.innerHTML = '';
@@ -678,7 +722,7 @@ function renderFavPanel() {
       <div class="fav-item-name">${item.name}</div>
       <div class="fav-item-actions">
         <button class="fav-item-btn" onclick="copyToClipboard('${item.name}', this)">Copy</button>
-        <button class="fav-item-btn remove" onclick="removeFavFromPanel('${item.name}')">✕</button>
+        <button class="fav-item-btn remove" onclick="removeFavFromPanel('${item.name}')">Remove</button>
       </div>`;
     body.appendChild(el);
   });
@@ -687,7 +731,6 @@ function removeFavFromPanel(name) {
   let favs = getFavs().filter(f => f.name !== name);
   saveFavs(favs);
   renderFavPanel();
-  // update heart on card if visible
   document.querySelectorAll('.fav-btn').forEach(btn => {
     const cardName = btn.closest('.name-card')?.querySelector('.name-text')?.textContent;
     if (cardName === name) btn.classList.remove('saved');
@@ -696,12 +739,12 @@ function removeFavFromPanel(name) {
 function copyToClipboard(text, btn) {
   navigator.clipboard.writeText(text).then(() => {
     const orig = btn.textContent;
-    btn.textContent = '✓';
+    btn.textContent = 'Copied';
     setTimeout(() => btn.textContent = orig, 1500);
   });
 }
 
-// ── Favorites ──
+// Favorites
 function getFavs() {
   try { return JSON.parse(localStorage.getItem('phraselix_favs') || '[]'); } catch { return []; }
 }
@@ -720,13 +763,12 @@ function toggleFav(card, item) {
   } else {
     favs.push(item);
     btn.classList.add('saved');
-    showToast('Saved to favorites ♥');
+    showToast('Saved to favorites');
   }
   saveFavs(favs);
 }
 function clearFavs() {
   saveFavs([]);
-  // update all heart buttons
   document.querySelectorAll('.fav-btn').forEach(b => b.classList.remove('saved'));
   showToast('Favorites cleared');
 }
@@ -738,7 +780,7 @@ function updateFavBar() {
   if (document.getElementById('favPanel').classList.contains('open')) renderFavPanel();
 }
 
-// ── Share ──
+// Share
 function shareFavs() {
   const favs = getFavs();
   if (!favs.length) return;
@@ -753,7 +795,7 @@ function shareResults() {
   navigator.clipboard.writeText(url).then(() => showToast('Link copied — share it!'));
 }
 
-// ── Toast ──
+// Toast
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -761,7 +803,7 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2000);
 }
 
-// ── Load shared names from URL ──
+// Load shared names from URL
 function loadSharedNames() {
   const params = new URLSearchParams(window.location.search);
   const shared = params.get('shared');
