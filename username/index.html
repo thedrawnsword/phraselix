@@ -582,44 +582,45 @@ async function generateMore() {
   if (!prompt || isLoading) return;
   hideError();
 
-  // FIX 2: Retry loop — if all names come back as duplicates, try again
-  // up to MAX_RETRIES times before giving up.
-  const MAX_RETRIES = 3;
+  // Keep accumulating fresh names until we have exactly selectedCount,
+  // retrying up to MAX_RETRIES times total before giving up.
+  const MAX_RETRIES = 5;
   let attempt = 0;
-  let newNames = [];
+  let collected = []; // fresh unique names accumulated across retries
+  const existingSet = new Set(allNames.map(n => n.toLowerCase()));
 
   setLoading(true, 'Generating more...');
   try {
-    while (attempt < MAX_RETRIES) {
+    while (collected.length < selectedCount && attempt < MAX_RETRIES) {
       attempt++;
-      if (attempt > 1) {
-        document.getElementById('loadingText').textContent = `Retrying... (${attempt}/${MAX_RETRIES})`;
+      const needed = selectedCount - collected.length;
+      // Ask for more than needed to increase chance of getting enough fresh ones
+      const askFor = Math.min(needed + 3, selectedCount * 2);
+
+      document.getElementById('loadingText').textContent =
+        attempt === 1 ? 'Generating more...' : `Getting ${needed} more fresh names...`;
+
+      let names = await generateNames(prompt, askFor);
+
+      for (const n of names) {
+        const key = n.name.toLowerCase();
+        if (!existingSet.has(key)) {
+          existingSet.add(key);
+          collected.push(n);
+          if (collected.length === selectedCount) break;
+        }
       }
-
-      // FIX 1 + 2: ask for selectedCount names (not hardcoded 10)
-      let names = await generateNames(prompt, selectedCount);
-
-      // Filter out names already shown
-      const existing = new Set(allNames.map(n => n.toLowerCase()));
-      newNames = names.filter(n => {
-        if (existing.has(n.name.toLowerCase())) return false;
-        existing.add(n.name.toLowerCase());
-        return true;
-      });
-
-      if (newNames.length > 0) break; // Got at least one fresh name — done
     }
 
-    if (newNames.length === 0) {
-      showError('All generated names were already shown. Try changing your description or style for more variety.');
+    if (collected.length === 0) {
+      showError('Could not generate fresh names. Try changing your description or style.');
       return;
     }
 
-    // Trim to selectedCount in case extras slipped through
-    newNames = newNames.slice(0, selectedCount);
-    allNames = [...allNames, ...newNames.map(n => n.name)];
+    // Add however many we got (up to selectedCount) — always at least 1
+    allNames = [...allNames, ...collected.map(n => n.name)];
     totalGenerated = allNames.length;
-    renderNames(newNames, true);
+    renderNames(collected, true);
     const countEl = document.getElementById('nameCount');
     if (countEl) countEl.textContent = document.querySelectorAll('.name-card').length + ' names';
   } catch(e) { showError('Error: ' + e.message); }
