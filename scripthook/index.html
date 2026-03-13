@@ -219,12 +219,59 @@ document.getElementById('prompt').placeholder='e.g. I tried waking up at 5am eve
 document.querySelectorAll('#styleRow .style-tag').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('#styleRow .style-tag').forEach(b=>b.classList.remove('active'));btn.classList.add('active');selectedStyle=btn.dataset.style;allItems=[];totalGenerated=0;});});
 document.querySelectorAll('.count-btn').forEach(btn=>{btn.addEventListener('click',()=>{if(btn.classList.contains('locked')){document.getElementById('countLockedTip').classList.add('show');return;}document.querySelectorAll('.count-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');selectedCount=parseInt(btn.dataset.count);document.getElementById('countLockedTip').classList.remove('show');});});
 document.getElementById('prompt').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey))generate();});
-function buildSystemPrompt(){return `You write the opening 1-3 sentences of a video script that make people stay and watch.\n\nStyle: ${selectedStyle}\n\nStyle guides:\n- curiosity: Open a loop the viewer needs to close. Tease without revealing.\n- story: Drop straight into a moment. Present tense, action-first.\n- bold: Make a claim that stops them. Confident, maybe provocative.\n- question: Ask something they instantly relate to or want answered.\n- contrast: Set up two opposites for tension.\n\nRules:\n- Max 3 sentences\n- Spoken language only\n- Never "In this video I will..."\n- No fake enthusiasm\n- Must make someone want to keep watching\n\nRespond ONLY with valid JSON: {"items":["hook1","hook2","hook3"]}`;}
-function buildUserMsg(prompt){return `Video: "${prompt}"\nStyle: ${selectedStyle}\n\nWrite EXACTLY ${selectedCount} opening hooks. Each must be a completely different approach. Max 3 sentences each.`;}
+function buildSystemPrompt(){return `You write the opening 1-3 sentences of a video script that make people stay and watch.
+
+YOUR #1 RULE: Mirror the creator's voice and energy from their description FIRST. If they write casually, write casual. If they're hype, be hype. If they're dry, match that. The style setting only shapes the STRUCTURE — it never overrides the creator's actual voice.
+
+Style: ${selectedStyle}
+
+Style guides (apply AFTER capturing their voice):
+- curiosity: Open a loop the viewer needs to close. Tease without revealing.
+- story: Drop straight into a moment. Present tense, action-first.
+- bold: Make a claim that stops them. Confident, maybe provocative.
+- question: Ask something they instantly relate to or want answered.
+- contrast: Set up two opposites for tension.
+
+Rules:
+- Max 3 sentences
+- Spoken language only — sounds natural out loud
+- NEVER "In this video I will..."
+- No fake enthusiasm or corporate energy
+- Must feel like a real person, not an AI template
+
+Respond ONLY with valid JSON: {"items":["hook1","hook2","hook3"]}`;
+}
+function buildUserMsg(prompt){return `Video: "${prompt}"\nStyle: ${selectedStyle}\n\nWrite EXACTLY ${selectedCount} opening hooks. Each must be a completely different approach. PRESERVE the creator's voice and energy — the style shapes structure, not personality. Max 3 sentences each.`;}
 async function generate(){const prompt=document.getElementById('prompt').value.trim();if(!prompt){document.getElementById('prompt').focus();return;}if(isLoading)return;hideError();if(isBadInput(prompt)){showError("Keep it clean — Phraselix isn't that kind of tool.");return;}setLoading(true,'Writing your hook...');allItems=[];totalGenerated=0;document.getElementById('results').innerHTML='';document.getElementById('btnMore').style.display='none';try{const result=await callAPI(buildSystemPrompt(),buildUserMsg(prompt));renderResults(result);document.getElementById('btnMore').style.display='block';}catch(e){showError('Something went wrong — try again.');console.error(e);}finally{setLoading(false);}}
 async function generateMore(){const prompt=document.getElementById('prompt').value.trim();if(!prompt||isLoading)return;hideError();setLoading(true,'Generating more...');const extra=allItems.length?'\n\nDo NOT repeat these:\n'+allItems.slice(-20).join(', '):'';try{const result=await callAPI(buildSystemPrompt(),buildUserMsg(prompt)+extra);appendResults(result);}catch(e){showError('Something went wrong — try again.');}finally{setLoading(false);}}
-function renderResults(data){const container=document.getElementById('results');container.innerHTML='<div class="results-header"><div class="results-label">Generated Hooks</div><div style="display:flex;align-items:center;gap:1rem"><button onclick="shareResults()" style="font-family:DM Mono,monospace;font-size:.55rem;letter-spacing:1.5px;text-transform:uppercase;padding:.25rem .7rem;border:1px solid var(--border2);border-radius:2px;background:none;color:var(--text3);cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor=\'var(--accent)\';this.style.color=\'var(--accent)\'" onmouseout="this.style.borderColor=\'var(--border2)\';this.style.color=\'var(--text3)\'">Share ↗</button><div class="results-count" id="itemCount">0</div></div></div><div class="names-grid" id="itemsGrid"></div>';const grid=document.getElementById('itemsGrid');const fresh=(data.items||[]).slice(0,selectedCount);allItems=fresh;totalGenerated=fresh.length;fresh.forEach(item=>grid.appendChild(makeCard(selectedStyle.charAt(0).toUpperCase()+selectedStyle.slice(1),item,'type-a',FAV_KEY)));document.getElementById('itemCount').textContent=totalGenerated+' results';updateFavBar();}
-function appendResults(data){const grid=document.getElementById('itemsGrid');if(!grid){renderResults(data);return;}const fresh=(data.items||[]).slice(0,selectedCount).filter(t=>!allItems.includes(t));allItems=[...allItems,...fresh];totalGenerated=allItems.length;const label=selectedStyle.charAt(0).toUpperCase()+selectedStyle.slice(1);[...fresh].reverse().forEach(item=>{const card=makeCard(label,item,'type-a',FAV_KEY);grid.insertBefore(card,grid.firstChild);});const countEl=document.getElementById('itemCount');if(countEl)countEl.textContent=totalGenerated+' results';updateFavBar();}
+function updateCount(){
+  const countEl=document.getElementById('itemCount');
+  if(countEl)countEl.textContent=document.querySelectorAll('#itemsGrid .name-card').length+' results';
+}
+function renderResults(data){
+  const container=document.getElementById('results');
+  container.innerHTML='';
+  const header=document.createElement('div');header.className='results-header';
+  const lbl=document.createElement('div');lbl.className='results-label';lbl.textContent='Generated Hooks';
+  const right=document.createElement('div');right.style.cssText='display:flex;align-items:center;gap:1rem';
+  const shareBtn=document.createElement('button');
+  shareBtn.textContent='Share';
+  shareBtn.style.cssText='font-family:DM Mono,monospace;font-size:.55rem;letter-spacing:1.5px;text-transform:uppercase;padding:.25rem .7rem;border:1px solid var(--border2);border-radius:2px;background:none;color:var(--text3);cursor:pointer;transition:all .15s';
+  shareBtn.onmouseenter=function(){this.style.borderColor='var(--accent)';this.style.color='var(--accent)';};
+  shareBtn.onmouseleave=function(){this.style.borderColor='var(--border2)';this.style.color='var(--text3)';};
+  shareBtn.onclick=shareResults;
+  const countEl=document.createElement('div');countEl.className='results-count';countEl.id='itemCount';countEl.textContent='0';
+  right.appendChild(shareBtn);right.appendChild(countEl);
+  header.appendChild(lbl);header.appendChild(right);
+  const grid=document.createElement('div');grid.className='names-grid';grid.id='itemsGrid';
+  container.appendChild(header);container.appendChild(grid);
+  const fresh=(data.items||[]).slice(0,selectedCount);
+  allItems=fresh;
+  fresh.forEach(item=>grid.appendChild(makeCard(selectedStyle.charAt(0).toUpperCase()+selectedStyle.slice(1),item,'type-a',FAV_KEY)));
+  updateCount();updateFavBar();
+}
+
+function appendResults(data){const grid=document.getElementById('itemsGrid');if(!grid){renderResults(data);return;}const fresh=(data.items||[]).slice(0,selectedCount).filter(t=>!allItems.includes(t));allItems=[...allItems,...fresh];totalGenerated=allItems.length;const label=selectedStyle.charAt(0).toUpperCase()+selectedStyle.slice(1);[...fresh].reverse().forEach(item=>{const card=makeCard(label,item,'type-a',FAV_KEY);grid.insertBefore(card,grid.firstChild);});updateCount();updateFavBar();}
 function isBadInput(text){const banned=['porn','porno','pornstar','pornhub','onlyfans','sex','sexy','sexual','nude','naked','nsfw','xxx','erotic','hentai','horny','boobs','tits','dick','cock','pussy','vagina','penis','blowjob','handjob','cumshot','orgasm','fetish','bdsm','stripper','escort','prostitute','hooker','camgirl','fuck','shit','bitch','cunt','asshole','bastard','slut','whore','nigga','nigger','faggot','retard','murder','rape','suicide','terrorist','nazis','nazi','racist','racism','genocide','pedophile','pedo','molest'];const wb=(t,w)=>new RegExp('\\b'+w+'\\b').test(t);const t=text.toLowerCase();for(const word of banned){if(wb(t,word))return true;}const leet=t.replace(/0/g,'o').replace(/1/g,'i').replace(/3/g,'e').replace(/4/g,'a').replace(/5/g,'s').replace(/8/g,'b').replace(/\$/g,'s').replace(/@/g,'a').replace(/!/g,'i');for(const word of banned){if(wb(leet,word))return true;}return false;}
 async function callAPI(sys,msg){const r=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:sys,messages:[{role:'user',content:msg}]})});const d=await r.json();if(d.error)throw new Error(d.error.message||'API error');const raw=d.content[0].text.trim().replace(/```json|```/g,'').trim();const match=raw.match(/\{[\s\S]*\}/);if(!match)throw new Error('No JSON in response');const parsed=JSON.parse(match[0]);if(!parsed.items||!parsed.items.length)throw new Error('No items in response');return parsed;}
 function getFavs(key){try{return JSON.parse(localStorage.getItem(key)||'[]');}catch{return[];}}
