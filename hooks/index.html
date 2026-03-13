@@ -346,22 +346,22 @@ NEVER write:
 - Fake hype: INSANE, life-changing, you won't believe
 
 Respond ONLY with valid JSON, no markdown, no extra text:
-{"titles":["title1","title2"],"hashtags":["#tag1","#tag2","#tag3","#tag4","#tag5","#tag6"],"caption":"Short ready-to-post caption, sounds human."}`;
-}
+{"titles":["title1","title2","title3"],"hashtags":["#tag1","#tag2","#tag3","#tag4","#tag5","#tag6"],"caption":"Short ready-to-post caption, sounds human."}
+The number of items in titles must match exactly what the user requests.`;}
 
 function buildUserMsg(prompt) {
   return `Video: "${prompt}"
 Tone: ${selectedTone}
 
-Decide if this is a content video or a process video. Write exactly ${selectedCount} titles that match. Each must be structurally different.`;
+Decide if this is a content video or a process video. Return EXACTLY ${selectedCount} title(s) in the titles array — no more, no less. Each must be structurally different.`;
 }
 
 async function generate() {
   const prompt = document.getElementById('prompt').value.trim();
   if (!prompt) { document.getElementById('prompt').focus(); return; }
   if (isLoading) return;
-  if (isBadInput(prompt)) { showError("Keep it clean — Phraselix isn't that kind of tool."); return; }
   hideError();
+  if (isBadInput(prompt)) { showError("Keep it clean — Phraselix isn't that kind of tool."); return; }
   setLoading(true, 'Crafting your titles...');
   document.getElementById('results').innerHTML = '';
   document.getElementById('btnMore').style.display = 'none';
