@@ -424,6 +424,7 @@ function renderResults(data) {
     <div class="names-grid" id="titlesGrid"></div>`;
 
   const grid = document.getElementById('titlesGrid');
+  const toneLabel = selectedTone.charAt(0).toUpperCase() + selectedTone.slice(1);
   const newTitles = (data.titles || []).slice(0, selectedCount);
   allTitles = newTitles;
   totalGenerated = newTitles.length;
