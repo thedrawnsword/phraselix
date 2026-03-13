@@ -252,6 +252,8 @@ document.getElementById('taglineText').innerHTML = taglines[Math.floor(Math.rand
 let selectedTone = 'viral';
 let selectedCount = 3;
 let isLoading = false;
+let allTitles = [];
+let totalGenerated = 0;
 
 document.querySelectorAll('#toneRow .style-tag').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -373,6 +375,7 @@ async function generate() {
   hideError();
   if (isBadInput(prompt)) { showError("Keep it clean — Phraselix isn't that kind of tool."); return; }
   setLoading(true, 'Crafting your hook...');
+  allTitles = []; totalGenerated = 0;
   document.getElementById('results').innerHTML = '';
   document.getElementById('btnMore').style.display = 'none';
   try {
@@ -392,10 +395,8 @@ async function generateMore() {
   if (!prompt || isLoading) return;
   hideError();
   setLoading(true, 'Generating more hooks...');
-  // collect already shown titles so AI avoids repeats
-  const existing = [...document.querySelectorAll('.name-text')].map(el => el.textContent).join(' | ');
-  const extraInstruction = existing
-    ? '\n\nAlready shown titles (do NOT repeat these, generate completely different ones):\n' + existing
+  const extraInstruction = allTitles.length
+    ? '\n\nDo NOT repeat any of these already shown titles, generate completely different ones:\n' + allTitles.slice(-20).join(', ')
     : '\n\nGenerate completely different titles from any previous set.';
   try {
     const result = await callAPI(buildSystemPrompt(), buildUserMsg(prompt) + extraInstruction);
@@ -409,61 +410,63 @@ async function generateMore() {
 
 function renderResults(data) {
   const container = document.getElementById('results');
-  const toneLabel = selectedTone.charAt(0).toUpperCase() + selectedTone.slice(1);
   container.innerHTML = `
     <div class="results-header">
-      <div class="results-label">Generated titles</div>
+      <div class="results-label">Generated Hooks</div>
       <div style="display:flex;align-items:center;gap:1rem">
         <button onclick="shareResults()" style="font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:1.5px;text-transform:uppercase;padding:.25rem .7rem;border:1px solid var(--border2);border-radius:2px;background:none;color:var(--text3);cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text3)'">Share ↗</button>
-        <div class="results-count">${toneLabel}</div>
+        <div class="results-count" id="hookCount">0 hooks</div>
       </div>
     </div>
     <div class="names-grid" id="titlesGrid"></div>`;
 
   const grid = document.getElementById('titlesGrid');
+  const newTitles = (data.titles || []).slice(0, selectedCount);
+  allTitles = newTitles;
+  totalGenerated = newTitles.length;
 
-  if (data.titles && data.titles.length) {
-    data.titles.slice(0, selectedCount).forEach((title, i) => {
-      grid.appendChild(makeCard('title', `Title ${i + 1}`, title, 'type-title'));
-    });
-  }
+  newTitles.forEach((title, i) => {
+    grid.appendChild(makeCard('title', 'Hook ' + (i + 1), title, 'type-title'));
+  });
 
   if (data.hashtags && data.hashtags.length) {
     const card = document.createElement('div');
     card.className = 'name-card';
-    card.style.animationDelay = '0.3s';
     card.innerHTML = `<div class="name-style type-hashtags">Hashtags</div><div class="tags-wrap">${data.hashtags.map(t => `<span class="tag-pill" onclick="copyTag(this,'${t}')">${t}</span>`).join('')}</div><div class="copy-hint">click a tag to copy it</div>`;
     grid.appendChild(card);
   }
 
+  document.getElementById('hookCount').textContent = totalGenerated + ' hooks';
   updateFavBar();
 }
 
 function appendResults(data) {
-  // get existing grid or bail
   const grid = document.getElementById('titlesGrid');
   if (!grid) { renderResults(data); return; }
 
-  // divider
-  const divider = document.createElement('div');
-  divider.style.cssText = 'grid-column:1/-1;border-top:1px solid var(--border);margin:.5rem 0;';
-  grid.appendChild(divider);
+  const newTitles = (data.titles || []).slice(0, selectedCount);
+  // dedupe against already shown
+  const existing = new Set(allTitles.map(t => t.toLowerCase()));
+  const fresh = newTitles.filter(t => !existing.has(t.toLowerCase()));
+  allTitles = [...allTitles, ...fresh];
+  totalGenerated = allTitles.length;
 
-  const existingCount = grid.querySelectorAll('.name-card').length;
-  if (data.titles && data.titles.length) {
-    data.titles.slice(0, selectedCount).forEach((title, i) => {
-      const card = makeCard('title', 'Title ' + (existingCount + i + 1), title, 'type-title');
-      grid.appendChild(card);
-    });
-  }
+  fresh.forEach((title, i) => {
+    grid.appendChild(makeCard('title', 'Hook ' + (allTitles.length - fresh.length + i + 1), title, 'type-title'));
+  });
 
   if (data.hashtags && data.hashtags.length) {
+    // replace existing hashtag card
+    const old = grid.querySelector('.type-hashtags')?.closest('.name-card');
+    if (old) old.remove();
     const card = document.createElement('div');
     card.className = 'name-card';
     card.innerHTML = `<div class="name-style type-hashtags">Hashtags</div><div class="tags-wrap">${data.hashtags.map(t => `<span class="tag-pill" onclick="copyTag(this,'${t}')">${t}</span>`).join('')}</div><div class="copy-hint">click a tag to copy it</div>`;
     grid.appendChild(card);
   }
 
+  const countEl = document.getElementById('hookCount');
+  if (countEl) countEl.textContent = totalGenerated + ' hooks';
   updateFavBar();
 }
 
