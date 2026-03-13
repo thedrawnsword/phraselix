@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Phraselix — Title Generator</title>
+<title>Phraselix — Hook Generator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -196,8 +196,8 @@ body{cursor:none;}
     <div class="error-msg" id="errorMsg"></div>
 
     <div class="btn-row">
-      <button class="btn-generate" id="btnGenerate" onclick="generate()">Generate Titles</button>
-      <button class="btn-more" id="btnMore" onclick="generateMore()">+ More Titles</button>
+      <button class="btn-generate" id="btnGenerate" onclick="generate()">Generate Hook</button>
+      <button class="btn-more" id="btnMore" onclick="generateMore()">+ More Hooks</button>
     </div>
   </section>
 
@@ -218,7 +218,7 @@ body{cursor:none;}
 
   <footer>
     <span class="footer-text">Phraselix — Content Tools</span>
-    <span class="footer-text">Title Generator</span>
+    <span class="footer-text">Hook Generator</span>
   </footer>
 </div>
 
@@ -240,12 +240,12 @@ body{cursor:none;}
 <script>
 // ── Rotating taglines ──
 const taglines = [
-  'Titles that make people <em>stop.</em>',
-  'Your video deserves a title that <em>hits.</em>',
+  'Titles and tags that make people <em>stop.</em>',
+  'Your video deserves a hook that <em>hits.</em>',
   'Stop using boring titles. Get ones that <em>click.</em>',
   'Describe the video. Get the hook that <em>works.</em>',
   'Every scroll is a chance to <em>grab attention.</em>',
-  'The title is the thumbnail for your <em>words.</em>',
+  'The title is the first thing they <em>see.</em>',
   'Make them click before they even <em>think.</em>',
 ];
 document.getElementById('taglineText').innerHTML = taglines[Math.floor(Math.random() * taglines.length)];
@@ -358,8 +358,7 @@ NEVER write:
 - Fake hype: INSANE, life-changing, you won't believe
 
 Respond ONLY with valid JSON, no markdown, no extra text:
-{"titles":["title1","title2","title3"],"hashtags":["#tag1","#tag2","#tag3","#tag4","#tag5","#tag6"],"caption":"Short ready-to-post caption, sounds human."}
-The number of items in titles must match exactly what the user requests.`;}
+{"titles":["title1","title2","title3"],"hashtags":["#tag1","#tag2","#tag3","#tag4","#tag5","#tag6"]}`;}
 
 function buildUserMsg(prompt) {
   return `Video: "${prompt}"
@@ -374,7 +373,7 @@ async function generate() {
   if (isLoading) return;
   hideError();
   if (isBadInput(prompt)) { showError("Keep it clean — Phraselix isn't that kind of tool."); return; }
-  setLoading(true, 'Crafting your titles...');
+  setLoading(true, 'Crafting your hook...');
   document.getElementById('results').innerHTML = '';
   document.getElementById('btnMore').style.display = 'none';
   try {
@@ -393,7 +392,7 @@ async function generateMore() {
   const prompt = document.getElementById('prompt').value.trim();
   if (!prompt || isLoading) return;
   hideError();
-  setLoading(true, 'Generating fresh titles...');
+  setLoading(true, 'Generating fresh hooks...');
   document.getElementById('results').innerHTML = '';
   try {
     const result = await callAPI(buildSystemPrompt(), buildUserMsg(prompt) + '\n\nGenerate completely different titles from any previous set.');
@@ -434,10 +433,6 @@ function renderResults(data) {
     grid.appendChild(card);
   }
 
-  if (data.caption) {
-    grid.appendChild(makeCard('caption', 'Caption', data.caption, 'type-caption'));
-  }
-
   updateFavBar();
 }
 
@@ -459,8 +454,8 @@ function makeCard(type, label, content, typeClass) {
   return card;
 }
 
-function getFavs() { try { return JSON.parse(localStorage.getItem('phraselix_title_favs') || '[]'); } catch { return []; } }
-function saveFavs(favs) { localStorage.setItem('phraselix_title_favs', JSON.stringify(favs)); updateFavBar(); }
+function getFavs() { try { return JSON.parse(localStorage.getItem('phraselix_hook_favs') || '[]'); } catch { return []; } }
+function saveFavs(favs) { localStorage.setItem('phraselix_hook_favs', JSON.stringify(favs)); updateFavBar(); }
 function toggleFav(card, item) {
   let favs = getFavs();
   const idx = favs.findIndex(f => f.content === item.content);
@@ -535,7 +530,7 @@ function copyTag(el, tag) {
 function setLoading(state, text) {
   isLoading = state;
   document.getElementById('loading').classList.toggle('show', state);
-  document.getElementById('loadingText').textContent = text || 'Crafting your titles...';
+  document.getElementById('loadingText').textContent = text || 'Crafting your hook...';
   document.getElementById('btnGenerate').disabled = state;
 }
 function showError(msg) { const el = document.getElementById('errorMsg'); el.textContent = msg; el.classList.add('show'); }
