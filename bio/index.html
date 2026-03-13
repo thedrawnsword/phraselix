@@ -329,16 +329,31 @@ async function generateMore() {
   }
 }
 
+function updateCount() {
+  const countEl = document.getElementById('itemCount');
+  if (countEl) countEl.textContent = document.querySelectorAll('#itemsGrid .name-card').length + ' results';
+}
 function renderResults(data) {
   const container = document.getElementById('results');
-  container.innerHTML = '<div class="results-header"><div class="results-label">Generated Bios</div><div style="display:flex;align-items:center;gap:1rem"><button onclick="shareResults()" style="font-family:DM Mono,monospace;font-size:.55rem;letter-spacing:1.5px;text-transform:uppercase;padding:.25rem .7rem;border:1px solid var(--border2);border-radius:2px;background:none;color:var(--text3);cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor=\'var(--accent)\';this.style.color=\'var(--accent)\'" onmouseout="this.style.borderColor=\'var(--border2)\';this.style.color=\'var(--text3)\'">Share ↗</button><div class="results-count" id="itemCount">0</div></div></div><div class="names-grid" id="itemsGrid"></div>';
-  const grid = document.getElementById('itemsGrid');
+  container.innerHTML = '';
+  const header = document.createElement('div'); header.className = 'results-header';
+  const lbl = document.createElement('div'); lbl.className = 'results-label'; lbl.textContent = 'Generated Bios';
+  const right = document.createElement('div'); right.style.cssText = 'display:flex;align-items:center;gap:1rem';
+  const shareBtn = document.createElement('button');
+  shareBtn.textContent = 'Share';
+  shareBtn.style.cssText = 'font-family:DM Mono,monospace;font-size:.55rem;letter-spacing:1.5px;text-transform:uppercase;padding:.25rem .7rem;border:1px solid var(--border2);border-radius:2px;background:none;color:var(--text3);cursor:pointer;transition:all .15s';
+  shareBtn.onmouseenter = function(){ this.style.borderColor='var(--accent)'; this.style.color='var(--accent)'; };
+  shareBtn.onmouseleave = function(){ this.style.borderColor='var(--border2)'; this.style.color='var(--text3)'; };
+  shareBtn.onclick = shareResults;
+  const countEl = document.createElement('div'); countEl.className = 'results-count'; countEl.id = 'itemCount'; countEl.textContent = '0';
+  right.appendChild(shareBtn); right.appendChild(countEl);
+  header.appendChild(lbl); header.appendChild(right);
+  const grid = document.createElement('div'); grid.className = 'names-grid'; grid.id = 'itemsGrid';
+  container.appendChild(header); container.appendChild(grid);
   const fresh = (data.items || []).slice(0, selectedCount);
   allItems = fresh;
-  totalGenerated = fresh.length;
   fresh.forEach(item => grid.appendChild(makeCard(selectedStyle.charAt(0).toUpperCase()+selectedStyle.slice(1), item, 'type-a', FAV_KEY)));
-  document.getElementById('itemCount').textContent = totalGenerated + ' results';
-  updateFavBar();
+  updateCount(); updateFavBar();
 }
 
 function appendResults(data) {
@@ -352,9 +367,7 @@ function appendResults(data) {
     const card = makeCard(label, item, 'type-a', FAV_KEY);
     grid.insertBefore(card, grid.firstChild);
   });
-  const countEl = document.getElementById('itemCount');
-  if (countEl) countEl.textContent = totalGenerated + ' results';
-  updateFavBar();
+  updateCount(); updateFavBar();
 }
 
 function isBadInput(text) {
