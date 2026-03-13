@@ -8,7 +8,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#06070a;--bg2:#0d0f14;--bg3:#13161e;--border:#1e2230;--border2:#2a2f42;--accent:#e8ff47;--accent2:#c8e000;--text:#eeeef5;--text2:#7a7f9a;--text3:#4a4f66;--red:#ff4757;--blue:#4ecdc4;--purple:#a78bfa;--orange:#ff8c42;}
+:root{
+  --bg:#06070a;--bg2:#0d0f14;--bg3:#13161e;
+  --border:#1e2230;--border2:#2a2f42;
+  --accent:#e8ff47;--accent2:#c8e000;
+  --text:#eeeef5;--text2:#7a7f9a;--text3:#4a4f66;
+  --red:#ff4757;--blue:#4ecdc4;--purple:#a78bfa;--orange:#ff8c42;
+}
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
 body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");opacity:.4;}
@@ -145,14 +151,18 @@ body{cursor:none;}
     <a class="logo" href="/">Phraselix</a>
     <a class="back-btn" href="/">← All Tools</a>
   </header>
+
   <div class="hero-tagline">
     <div class="tagline-text" id="taglineText">A bio that actually sounds like <em>you.</em></div>
     <div class="tagline-meta">ps — Phraselix keeps growing</div>
   </div>
+
   <div class="shared-banner" id="sharedBanner">Someone shared these with you</div>
+
   <section class="input-section">
     <div class="prompt-label">Tell us about yourself or your brand</div>
     <textarea id="prompt" rows="4" maxlength="400"></textarea>
+
     <div class="count-section">
       <div class="count-hint">How many <span>— pick a number</span></div>
       <div class="count-row">
@@ -164,26 +174,30 @@ body{cursor:none;}
       </div>
       <div class="count-locked-tip" id="countLockedTip">More coming with premium — soon</div>
     </div>
+
     <div class="style-section">
-      <div class="style-hint">Platform <span>— pick one</span></div>
+      <div class="style-hint">Tone <span>— pick one</span></div>
       <div class="style-row" id="styleRow">
-        <button class="style-tag active" data-style="instagram">Instagram</button>
-        <button class="style-tag" data-style="tiktok">TikTok</button>
-        <button class="style-tag" data-style="twitter">X / Twitter</button>
-        <button class="style-tag" data-style="youtube">YouTube</button>
-        <button class="style-tag" data-style="linkedin">LinkedIn</button>
+        <button class="style-tag active" data-style="professional">Professional</button>
+        <button class="style-tag" data-style="witty">Witty</button>
+        <button class="style-tag" data-style="minimal">Minimal</button>
+        <button class="style-tag" data-style="bold">Bold</button>
       </div>
     </div>
+
     <div class="error-msg" id="errorMsg"></div>
+
     <div class="btn-row">
       <button class="btn-generate" id="btnGenerate" onclick="generate()">Generate Bios</button>
       <button class="btn-more" id="btnMore" onclick="generateMore()">+ More Bios</button>
     </div>
   </section>
+
   <div class="loading" id="loading">
     <div class="loader"><span></span><span></span><span></span></div>
     <span id="loadingText">Writing your bio...</span>
   </div>
+
   <div class="fav-bar" id="favBar">
     <div class="fav-bar-left">Favorites: <span id="favCount">0</span></div>
     <div class="fav-bar-right">
@@ -191,12 +205,15 @@ body{cursor:none;}
       <button class="fav-action" onclick="shareFavs()">Share ↗</button>
     </div>
   </div>
+
   <div id="results"></div>
+
   <footer>
     <span class="footer-text">Phraselix — Content Tools</span>
     <span class="footer-text">Bio Generator</span>
   </footer>
 </div>
+
 <div class="fav-overlay" id="favOverlay" onclick="closeFavPanel()"></div>
 <div class="fav-panel" id="favPanel">
   <div class="fav-panel-header">
@@ -210,48 +227,244 @@ body{cursor:none;}
   </div>
 </div>
 <div class="toast" id="toast"></div>
+
 <script>
-const FAV_KEY='phraselix_bio_favs';
-let selectedStyle='instagram',selectedCount=3,isLoading=false,allItems=[],totalGenerated=0;
-const taglines=['A bio that actually sounds like <em>you.</em>','Stop writing boring bios. Sound like <em>yourself.</em>','Your profile. Your vibe. Your <em>words.</em>','One sentence that makes people <em>follow.</em>','Your bio is your first impression. Make it <em>hit.</em>'];
-document.getElementById('taglineText').innerHTML=taglines[Math.floor(Math.random()*taglines.length)];
-document.getElementById('prompt').placeholder='e.g. fitness creator, loves travel, based in NYC, posts daily workouts...';
-document.querySelectorAll('#styleRow .style-tag').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('#styleRow .style-tag').forEach(b=>b.classList.remove('active'));btn.classList.add('active');selectedStyle=btn.dataset.style;allItems=[];totalGenerated=0;});});
-document.querySelectorAll('.count-btn').forEach(btn=>{btn.addEventListener('click',()=>{if(btn.classList.contains('locked')){document.getElementById('countLockedTip').classList.add('show');return;}document.querySelectorAll('.count-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');selectedCount=parseInt(btn.dataset.count);document.getElementById('countLockedTip').classList.remove('show');});});
-document.getElementById('prompt').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey))generate();});
-function buildSystemPrompt(){return `You write short, punchy social media bios that feel human and authentic. No cringe, no buzzwords, no "passionate about".\n\nPlatform: ${selectedStyle}\n\nPlatform rules:\n- instagram: Max 150 chars. Punchy, emojis optional, line breaks work well.\n- tiktok: Casual, lowercase okay, fun. Max 80 chars.\n- twitter: Max 160 chars. Witty or direct. Can have dry humor.\n- youtube: Max 200 chars. What kind of content, why follow, who it's for.\n- linkedin: Professional but not stiff. 200-300 chars.\n\nNEVER write "Passionate about X", "Helping people achieve Y", "On a journey to Z", generic motivational phrases.\n\nRespond ONLY with valid JSON: {"items":["bio1","bio2","bio3"]}`;}
-function buildUserMsg(prompt){return `Person/Brand: "${prompt}"\nPlatform: ${selectedStyle}\n\nWrite EXACTLY ${selectedCount} bios. Each must have a completely different angle, structure, and personality.`;}
-async function generate(){const prompt=document.getElementById('prompt').value.trim();if(!prompt){document.getElementById('prompt').focus();return;}if(isLoading)return;hideError();if(isBadInput(prompt)){showError("Keep it clean — Phraselix isn't that kind of tool.");return;}setLoading(true,'Writing your bio...');allItems=[];totalGenerated=0;document.getElementById('results').innerHTML='';document.getElementById('btnMore').style.display='none';try{const result=await callAPI(buildSystemPrompt(),buildUserMsg(prompt));renderResults(result);document.getElementById('btnMore').style.display='block';}catch(e){showError('Something went wrong — try again.');console.error(e);}finally{setLoading(false);}}
-async function generateMore(){const prompt=document.getElementById('prompt').value.trim();if(!prompt||isLoading)return;hideError();setLoading(true,'Generating more...');const extra=allItems.length?'\n\nDo NOT repeat these:\n'+allItems.slice(-20).join(', '):'';try{const result=await callAPI(buildSystemPrompt(),buildUserMsg(prompt)+extra);appendResults(result);}catch(e){showError('Something went wrong — try again.');}finally{setLoading(false);}}
-function renderResults(data){const container=document.getElementById('results');container.innerHTML='<div class="results-header"><div class="results-label">Generated Bios</div><div style="display:flex;align-items:center;gap:1rem"><button onclick="shareResults()" style="font-family:DM Mono,monospace;font-size:.55rem;letter-spacing:1.5px;text-transform:uppercase;padding:.25rem .7rem;border:1px solid var(--border2);border-radius:2px;background:none;color:var(--text3);cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor=\'var(--accent)\';this.style.color=\'var(--accent)\'" onmouseout="this.style.borderColor=\'var(--border2)\';this.style.color=\'var(--text3)\'">Share ↗</button><div class="results-count" id="itemCount">0</div></div></div><div class="names-grid" id="itemsGrid"></div>';const grid=document.getElementById('itemsGrid');const fresh=(data.items||[]).slice(0,selectedCount);allItems=fresh;totalGenerated=fresh.length;fresh.forEach(item=>grid.appendChild(makeCard(selectedStyle.charAt(0).toUpperCase()+selectedStyle.slice(1),item,'type-a',FAV_KEY)));document.getElementById('itemCount').textContent=totalGenerated+' results';updateFavBar();}
-function appendResults(data){const grid=document.getElementById('itemsGrid');if(!grid){renderResults(data);return;}const fresh=(data.items||[]).slice(0,selectedCount).filter(t=>!allItems.includes(t));allItems=[...allItems,...fresh];totalGenerated=allItems.length;const label=selectedStyle.charAt(0).toUpperCase()+selectedStyle.slice(1);[...fresh].reverse().forEach(item=>{const card=makeCard(label,item,'type-a',FAV_KEY);grid.insertBefore(card,grid.firstChild);});const countEl=document.getElementById('itemCount');if(countEl)countEl.textContent=totalGenerated+' results';updateFavBar();}
-function isBadInput(text){const banned=['porn','porno','pornstar','pornhub','onlyfans','sex','sexy','sexual','nude','naked','nsfw','xxx','erotic','hentai','horny','boobs','tits','dick','cock','pussy','vagina','penis','blowjob','handjob','cumshot','orgasm','fetish','bdsm','stripper','escort','prostitute','hooker','camgirl','fuck','shit','bitch','cunt','asshole','bastard','slut','whore','nigga','nigger','faggot','retard','murder','rape','suicide','terrorist','nazis','nazi','racist','racism','genocide','pedophile','pedo','molest'];const wb=(t,w)=>new RegExp('\\b'+w+'\\b').test(t);const t=text.toLowerCase();for(const word of banned){if(wb(t,word))return true;}const leet=t.replace(/0/g,'o').replace(/1/g,'i').replace(/3/g,'e').replace(/4/g,'a').replace(/5/g,'s').replace(/8/g,'b').replace(/\$/g,'s').replace(/@/g,'a').replace(/!/g,'i');for(const word of banned){if(wb(leet,word))return true;}return false;}
-async function callAPI(sys,msg){const r=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:sys,messages:[{role:'user',content:msg}]})});const d=await r.json();if(d.error)throw new Error(d.error.message||'API error');const raw=d.content[0].text.trim().replace(/```json|```/g,'').trim();const match=raw.match(/\{[\s\S]*\}/);if(!match)throw new Error('No JSON in response');const parsed=JSON.parse(match[0]);if(!parsed.items||!parsed.items.length)throw new Error('No items in response');return parsed;}
-function getFavs(key){try{return JSON.parse(localStorage.getItem(key)||'[]');}catch{return[];}}
-function saveFavs(key,favs){localStorage.setItem(key,JSON.stringify(favs));updateFavBar();}
-function toggleFav(card,item,key){let favs=getFavs(key);const idx=favs.findIndex(f=>f.content===item.content);const btn=card.querySelector('.fav-btn');if(idx>-1){favs.splice(idx,1);btn.classList.remove('saved');showToast('Removed from favorites');}else{favs.push(item);btn.classList.add('saved');showToast('Saved ♥');}saveFavs(key,favs);}
-function updateFavBar(){const favs=getFavs(FAV_KEY);document.getElementById('favCount').textContent=favs.length;document.getElementById('favBar').classList.toggle('show',favs.length>0);if(document.getElementById('favPanel').classList.contains('open'))renderFavPanel();}
-function openFavPanel(){renderFavPanel();document.getElementById('favPanel').classList.add('open');document.getElementById('favOverlay').classList.add('show');}
-function closeFavPanel(){document.getElementById('favPanel').classList.remove('open');document.getElementById('favOverlay').classList.remove('show');}
-function renderFavPanel(){const favs=getFavs(FAV_KEY);const body=document.getElementById('favPanelBody');if(!favs.length){body.innerHTML='<div class="fav-panel-empty">No favorites yet.<br>Hit ♥ on any card<br>to save it here.</div>';return;}body.innerHTML='';favs.forEach(item=>{const el=document.createElement('div');el.className='fav-item';el.innerHTML='<div class="fav-item-content"><div class="fav-item-label">'+(item.label||'')+'</div><div class="fav-item-text">'+item.content+'</div></div><div class="fav-item-actions"><button class="fav-item-btn" onclick="copyText(\''+item.content.replace(/'/g,"\\'")+"',this)\">Copy</button><button class=\"fav-item-btn remove\" onclick=\"removeFav('"+item.content.replace(/'/g,"\\'")+'\')">X</button></div>';body.appendChild(el);});}
-function removeFav(content){saveFavs(FAV_KEY,getFavs(FAV_KEY).filter(f=>f.content!==content));renderFavPanel();document.querySelectorAll('.fav-btn').forEach(btn=>{const t=btn.closest('.name-card')?.querySelector('.name-text')?.textContent;if(t===content)btn.classList.remove('saved');});}
-function clearFavs(){saveFavs(FAV_KEY,[]);document.querySelectorAll('.fav-btn').forEach(b=>b.classList.remove('saved'));showToast('Favorites cleared');}
-function copyText(text,btn){navigator.clipboard.writeText(text).then(()=>{const o=btn.textContent;btn.textContent='Done';setTimeout(()=>btn.textContent=o,1500);});}
-function shareResults(){const cards=[...document.querySelectorAll('.name-text')].map(c=>c.textContent);if(!cards.length)return;navigator.clipboard.writeText(window.location.origin+window.location.pathname+'?shared='+encodeURIComponent(cards.join('|||'))).then(()=>showToast('Link copied!'));}
-function shareFavs(){const favs=getFavs(FAV_KEY);if(!favs.length)return;navigator.clipboard.writeText(window.location.origin+window.location.pathname+'?shared='+encodeURIComponent(favs.map(f=>f.content).join('|||'))).then(()=>showToast('Link copied!'));}
-function makeCard(label,content,typeClass,key){const card=document.createElement('div');card.className='name-card';const item={label,content};const isFaved=getFavs(key).some(f=>f.content===content);card.innerHTML='<button class="fav-btn '+(isFaved?'saved':'')+'" title="Save">&#9829;</button><div class="name-style '+typeClass+'">'+label+'</div><div class="name-text">'+content+'</div><div class="copy-hint">click to copy</div>';card.querySelector('.fav-btn').addEventListener('click',e=>{e.stopPropagation();toggleFav(card,item,key);});card.addEventListener('click',()=>{navigator.clipboard.writeText(content).then(()=>{card.classList.add('copied');card.querySelector('.copy-hint').textContent='copied!';setTimeout(()=>{card.classList.remove('copied');card.querySelector('.copy-hint').textContent='click to copy';},2000);});});return card;}
-function setLoading(state,text){isLoading=state;document.getElementById('loading').classList.toggle('show',state);document.getElementById('loadingText').textContent=text||'Generating...';document.getElementById('btnGenerate').disabled=state;}
-function showError(msg){const el=document.getElementById('errorMsg');el.textContent=msg;el.classList.add('show');}
-function hideError(){document.getElementById('errorMsg').classList.remove('show');}
-function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
-const cursor=document.getElementById('cursor');const ring=document.getElementById('cursorRing');let mx=0,my=0,rx=0,ry=0;
-document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=mx+'px';cursor.style.top=my+'px';});
-function animRing(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(animRing);}animRing();
-document.querySelectorAll('a,button,.name-card').forEach(el=>{el.addEventListener('mouseenter',()=>{ring.style.width='48px';ring.style.height='48px';ring.style.borderColor='rgba(232,255,71,.6)';});el.addEventListener('mouseleave',()=>{ring.style.width='32px';ring.style.height='32px';ring.style.borderColor='rgba(232,255,71,.3)';});});
-document.addEventListener('touchstart',e=>{const touch=e.touches[0];const ripple=document.createElement('div');ripple.className='ripple';ripple.style.left=touch.clientX+'px';ripple.style.top=touch.clientY+'px';document.body.appendChild(ripple);setTimeout(()=>ripple.remove(),500);},{passive:true});
+const FAV_KEY = 'phraselix_bio_favs';
+let selectedStyle = 'professional';
+let selectedCount = 3;
+let isLoading = false;
+let allItems = [];
+let totalGenerated = 0;
+
+const taglines = [
+  'A bio that actually sounds like <em>you.</em>',
+  'Stop writing boring bios. Sound like <em>yourself.</em>',
+  'Your profile. Your vibe. Your <em>words.</em>',
+  'One sentence that makes people <em>follow.</em>',
+  'Your bio is your first impression. Make it <em>hit.</em>'
+];
+document.getElementById('taglineText').innerHTML = taglines[Math.floor(Math.random() * taglines.length)];
+
+document.getElementById('prompt').placeholder = 'e.g. fitness creator, loves travel, based in NYC, posts daily workouts...';
+
+document.querySelectorAll('#styleRow .style-tag').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#styleRow .style-tag').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedStyle = btn.dataset.style;
+    allItems = []; totalGenerated = 0;
+  });
+});
+
+document.querySelectorAll('.count-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (btn.classList.contains('locked')) { document.getElementById('countLockedTip').classList.add('show'); return; }
+    document.querySelectorAll('.count-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedCount = parseInt(btn.dataset.count);
+    document.getElementById('countLockedTip').classList.remove('show');
+  });
+});
+
+document.getElementById('prompt').addEventListener('keydown', e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) generate(); });
+
+function buildSystemPrompt() {
+  return `You write short, punchy bios that feel human and authentic. No cringe, no buzzwords, no "passionate about".
+
+Tone rules:
+- professional: Polished and credible. Clear value proposition. What you do and why it matters. No fluff.
+- witty: Clever, dry, or self-aware. A little personality goes a long way. Avoid trying too hard.
+- minimal: As few words as possible. Every word earns its place. No filler.
+- bold: Confident, direct, unapologetic. Makes a statement. No hedging.
+
+NEVER write:
+- "Passionate about X"
+- "Helping people achieve Y"
+- "On a journey to Z"
+- Generic motivational phrases
+
+Respond ONLY with valid JSON: {"items":["bio1","bio2","bio3"]}`;
+}
+
+function buildUserMsg(prompt) {
+  return `Person/Brand: "${prompt}"\nTone: ${selectedStyle}\n\nWrite EXACTLY ${selectedCount} bios. Each must have a completely different angle, structure, and personality. Match the tone strictly.`;
+}
+
+async function generate() {
+  const prompt = document.getElementById('prompt').value.trim();
+  if (!prompt) { document.getElementById('prompt').focus(); return; }
+  if (isLoading) return;
+  hideError();
+  if (isBadInput(prompt)) { showError("Keep it clean — Phraselix isn't that kind of tool."); return; }
+  setLoading(true, 'Writing your bio...');
+  allItems = []; totalGenerated = 0;
+  document.getElementById('results').innerHTML = '';
+  document.getElementById('btnMore').style.display = 'none';
+  try {
+    const result = await callAPI(buildSystemPrompt(), buildUserMsg(prompt));
+    renderResults(result);
+    document.getElementById('btnMore').style.display = 'block';
+  } catch(e) {
+    showError('Something went wrong — try again.');
+    console.error(e);
+  } finally {
+    setLoading(false);
+  }
+}
+
+async function generateMore() {
+  const prompt = document.getElementById('prompt').value.trim();
+  if (!prompt || isLoading) return;
+  hideError();
+  setLoading(true, 'Generating more...');
+  const extra = allItems.length ? '\n\nDo NOT repeat these, generate completely different ones:\n' + allItems.slice(-20).join(', ') : '';
+  try {
+    const result = await callAPI(buildSystemPrompt(), buildUserMsg(prompt) + extra);
+    appendResults(result);
+  } catch(e) {
+    showError('Something went wrong — try again.');
+    console.error(e);
+  } finally {
+    setLoading(false);
+  }
+}
+
+function renderResults(data) {
+  const container = document.getElementById('results');
+  container.innerHTML = '<div class="results-header"><div class="results-label">Generated Bios</div><div style="display:flex;align-items:center;gap:1rem"><button onclick="shareResults()" style="font-family:DM Mono,monospace;font-size:.55rem;letter-spacing:1.5px;text-transform:uppercase;padding:.25rem .7rem;border:1px solid var(--border2);border-radius:2px;background:none;color:var(--text3);cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor=\'var(--accent)\';this.style.color=\'var(--accent)\'" onmouseout="this.style.borderColor=\'var(--border2)\';this.style.color=\'var(--text3)\'">Share ↗</button><div class="results-count" id="itemCount">0</div></div></div><div class="names-grid" id="itemsGrid"></div>';
+  const grid = document.getElementById('itemsGrid');
+  const fresh = (data.items || []).slice(0, selectedCount);
+  allItems = fresh;
+  totalGenerated = fresh.length;
+  fresh.forEach(item => grid.appendChild(makeCard(selectedStyle.charAt(0).toUpperCase()+selectedStyle.slice(1), item, 'type-a', FAV_KEY)));
+  document.getElementById('itemCount').textContent = totalGenerated + ' results';
+  updateFavBar();
+}
+
+function appendResults(data) {
+  const grid = document.getElementById('itemsGrid');
+  if (!grid) { renderResults(data); return; }
+  const fresh = (data.items || []).slice(0, selectedCount).filter(t => !allItems.includes(t));
+  allItems = [...allItems, ...fresh];
+  totalGenerated = allItems.length;
+  const label = selectedStyle.charAt(0).toUpperCase()+selectedStyle.slice(1);
+  [...fresh].reverse().forEach(item => {
+    const card = makeCard(label, item, 'type-a', FAV_KEY);
+    grid.insertBefore(card, grid.firstChild);
+  });
+  const countEl = document.getElementById('itemCount');
+  if (countEl) countEl.textContent = totalGenerated + ' results';
+  updateFavBar();
+}
+
+function isBadInput(text) {
+  const banned = ['porn','porno','pornstar','pornhub','onlyfans','sex','sexy','sexual','nude','naked','nsfw','xxx','erotic','hentai','horny','boobs','tits','dick','cock','pussy','vagina','penis','blowjob','handjob','cumshot','orgasm','fetish','bdsm','stripper','escort','prostitute','hooker','camgirl','fuck','shit','bitch','cunt','asshole','bastard','slut','whore','nigga','nigger','faggot','retard','murder','rape','suicide','terrorist','nazis','nazi','racist','racism','genocide','pedophile','pedo','molest'];
+  const wb = (t, w) => new RegExp('\\b' + w + '\\b').test(t);
+  const t = text.toLowerCase();
+  for (const word of banned) { if (wb(t, word)) return true; }
+  const leet = t.replace(/0/g,'o').replace(/1/g,'i').replace(/3/g,'e').replace(/4/g,'a').replace(/5/g,'s').replace(/8/g,'b').replace(/\$/g,'s').replace(/@/g,'a').replace(/!/g,'i');
+  for (const word of banned) { if (wb(leet, word)) return true; }
+  return false;
+}
+
+async function callAPI(sys, msg) {
+  const r = await fetch('/api/generate', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ system:sys, messages:[{role:'user',content:msg}] }) });
+  const d = await r.json();
+  if (d.error) throw new Error(d.error.message || 'API error');
+  const raw = d.content[0].text.trim().replace(/```json|```/g,'').trim();
+  const match = raw.match(/\{[\s\S]*\}/);
+  if (!match) throw new Error('No JSON in response');
+  const parsed = JSON.parse(match[0]);
+  if (!parsed.items || !parsed.items.length) throw new Error('No items in response');
+  return parsed;
+}
+
+function getFavs(key) { try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; } }
+function saveFavs(key, favs) { localStorage.setItem(key, JSON.stringify(favs)); updateFavBar(); }
+function toggleFav(card, item, key) {
+  let favs = getFavs(key);
+  const idx = favs.findIndex(f => f.content === item.content);
+  const btn = card.querySelector('.fav-btn');
+  if (idx > -1) { favs.splice(idx,1); btn.classList.remove('saved'); showToast('Removed from favorites'); }
+  else { favs.push(item); btn.classList.add('saved'); showToast('Saved ♥'); }
+  saveFavs(key, favs);
+}
+function updateFavBar() {
+  const favs = getFavs(FAV_KEY);
+  document.getElementById('favCount').textContent = favs.length;
+  document.getElementById('favBar').classList.toggle('show', favs.length > 0);
+  if (document.getElementById('favPanel').classList.contains('open')) renderFavPanel();
+}
+function openFavPanel() { renderFavPanel(); document.getElementById('favPanel').classList.add('open'); document.getElementById('favOverlay').classList.add('show'); }
+function closeFavPanel() { document.getElementById('favPanel').classList.remove('open'); document.getElementById('favOverlay').classList.remove('show'); }
+function renderFavPanel() {
+  const favs = getFavs(FAV_KEY);
+  const body = document.getElementById('favPanelBody');
+  if (!favs.length) { body.innerHTML = '<div class="fav-panel-empty">No favorites yet.<br>Hit ♥ on any card<br>to save it here.</div>'; return; }
+  body.innerHTML = '';
+  favs.forEach(item => {
+    const el = document.createElement('div');
+    el.className = 'fav-item';
+    el.innerHTML = '<div class="fav-item-content"><div class="fav-item-label">' + (item.label||'') + '</div><div class="fav-item-text">' + item.content + '</div></div><div class="fav-item-actions"><button class="fav-item-btn" onclick="copyText(\'' + item.content.replace(/'/g,"\\'") + '\',this)">Copy</button><button class="fav-item-btn remove" onclick="removeFav(\'' + item.content.replace(/'/g,"\\'") + '\')">X</button></div>';
+    body.appendChild(el);
+  });
+}
+function removeFav(content) { saveFavs(FAV_KEY, getFavs(FAV_KEY).filter(f => f.content !== content)); renderFavPanel(); document.querySelectorAll('.fav-btn').forEach(btn => { const t = btn.closest('.name-card')?.querySelector('.name-text')?.textContent; if (t === content) btn.classList.remove('saved'); }); }
+function clearFavs() { saveFavs(FAV_KEY, []); document.querySelectorAll('.fav-btn').forEach(b => b.classList.remove('saved')); showToast('Favorites cleared'); }
+function copyText(text, btn) { navigator.clipboard.writeText(text).then(() => { const o = btn.textContent; btn.textContent = 'Done'; setTimeout(() => btn.textContent = o, 1500); }); }
+function shareResults() {
+  const cards = [...document.querySelectorAll('.name-text')].map(c => c.textContent);
+  if (!cards.length) return;
+  navigator.clipboard.writeText(window.location.origin + window.location.pathname + '?shared=' + encodeURIComponent(cards.join('|||'))).then(() => showToast('Link copied!'));
+}
+function shareFavs() {
+  const favs = getFavs(FAV_KEY);
+  if (!favs.length) return;
+  navigator.clipboard.writeText(window.location.origin + window.location.pathname + '?shared=' + encodeURIComponent(favs.map(f=>f.content).join('|||'))).then(() => showToast('Link copied!'));
+}
+function makeCard(label, content, typeClass, key) {
+  const card = document.createElement('div');
+  card.className = 'name-card';
+  const item = { label, content };
+  const isFaved = getFavs(key).some(f => f.content === content);
+  card.innerHTML = '<button class="fav-btn ' + (isFaved?'saved':'') + '" title="Save">&#9829;</button><div class="name-style ' + typeClass + '">' + label + '</div><div class="name-text">' + content + '</div><div class="copy-hint">click to copy</div>';
+  card.querySelector('.fav-btn').addEventListener('click', e => { e.stopPropagation(); toggleFav(card, item, key); });
+  card.addEventListener('click', () => { navigator.clipboard.writeText(content).then(() => { card.classList.add('copied'); card.querySelector('.copy-hint').textContent = 'copied!'; setTimeout(() => { card.classList.remove('copied'); card.querySelector('.copy-hint').textContent = 'click to copy'; }, 2000); }); });
+  return card;
+}
+function setLoading(state, text) { isLoading = state; document.getElementById('loading').classList.toggle('show', state); document.getElementById('loadingText').textContent = text || 'Generating...'; document.getElementById('btnGenerate').disabled = state; }
+function showError(msg) { const el = document.getElementById('errorMsg'); el.textContent = msg; el.classList.add('show'); }
+function hideError() { document.getElementById('errorMsg').classList.remove('show'); }
+function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2000); }
+
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; cursor.style.left=mx+'px'; cursor.style.top=my+'px'; });
+function animRing() { rx+=(mx-rx)*.12; ry+=(my-ry)*.12; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(animRing); }
+animRing();
+document.querySelectorAll('a,button,.name-card').forEach(el => {
+  el.addEventListener('mouseenter', () => { ring.style.width='48px'; ring.style.height='48px'; ring.style.borderColor='rgba(232,255,71,.6)'; });
+  el.addEventListener('mouseleave', () => { ring.style.width='32px'; ring.style.height='32px'; ring.style.borderColor='rgba(232,255,71,.3)'; });
+});
+document.addEventListener('touchstart', e => {
+  const touch = e.touches[0];
+  const ripple = document.createElement('div');
+  ripple.className = 'ripple';
+  ripple.style.left = touch.clientX + 'px';
+  ripple.style.top = touch.clientY + 'px';
+  document.body.appendChild(ripple);
+  setTimeout(() => ripple.remove(), 500);
+}, {passive:true});
 updateFavBar();
-const sharedParam=new URLSearchParams(window.location.search).get('shared');
-if(sharedParam){const items=decodeURIComponent(sharedParam).split('|||').filter(Boolean);document.getElementById('sharedBanner').classList.add('show');const grid=document.createElement('div');grid.className='names-grid';items.forEach(content=>grid.appendChild(makeCard('Shared',content,'type-a',FAV_KEY)));document.getElementById('results').appendChild(grid);}
+const sharedParam = new URLSearchParams(window.location.search).get('shared');
+if (sharedParam) {
+  const items = decodeURIComponent(sharedParam).split('|||').filter(Boolean);
+  document.getElementById('sharedBanner').classList.add('show');
+  const grid = document.createElement('div'); grid.className = 'names-grid';
+  items.forEach(content => grid.appendChild(makeCard('Shared', content, 'type-a', FAV_KEY)));
+  document.getElementById('results').appendChild(grid);
+}
 </script>
 <script defer src="/_vercel/insights/script.js"></script>
 </body>
