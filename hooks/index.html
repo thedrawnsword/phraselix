@@ -320,8 +320,15 @@ async function callAPI(systemPrompt, userMsg) {
   });
   const data = await response.json();
   if (data.error) throw new Error(data.error.message || 'API error');
-  const text = data.content[0].text.trim().replace(/```json|```/g, '').trim();
-  return JSON.parse(text);
+  const raw = data.content[0].text.trim();
+  // strip markdown fences
+  const clean = raw.replace(/```json|```/g, '').trim();
+  // extract JSON object even if there's surrounding text
+  const match = clean.match(/\{[\s\S]*\}/);
+  if (!match) throw new Error('No JSON found in response: ' + raw.slice(0, 100));
+  const parsed = JSON.parse(match[0]);
+  if (!parsed.titles || !parsed.titles.length) throw new Error('No titles in response');
+  return parsed;
 }
 
 function buildSystemPrompt() {
