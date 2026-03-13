@@ -5,96 +5,50 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Phraselix — Title Generator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#07080c;
-  --bg2:#0d0f14;
-  --bg3:#12141a;
-  --text:#e8e8e8;
-  --text2:#8a9099;
-  --text3:#454d5a;
-  --border:#1a1d26;
-  --border2:#252830;
-  --accent:#e8ff47;
-  --accent2:#c8df20;
-  --blue:#4ecdc4;
-  --purple:#a78bfa;
-  --red:#ff4757;
+  --bg:#06070a;--bg2:#0d0f14;--bg3:#13161e;
+  --border:#1e2230;--border2:#2a2f42;
+  --accent:#e8ff47;--accent2:#c8e000;
+  --text:#eeeef5;--text2:#7a7f9a;--text3:#4a4f66;
+  --red:#ff4757;--blue:#4ecdc4;--purple:#a78bfa;--orange:#ff8c42;
 }
-
-/* ── Base ── */
-html{scroll-behavior:smooth;}
-body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;overflow-x:hidden;cursor:none;}
-
-@media(hover:none),(max-width:600px){
-  body{cursor:auto;}
-  .cursor,.cursor-ring{display:none;}
-}
-
-/* ── Custom cursor ── */
-.cursor{position:fixed;width:8px;height:8px;background:var(--accent);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:difference;}
-.cursor-ring{position:fixed;width:32px;height:32px;border:1px solid rgba(232,255,71,.3);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .3s,height .3s,border-color .3s;}
-
-/* ── Touch ripple ── */
-.ripple{position:fixed;border-radius:50%;background:rgba(232,255,71,.3);pointer-events:none;z-index:9999;transform:translate(-50%,-50%) scale(0);animation:rippleOut .5s cubic-bezier(.16,1,.3,1) forwards;}
-@keyframes rippleOut{0%{width:10px;height:10px;opacity:1;transform:translate(-50%,-50%) scale(0);}100%{width:80px;height:80px;opacity:0;transform:translate(-50%,-50%) scale(1);}}
-
-/* ── Background ── */
-.bg-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(232,255,71,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(232,255,71,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
-.bg-glow{position:fixed;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(232,255,71,.05) 0%,transparent 70%);top:-200px;right:-100px;pointer-events:none;z-index:0;animation:floatGlow 8s ease-in-out infinite;}
-.bg-glow2{position:fixed;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(232,255,71,.03) 0%,transparent 70%);bottom:-100px;left:-100px;pointer-events:none;z-index:0;animation:floatGlow 10s ease-in-out infinite reverse;}
-@keyframes floatGlow{0%,100%{transform:translate(0,0);}50%{transform:translate(30px,-30px);}}
-
-/* ── Layout ── */
-.wrap{max-width:780px;margin:0 auto;padding:0 1.5rem;position:relative;z-index:1;}
-
-/* ── Header ── */
-header{display:flex;align-items:center;justify-content:space-between;padding:1.5rem 0;border-bottom:1px solid var(--border);}
-.logo{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:3px;color:var(--text);text-decoration:none;opacity:.6;transition:opacity .2s;}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");opacity:.4;}
+body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(232,255,71,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(232,255,71,.025) 1px,transparent 1px);background-size:60px 60px;}
+.wrap{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:0 1.5rem}
+header{padding:1.4rem 0;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);margin-bottom:0;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:4px;line-height:1;color:var(--accent);opacity:.65;transition:opacity .2s;text-decoration:none;}
 .logo:hover{opacity:1;}
-.back-btn{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--text3);text-decoration:none;border:1px solid var(--border2);padding:.3rem .8rem;border-radius:2px;transition:all .2s;}
-.back-btn:hover{color:var(--accent);border-color:var(--accent);}
-
-/* ── Hero ── */
-.hero{padding:3rem 0 2rem;position:relative;}
-.hero-eyebrow{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;}
-.hero-eyebrow::before{content:'';width:20px;height:1px;background:var(--accent);}
-.hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,10vw,5.5rem);letter-spacing:2px;line-height:.95;margin-bottom:1rem;}
-.hero-title span{color:var(--accent);position:relative;display:inline-block;}
-.hero-title span::after{content:'';position:absolute;bottom:4px;left:0;right:0;height:3px;background:var(--accent);border-radius:2px;}
-.hero-sub{font-size:.95rem;color:var(--text2);font-weight:400;max-width:480px;line-height:1.6;}
-
-/* ── Platform tabs ── */
-.platform-section{margin:2rem 0 1.5rem;}
-.platform-label{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:.8rem;}
-.platform-tabs{display:flex;gap:.5rem;flex-wrap:wrap;}
-.platform-tab{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:1.5px;text-transform:uppercase;padding:.4rem 1rem;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:.4rem;}
-.platform-tab:hover{border-color:var(--accent);color:var(--accent);}
-.platform-tab.active{background:var(--accent);color:var(--bg);border-color:var(--accent);}
-.platform-tab .tab-icon{font-size:.8rem;}
-
-/* ── Input area ── */
-.input-section{margin-bottom:1.5rem;}
-.input-label{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:.6rem;display:flex;justify-content:space-between;}
-.char-count{color:var(--text3);transition:color .2s;}
+.back-btn{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--text3);text-decoration:none;transition:color .2s;display:flex;align-items:center;gap:.4rem;}
+.back-btn:hover{color:var(--accent);}
+.hero-tagline{padding:2rem 0 1.8rem;text-align:center;border-bottom:1px solid var(--border);margin-bottom:2.5rem;}
+.tagline-text{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.8rem,6vw,5rem);letter-spacing:3px;line-height:1.1;color:var(--text);animation:fadeInUp .5s ease both;}
+.tagline-text em{font-style:normal;color:var(--accent);text-shadow:0 0 40px rgba(232,255,71,.3);}
+.tagline-meta{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:.8rem;animation:fadeInUp .5s ease .2s both;}
+.tagline-sub{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--text3);margin-top:.6rem;animation:fadeInUp .5s ease .1s both;}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.input-section{margin-bottom:3rem}
+.prompt-label{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;}
+.prompt-label::before{content:'//';color:var(--text3)}
+textarea{width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:4px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:1.05rem;font-weight:300;padding:1.2rem 1.4rem;resize:none;outline:none;transition:border-color .2s,box-shadow .2s;line-height:1.6;min-height:110px;}
+textarea:focus{border-color:var(--accent);box-shadow:0 0 0 1px rgba(232,255,71,.15),inset 0 0 30px rgba(232,255,71,.02);}
+textarea::placeholder{color:var(--text3)}
+.char-count{font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:1px;color:var(--text3);text-align:right;margin-top:.4rem;}
 .char-count.warn{color:var(--accent);}
-.input-wrap{position:relative;}
-.main-input{width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:1.2rem 1.4rem;font-family:'Syne',sans-serif;font-size:.95rem;color:var(--text);resize:none;min-height:110px;outline:none;transition:border-color .2s,box-shadow .2s;line-height:1.6;}
-.main-input::placeholder{color:var(--text3);}
-.main-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(232,255,71,.06);}
-
-/* ── Options row ── */
-.options-row{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;margin-bottom:1.5rem;}
-.option-pill{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:1.5px;text-transform:uppercase;padding:.35rem .9rem;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;transition:all .2s;}
-.option-pill:hover{border-color:var(--accent);color:var(--accent);}
-.option-pill.active{background:rgba(232,255,71,.08);border-color:var(--accent);color:var(--accent);}
-
-
-/* ── Count picker ── */
-.count-section{margin:.8rem 0 1.2rem;}
+.style-section{margin:1.2rem 0 1.5rem;}
+.style-hint{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:.7rem;}
+.style-hint span{color:var(--accent);opacity:.7}
+.style-row{display:flex;flex-wrap:wrap;gap:.5rem;}
+.style-tag{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:1.5px;text-transform:uppercase;padding:.35rem .8rem;border:1px solid var(--border2);border-radius:2px;background:transparent;color:var(--text2);cursor:pointer;transition:all .15s;user-select:none;}
+.style-tag:hover{border-color:var(--accent);color:var(--accent)}
+.style-tag.active{background:var(--accent);color:var(--bg);border-color:var(--accent);font-weight:500;}
+.count-section{margin:.8rem 0 1.5rem;}
 .count-hint{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:.7rem;}
+.count-hint span{color:var(--accent);opacity:.7}
 .count-row{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;}
 .count-btn{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:1px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border2);border-radius:3px;background:transparent;color:var(--text2);cursor:pointer;transition:all .15s;user-select:none;}
 .count-btn:hover{border-color:var(--accent);color:var(--accent);}
@@ -103,37 +57,57 @@ header{display:flex;align-items:center;justify-content:space-between;padding:1.5
 .count-btn.locked:hover{border-color:var(--border2);color:var(--text2);}
 .count-locked-tip{font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-top:.5rem;display:none;}
 .count-locked-tip.show{display:block;}
-@media(max-width:600px){.count-btn{width:28px;height:28px;font-size:.85rem;}.count-row{gap:.25rem;}}
-/* ── Generate button ── */
-.btn-generate{width:100%;padding:1.1rem;background:var(--accent);border:none;border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:3px;color:var(--bg);cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
-.btn-generate::before{content:'';position:absolute;inset:0;background:var(--accent2);opacity:0;transition:opacity .3s;}
-.btn-generate:hover::before{opacity:1;}
-.btn-generate:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(232,255,71,.2);}
-.btn-generate:active{transform:translateY(0);}
-.btn-generate:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none;}
-.btn-generate span{position:relative;z-index:1;}
-
-/* ── Loading ── */
+.btn-row{display:flex;gap:1rem;align-items:center}
+.btn-generate{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:3px;padding:.7rem 2.5rem;background:var(--accent);color:var(--bg);border:none;border-radius:3px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden;}
+.btn-generate::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);transform:translateX(-100%);transition:transform .4s;}
+.btn-generate:hover::after{transform:translateX(100%)}
+.btn-generate:hover{background:var(--accent2);transform:translateY(-1px);box-shadow:0 8px 30px rgba(232,255,71,.25)}
+.btn-generate:active{transform:translateY(0)}
+.btn-generate:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-more{font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:2px;text-transform:uppercase;padding:.7rem 1.5rem;background:transparent;color:var(--text2);border:1px solid var(--border2);border-radius:3px;cursor:pointer;transition:all .15s;display:none;}
+.btn-more:hover{border-color:var(--accent);color:var(--accent)}
+.btn-more:disabled{opacity:.3;cursor:not-allowed}
 .loading{display:none;align-items:center;gap:1rem;padding:2rem 0;font-family:'DM Mono',monospace;font-size:.7rem;color:var(--text2);letter-spacing:2px;text-transform:uppercase;}
-.loading.show{display:flex;}
+.loading.show{display:flex}
 .loader{display:flex;gap:4px;}
 .loader span{width:6px;height:6px;background:var(--accent);border-radius:50%;animation:pulse 1.2s ease-in-out infinite;}
 .loader span:nth-child(2){animation-delay:.2s}
 .loader span:nth-child(3){animation-delay:.4s}
 @keyframes pulse{0%,80%,100%{opacity:.2;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
-
-
-/* ── Favorites bar ── */
+#results{margin-top:1rem}
+.results-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--border);}
+.results-label{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--text3);}
+.results-count{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;color:var(--accent);}
+.names-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:.75rem;}
+.name-card{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:1.2rem 1.4rem;display:flex;flex-direction:column;gap:.6rem;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;animation:fadeUp .4s ease both;}
+.name-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:0;transition:opacity .2s;}
+.name-card:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,0,0,.4)}
+.name-card:hover::before{opacity:.6}
+.name-card.copied{border-color:var(--accent);background:rgba(232,255,71,.04)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.name-text{font-family:'DM Sans',sans-serif;font-size:1.05rem;color:var(--text);line-height:1.5;font-weight:400;}
+.name-style{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:2px;text-transform:uppercase;padding:.2rem .5rem;border-radius:2px;display:inline-flex;align-items:center;width:fit-content;}
+.copy-hint{font-family:'DM Mono',monospace;font-size:.58rem;color:var(--text3);letter-spacing:1px;margin-top:.2rem;transition:color .2s;}
+.name-card:hover .copy-hint{color:var(--accent)}
+.name-card.copied .copy-hint{color:var(--accent)}
+.type-title{background:rgba(78,205,196,.1);color:var(--blue)}
+.type-hashtags{background:rgba(167,139,250,.1);color:var(--purple)}
+.type-caption{background:rgba(232,255,71,.1);color:var(--accent)}
+.tags-wrap{display:flex;flex-wrap:wrap;gap:.4rem;margin:.2rem 0;}
+.tag-pill{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:1px;padding:.25rem .6rem;border:1px solid var(--border2);border-radius:2px;cursor:pointer;transition:all .15s;color:var(--text2);}
+.tag-pill:hover{border-color:var(--accent);color:var(--accent);background:rgba(232,255,71,.05);}
+.fav-btn{position:absolute;top:.9rem;right:.9rem;background:none;border:none;cursor:pointer;font-size:1rem;opacity:.3;transition:opacity .2s,transform .2s;padding:.2rem;color:var(--accent);}
+.fav-btn:hover{opacity:.8;transform:scale(1.2);}
+.fav-btn.saved{opacity:1;transform:scale(1.1);}
 .fav-bar{display:none;align-items:center;justify-content:space-between;padding:.8rem 1.2rem;background:var(--bg2);border:1px solid var(--border2);border-radius:4px;margin-bottom:1rem;gap:1rem;}
 .fav-bar.show{display:flex;}
 .fav-bar-left{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--text2);}
 .fav-bar-left span{color:var(--accent);}
+.fav-bar-right{display:flex;gap:.6rem;}
 .fav-action{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:1.5px;text-transform:uppercase;padding:.3rem .8rem;border:1px solid var(--border2);border-radius:2px;background:none;color:var(--text2);cursor:pointer;transition:all .15s;}
 .fav-action:hover{border-color:var(--accent);color:var(--accent);}
 .fav-action.primary{border-color:var(--accent);color:var(--accent);}
 .fav-action.primary:hover{background:var(--accent);color:var(--bg);}
-
-/* ── Favorites panel ── */
 .fav-panel{position:fixed;right:0;top:0;height:100vh;width:340px;background:#0d0f14;border-left:1px solid var(--border2);z-index:1000;transform:translateX(100%);transition:transform .3s cubic-bezier(.16,1,.3,1);display:flex;flex-direction:column;overflow:hidden;}
 .fav-panel.open{transform:translateX(0);}
 .fav-panel-header{padding:1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
@@ -143,177 +117,104 @@ header{display:flex;align-items:center;justify-content:space-between;padding:1.5
 .fav-panel-body{flex:1;overflow-y:auto;padding:1rem;}
 .fav-panel-body::-webkit-scrollbar{width:3px}
 .fav-panel-body::-webkit-scrollbar-thumb{background:var(--border2)}
-.fav-item{background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:.8rem 1rem;margin-bottom:.5rem;display:flex;align-items:flex-start;justify-content:space-between;gap:.8rem;animation:fadeUp .3s ease both;}
+.fav-item{background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:1rem 1.2rem;margin-bottom:.6rem;display:flex;align-items:flex-start;justify-content:space-between;gap:.8rem;animation:fadeUp .3s ease both;}
 .fav-item-content{flex:1;}
-.fav-item-type{font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:.3rem;}
-.fav-item-text{font-size:.85rem;color:var(--text);line-height:1.4;}
-.fav-item-actions{display:flex;gap:.3rem;flex-shrink:0;}
-.fav-item-btn{font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:1px;text-transform:uppercase;padding:.2rem .5rem;border:1px solid var(--border2);border-radius:2px;background:none;color:var(--text3);cursor:pointer;transition:all .15s;}
+.fav-item-type{font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:.3rem;}
+.fav-item-text{font-size:.9rem;color:var(--text);line-height:1.4;}
+.fav-item-actions{display:flex;gap:.4rem;flex-shrink:0;}
+.fav-item-btn{font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:1px;text-transform:uppercase;padding:.25rem .6rem;border:1px solid var(--border2);border-radius:2px;background:none;color:var(--text3);cursor:pointer;transition:all .15s;}
 .fav-item-btn:hover{border-color:var(--accent);color:var(--accent);}
 .fav-item-btn.remove:hover{border-color:var(--red);color:var(--red);}
 .fav-panel-empty{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--text3);letter-spacing:2px;text-align:center;padding:3rem 1rem;text-transform:uppercase;line-height:2;}
 .fav-panel-footer{padding:1rem 1.5rem;border-top:1px solid var(--border);display:flex;gap:.6rem;flex-shrink:0;}
 .fav-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;opacity:0;pointer-events:none;transition:opacity .3s;}
 .fav-overlay.show{opacity:1;pointer-events:all;}
-
-/* ── Fav btn on card ── */
-.fav-btn{position:absolute;top:.9rem;right:.9rem;background:none;border:none;cursor:pointer;font-size:1rem;opacity:.25;transition:opacity .2s,transform .2s;padding:.2rem;color:var(--accent);}
-.fav-btn:hover{opacity:.8;transform:scale(1.2);}
-.fav-btn.saved{opacity:1;}
-.hook-card{position:relative;}
-/* ── Results ── */
-#results{margin-top:1.5rem;}
-
-/* ── Hook card ── */
-.hook-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:1.4rem 1.6rem;margin-bottom:1rem;position:relative;overflow:hidden;animation:slideIn .4s cubic-bezier(.16,1,.3,1) both;cursor:pointer;transition:border-color .2s,transform .2s,box-shadow .2s;}
-.hook-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);opacity:0;transition:opacity .2s;}
-.hook-card:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,0,0,.3);}
-.hook-card:hover::before{opacity:1;}
-.hook-card.copied{border-color:var(--accent);}
-@keyframes slideIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
-
-.card-type{font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:.8rem;display:inline-flex;align-items:center;gap:.4rem;padding:.2rem .6rem;border-radius:20px;}
-.type-title{background:rgba(232,255,71,.1);color:var(--accent);}
-.type-hook{background:rgba(78,205,196,.1);color:var(--blue);}
-.type-tags{background:rgba(167,139,250,.1);color:var(--purple);}
-.type-caption{background:rgba(232,255,71,.06);color:var(--accent);}
-
-.card-content{font-size:1rem;color:var(--text);line-height:1.6;font-weight:500;margin-bottom:.8rem;}
-.card-copy{font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);transition:color .2s;}
-.hook-card:hover .card-copy{color:var(--accent);}
-.hook-card.copied .card-copy{color:var(--accent);}
-
-/* ── Tags specifically ── */
-.tags-wrap{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.8rem;}
-.tag-pill{font-family:'DM Mono',monospace;font-size:.65rem;padding:.3rem .7rem;background:rgba(232,255,71,.06);border:1px solid rgba(232,255,71,.15);border-radius:20px;color:var(--accent);cursor:pointer;transition:all .15s;}
-.tag-pill:hover{background:rgba(232,255,71,.12);}
-
-/* ── Results header ── */
-.results-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;padding-bottom:.8rem;border-bottom:1px solid var(--border);}
-.results-label{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--text3);}
-.results-platform{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;color:var(--accent);}
-
-/* ── More btn ── */
-.btn-more{display:none;width:100%;padding:.85rem;background:transparent;border:1px solid var(--border2);border-radius:6px;font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--text2);cursor:pointer;transition:all .2s;margin-top:1rem;}
-.btn-more:hover{border-color:var(--accent);color:var(--accent);}
-
-/* ── Error ── */
-.error-msg{font-family:'DM Mono',monospace;font-size:.75rem;color:var(--red);padding:1rem 1.2rem;border:1px solid rgba(255,60,60,.2);border-radius:4px;background:rgba(255,60,60,.05);display:none;letter-spacing:1px;margin-bottom:1rem;}
-.error-msg.show{display:block;}
-
-/* ── Toast ── */
 .toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(20px);background:var(--accent);color:var(--bg);font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:2px;text-transform:uppercase;padding:.6rem 1.4rem;border-radius:3px;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;z-index:9999;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-
-/* ── Footer ── */
-footer{margin-top:5rem;padding:2rem 0 3rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
-.footer-text{font-family:'DM Mono',monospace;font-size:.55rem;color:var(--text3);letter-spacing:2px;text-transform:uppercase;}
-
-/* ── Mobile ── */
-@media(max-width:600px){
-  .hero-title{font-size:3.2rem;}
-  .platform-tabs{gap:.4rem;}
-  .platform-tab{font-size:.55rem;padding:.35rem .7rem;}
-  .options-row{gap:.4rem;}
-}
+.shared-banner{background:rgba(232,255,71,.05);border:1px solid rgba(232,255,71,.15);border-radius:4px;padding:1rem 1.4rem;margin-bottom:2rem;font-family:'DM Mono',monospace;font-size:.62rem;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;display:none;}
+.shared-banner.show{display:block;}
+.error-msg{font-family:'DM Mono',monospace;font-size:.75rem;color:var(--red);padding:1rem 1.2rem;border:1px solid rgba(255,71,87,.2);border-radius:4px;background:rgba(255,71,87,.05);display:none;letter-spacing:1px;}
+.error-msg.show{display:block}
+footer{margin-top:6rem;padding:2rem 0 3rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.footer-text{font-family:'DM Mono',monospace;font-size:.58rem;color:var(--text3);letter-spacing:2px;text-transform:uppercase;}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.cursor{position:fixed;width:8px;height:8px;background:var(--accent);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:difference;}
+.cursor-ring{position:fixed;width:32px;height:32px;border:1px solid rgba(232,255,71,.3);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .3s,height .3s,border-color .3s;}
+body{cursor:none;}
+@media(hover:none),(max-width:600px){body{cursor:auto;}.cursor,.cursor-ring{display:none;}}
+@media(max-width:600px){header{flex-direction:column;align-items:flex-start;gap:1rem}.names-grid{grid-template-columns:1fr}.btn-row{flex-wrap:wrap}.count-btn{width:28px;height:28px;font-size:.85rem;}.count-row{gap:.25rem;}}
+.ripple{position:fixed;border-radius:50%;background:rgba(232,255,71,.35);pointer-events:none;z-index:9999;transform:translate(-50%,-50%) scale(0);animation:rippleOut .5s cubic-bezier(.16,1,.3,1) forwards;}
+@keyframes rippleOut{0%{width:10px;height:10px;opacity:1;transform:translate(-50%,-50%) scale(0);}100%{width:80px;height:80px;opacity:0;transform:translate(-50%,-50%) scale(1);}}
 </style>
 </head>
 <body>
-
-<div class="bg-grid"></div>
-<div class="bg-glow"></div>
-<div class="bg-glow2"></div>
 <div class="cursor" id="cursor"></div>
 <div class="cursor-ring" id="cursorRing"></div>
-<div class="toast" id="toast"></div>
-
 <div class="wrap">
   <header>
-    <a href="/" class="logo">Phraselix</a>
-    <a href="/" class="back-btn">← All Tools</a>
+    <a class="logo" href="/">Phraselix</a>
+    <a class="back-btn" href="/">← All Tools</a>
   </header>
 
-  <section class="hero">
-    <div class="hero-eyebrow">Content Tool — 02</div>
-    <h1 class="hero-title">TITLES THAT<br>STOP THE <span>SCROLL</span></h1>
-    <p class="hero-sub">Describe your video. Get scroll-stopping titles and hashtags that people actually click.</p>
+  <div class="hero-tagline">
+    <div class="tagline-text">Titles that make people <em>stop.</em></div>
+    <div class="tagline-sub">Describe your video. Get scroll-stopping titles people actually click.</div>
+  </div>
+
+  <div class="shared-banner" id="sharedBanner">✦ Someone shared these titles with you</div>
+
+  <section class="input-section">
+    <div class="prompt-label">What's your video about?</div>
+    <textarea id="prompt" maxlength="300" rows="4" oninput="updateChar()"></textarea>
+    <div class="char-count" id="charCount">0 / 300</div>
+
+    <div class="style-section">
+      <div class="style-hint">Tone <span>— pick one</span></div>
+      <div class="style-row" id="toneRow">
+        <button class="style-tag active" data-tone="viral">Viral</button>
+        <button class="style-tag" data-tone="funny">Funny</button>
+        <button class="style-tag" data-tone="emotional">Emotional</button>
+        <button class="style-tag" data-tone="informative">Informative</button>
+        <button class="style-tag" data-tone="controversial">Controversial</button>
+      </div>
+    </div>
+
+    <div class="count-section">
+      <div class="count-hint">How many titles <span>— pick a number</span></div>
+      <div class="count-row">
+        <button class="count-btn" data-count="1">1</button>
+        <button class="count-btn" data-count="2">2</button>
+        <button class="count-btn active" data-count="3">3</button>
+        <button class="count-btn locked" data-count="4">4</button>
+        <button class="count-btn locked" data-count="5">5</button>
+      </div>
+      <div class="count-locked-tip" id="countLockedTip">✦ More titles coming with premium — soon</div>
+    </div>
+
+    <div class="error-msg" id="errorMsg"></div>
+
+    <div class="btn-row">
+      <button class="btn-generate" id="btnGenerate" onclick="generate()">Generate Titles</button>
+      <button class="btn-more" id="btnMore" onclick="generateMore()">+ More Titles</button>
+    </div>
   </section>
-
-  <!-- Platform -->
-  <div class="platform-section">
-    <div class="platform-label">Platform</div>
-    <div class="platform-tabs">
-      <button class="platform-tab active" data-platform="tiktok"><span class="tab-icon">♪</span> TikTok</button>
-      <button class="platform-tab" data-platform="instagram"><span class="tab-icon">◈</span> Instagram</button>
-      <button class="platform-tab" data-platform="youtube"><span class="tab-icon">▶</span> YouTube</button>
-      <button class="platform-tab" data-platform="twitter"><span class="tab-icon">✦</span> X / Twitter</button>
-    </div>
-  </div>
-
-  <!-- Input -->
-  <div class="input-section">
-    <div class="input-label">
-      <span>What's your video about?</span>
-      <span class="char-count" id="charCount">0 / 300</span>
-    </div>
-    <div class="input-wrap">
-      <textarea class="main-input" id="prompt" maxlength="300" placeholder="e.g. showing my morning routine as a broke college student who somehow stays productive..."></textarea>
-    </div>
-  </div>
-
-  <!-- Options -->
-  <div class="options-row">
-    <span style="font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-right:.3rem;">Tone:</span>
-    <button class="option-pill active" data-tone="viral">Viral</button>
-    <button class="option-pill" data-tone="funny">Funny</button>
-    <button class="option-pill" data-tone="emotional">Emotional</button>
-    <button class="option-pill" data-tone="informative">Informative</button>
-    <button class="option-pill" data-tone="controversial">Controversial</button>
-  </div>
-
-  <div class="count-section">
-    <div class="count-hint">How many results — pick a number</div>
-    <div class="count-row">
-      <button class="count-btn" data-count="1">1</button>
-      <button class="count-btn" data-count="2">2</button>
-      <button class="count-btn active" data-count="3">3</button>
-      <button class="count-btn locked" data-count="4">4</button>
-      <button class="count-btn locked" data-count="5">5</button>
-    </div>
-    <div class="count-locked-tip" id="countLockedTip">✦ More results coming with premium — soon</div>
-  </div>
-
-    <!-- Generate -->
-  <button class="btn-generate" id="btnGenerate" onclick="generate()">
-    <span>⚡ Generate Titles</span>
-  </button>
 
   <div class="loading" id="loading">
     <div class="loader"><span></span><span></span><span></span></div>
-    <span id="loadingText">Crafting your hook...</span>
+    <span id="loadingText">Crafting your titles...</span>
   </div>
 
   <div class="fav-bar" id="favBar">
     <div class="fav-bar-left">Favorites: <span id="favCount">0</span></div>
     <div class="fav-bar-right">
       <button class="fav-action primary" onclick="openFavPanel()">View Favorites ♥</button>
+      <button class="fav-action" onclick="shareFavs()">Share ↗</button>
     </div>
   </div>
-  <div class="error-msg" id="errorMsg"></div>
+
   <div id="results"></div>
-  <div class="fav-overlay" id="favOverlay" onclick="closeFavPanel()"></div>
-  <div class="fav-panel" id="favPanel">
-    <div class="fav-panel-header">
-      <div class="fav-panel-title">Favorites</div>
-      <button class="fav-panel-close" onclick="closeFavPanel()">✕ Close</button>
-    </div>
-    <div class="fav-panel-body" id="favPanelBody"></div>
-    <div class="fav-panel-footer">
-      <button class="fav-action primary" style="flex:1" onclick="shareFavs()">Share Favorites ↗</button>
-      <button class="fav-action" onclick="clearFavs()">Clear All</button>
-    </div>
-  </div>
-  <button class="btn-more" id="btnMore" onclick="generateMore()">↺ Generate New Titles</button>
 
   <footer>
     <span class="footer-text">Phraselix — Content Tools</span>
@@ -321,97 +222,65 @@ footer{margin-top:5rem;padding:2rem 0 3rem;border-top:1px solid var(--border);di
   </footer>
 </div>
 
-<script>
+<div class="fav-overlay" id="favOverlay" onclick="closeFavPanel()"></div>
+<div class="fav-panel" id="favPanel">
+  <div class="fav-panel-header">
+    <div class="fav-panel-title">Favorites</div>
+    <button class="fav-panel-close" onclick="closeFavPanel()">Close</button>
+  </div>
+  <div class="fav-panel-body" id="favPanelBody"></div>
+  <div class="fav-panel-footer">
+    <button class="fav-action primary" onclick="shareFavs()">Share Favorites ↗</button>
+    <button class="fav-action" onclick="clearFavs()">Clear All</button>
+  </div>
+</div>
 
-// ── Count picker ──
+<div class="toast" id="toast"></div>
+
+<script>
+let selectedTone = 'viral';
 let selectedCount = 3;
+let isLoading = false;
+
+document.querySelectorAll('#toneRow .style-tag').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#toneRow .style-tag').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedTone = btn.dataset.tone;
+  });
+});
+
 document.querySelectorAll('.count-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     if (btn.classList.contains('locked')) {
       document.getElementById('countLockedTip').classList.add('show');
-      setTimeout(() => document.getElementById('countLockedTip').classList.remove('show'), 2500);
       return;
     }
-    document.querySelectorAll('.count-btn:not(.locked)').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.count-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     selectedCount = parseInt(btn.dataset.count);
+    document.getElementById('countLockedTip').classList.remove('show');
   });
 });
 
-// ── State ──
-let selectedPlatform = 'tiktok';
-let selectedTone = 'viral';
-let isLoading = false;
-
-// ── Platform tabs ──
-document.querySelectorAll('.platform-tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.platform-tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    selectedPlatform = tab.dataset.platform;
-  });
-});
-
-// ── Tone pills ──
-document.querySelectorAll('.option-pill').forEach(pill => {
-  pill.addEventListener('click', () => {
-    document.querySelectorAll('.option-pill').forEach(p => p.classList.remove('active'));
-    pill.classList.add('active');
-    selectedTone = pill.dataset.tone;
-  });
-});
-
-// ── Char count ──
-document.getElementById('prompt').addEventListener('input', function() {
-  const len = this.value.length;
+function updateChar() {
+  const len = document.getElementById('prompt').value.length;
   const el = document.getElementById('charCount');
   el.textContent = len + ' / 300';
   el.classList.toggle('warn', len > 250);
-});
+}
 
-// ── Keyboard shortcut ──
-document.getElementById('prompt').addEventListener('keydown', e => {
-  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) generate();
-});
-
-// ── Platform display names ──
-const platformNames = {
-  tiktok: 'TikTok',
-  instagram: 'Instagram Reels',
-  youtube: 'YouTube',
-  twitter: 'X / Twitter'
-};
-
-// ── Placeholders ──
 const placeholders = [
-  "showing my morning routine as a broke college student who somehow stays productive...",
-  "trying every viral food trend from this week so you don't have to...",
-  "I quit my 9-5 to do this full time and here's what happened after 30 days...",
-  "rating every coffee shop in my city as someone who works remotely...",
-  "teaching myself to code in 30 days with zero experience...",
-  "honest review of living alone for the first time at 22...",
-  "day in my life as a night shift nurse — the reality nobody talks about...",
-  "I asked AI to plan my entire week and actually followed it...",
+  "Fighting animation between two rival characters...",
+  "Morning routine as a broke college student...",
+  "Trying every viral food trend so you don't have to...",
+  "Day in my life as a night shift nurse...",
+  "I quit my 9-5 and here's what happened after 30 days...",
+  "Teaching myself to code in 30 days with zero experience...",
+  "Honest review of living alone for the first time at 22...",
 ];
 document.getElementById('prompt').placeholder = placeholders[Math.floor(Math.random() * placeholders.length)];
 
-// ── API call ──
-async function callAPI(systemPrompt, userMsg) {
-  const response = await fetch('/api/generate', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      system: systemPrompt,
-      messages: [{ role: 'user', content: userMsg }]
-    })
-  });
-  const data = await response.json();
-  if (data.error) throw new Error(data.error.message || 'API error');
-  const text = data.content[0].text.trim().replace(/```json|```/g, '').trim();
-  return JSON.parse(text);
-}
-
-// ── Generate ──
 function isBadInput(text) {
   const t = text.toLowerCase();
   const banned = [
@@ -434,20 +303,68 @@ function isBadInput(text) {
   return false;
 }
 
+async function callAPI(systemPrompt, userMsg) {
+  const response = await fetch('/api/generate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ system: systemPrompt, messages: [{ role: 'user', content: userMsg }] })
+  });
+  const data = await response.json();
+  if (data.error) throw new Error(data.error.message || 'API error');
+  const text = data.content[0].text.trim().replace(/```json|```/g, '').trim();
+  return JSON.parse(text);
+}
+
+function buildSystemPrompt() {
+  const toneGuides = {
+    viral: 'VIRAL: High stakes, curiosity gap, open loops. Make them need to click. Use active verbs — "I survived" not "I spent". Numbers and time create urgency.',
+    funny: 'FUNNY: Relatable, self-aware, absurd. Sound like you are texting a friend. Lean into the cringe, the fail, the unexpected twist.',
+    emotional: 'EMOTIONAL: Match the emotion to the content. For action/intense content — pride, grind, tension, sacrifice. For personal content — vulnerability, growth. Never apply soft emotions to intense content.',
+    informative: 'INFORMATIVE: Lead with the result or insight. Front-load the keyword. Use numbers. Clear promise, zero fluff.',
+    controversial: 'CONTROVERSIAL: Challenge a common belief. Say the thing nobody says out loud. Triggers curiosity and debate from both sides.'
+  };
+
+  return `You are an expert at writing video titles that get clicks. You know different videos need different title styles.
+
+Tone: ${selectedTone}
+${toneGuides[selectedTone]}
+
+CRITICAL: MATCH THE TITLE STYLE TO WHAT THE VIDEO ACTUALLY IS.
+
+If the video IS the content (animation, fight scene, short film, skit, music video):
+- Write titles like MOVIE or SHOW titles that tease what it contains
+- For a fight animation: "The Last Stand", "Two Rivals. One Battle.", "No Mercy", "Outmatched"
+- Think Alan Becker: "Animation vs. Minecraft" not "I spent months animating Minecraft"
+
+If the video is ABOUT making something (vlog, devlog, tutorial, behind the scenes):
+- Write from the creator perspective about their experience
+- Examples: "I spent 3 months on this fight scene", "72 hours on one animation"
+
+NEVER write:
+- POV format unless the video is literally a POV video
+- Wikipedia descriptions of what happens
+- Fake hype: INSANE, life-changing, you won't believe
+
+Respond ONLY with valid JSON, no markdown, no extra text:
+{"titles":["title1","title2"],"hashtags":["#tag1","#tag2","#tag3","#tag4","#tag5","#tag6"],"caption":"Short ready-to-post caption, sounds human."}`;
+}
+
+function buildUserMsg(prompt) {
+  return `Video: "${prompt}"
+Tone: ${selectedTone}
+
+Decide if this is a content video or a process video. Write exactly ${selectedCount} titles that match. Each must be structurally different.`;
+}
+
 async function generate() {
   const prompt = document.getElementById('prompt').value.trim();
   if (!prompt) { document.getElementById('prompt').focus(); return; }
   if (isLoading) return;
-  if (isBadInput(prompt)) {
-    showError("Keep it clean — Phraselix isn't that kind of tool.");
-    return;
-  }
-
-  setLoading(true, 'Crafting your titles...');
+  if (isBadInput(prompt)) { showError("Keep it clean — Phraselix isn't that kind of tool."); return; }
   hideError();
+  setLoading(true, 'Crafting your titles...');
   document.getElementById('results').innerHTML = '';
   document.getElementById('btnMore').style.display = 'none';
-
   try {
     const result = await callAPI(buildSystemPrompt(), buildUserMsg(prompt));
     renderResults(result);
@@ -463,11 +380,11 @@ async function generate() {
 async function generateMore() {
   const prompt = document.getElementById('prompt').value.trim();
   if (!prompt || isLoading) return;
-  setLoading(true, 'Generating fresh titles...');
   hideError();
+  setLoading(true, 'Generating fresh titles...');
   document.getElementById('results').innerHTML = '';
   try {
-    const result = await callAPI(buildSystemPrompt(), buildUserMsg(prompt) + '\n\nIMPORTANT: Generate completely different titles and hooks from the previous set.');
+    const result = await callAPI(buildSystemPrompt(), buildUserMsg(prompt) + '\n\nGenerate completely different titles from any previous set.');
     renderResults(result);
   } catch(e) {
     showError('Something went wrong — try again.');
@@ -476,121 +393,62 @@ async function generateMore() {
   }
 }
 
-function buildSystemPrompt() {
-  const platformGuides = {
-    tiktok: 'TikTok: Titles max 60 chars. Hooks must grab in first 2 seconds. Use "POV:", "telling my...", "the way...", pattern interrupts. Hashtags: mix 3 mega (1M+), 4 mid (100k-1M), 3 niche tags.',
-    instagram: 'Instagram Reels: Title as caption opening line — punchy, emoji optional. Hook for first frame overlay text. Hashtags: 10-15 tags, mix sizes, no banned tags.',
-    youtube: 'YouTube: Titles 50-70 chars, front-load keywords, brackets/numbers work well e.g. "[HONEST]" or "I tried for 30 days". Hook for intro script, first 30 seconds. Tags: 5 keyword tags, no # symbol.',
-    twitter: 'X/Twitter: Title is the tweet — max 240 chars, no hashtag spam (max 2). Hook is the opening line that makes people click "read more". Conversational tone.'
-  };
-
-  const toneGuides = {
-    viral: `VIRAL TONE: High stakes, curiosity gap, open loops. Make them NEED to click to find out what happened. Use active verbs — "I survived" not "I spent". Numbers and time create urgency.`,
-    funny: `FUNNY TONE: Relatable, self-aware, absurd. Sound like you're texting a friend. Use lowercase for comedic effect. Lean into the cringe, the fail, the unexpected twist.`,
-    emotional: `EMOTIONAL TONE: Personal, honest, vulnerable — but NOT soft or sad. "This broke me" is emotional AND intense. Tap into pride, struggle, obsession, sacrifice. NOT crying-at-sunset vibes.`,
-    informative: `INFORMATIVE TONE: Lead with the result or the insight. Front-load the keyword. Use numbers and brackets. "5 things nobody tells you about X" style. Clear promise, zero fluff.`,
-    controversial: `CONTROVERSIAL TONE: Challenge a common belief. Say the thing nobody says out loud. "Everyone is wrong about X" or "Stop doing Y" triggers immediate curiosity AND debate.`
-  };
-
-  const platformRules = {
-    tiktok: `TIKTOK RULES: Max 60 chars. Raw and unfiltered wins. Lowercase feels more human. No hashtags in title itself. Sound like you're texting your group chat.`,
-    instagram: `INSTAGRAM REELS RULES: Punchy opener that works as caption AND title. 1 line max. Emoji optional but only if it adds meaning. Relatable over polished.`,
-    youtube: `YOUTUBE RULES: 50-70 chars. Front-load the keyword. Numbers and brackets boost CTR — e.g. "[HONEST]", "(I almost quit)". Active verbs. "I survived" beats "I spent". Stakes must feel real.`,
-    twitter: `X/TWITTER RULES: The title IS the tweet. Max 240 chars but shorter wins. Conversational. 1-2 hashtags MAX. Leave an open loop that forces people to click "read more".`
-  };
-
-  return `You are an expert at writing video titles that get clicks. You know that different videos need different title styles.
-
-Platform: ${platformNames[selectedPlatform]}
-Tone: ${selectedTone}
-
-${platformRules[selectedPlatform]}
-${toneGuides[selectedTone]}
-
-CRITICAL: MATCH THE TITLE STYLE TO WHAT THE VIDEO ACTUALLY IS.
-
-If the video IS the content itself (animation, fight scene, short film, skit, music video):
-- Write titles like MOVIE or SHOW titles that tease what happens
-- Examples for a fight animation: "The Last Stand", "Two Rivals. One Battle.", "The Final Clash", "No Mercy", "Outmatched"
-- Think Alan Becker: "Animation vs. Minecraft" not "I spent months animating Minecraft"
-- The title should make someone want to WATCH the thing, not read about the making
-
-If the video is ABOUT making something (devlog, vlog, tutorial, behind the scenes):
-- Write from the creator perspective about their experience
-- Examples: "I spent 3 months on this fight scene", "72 hours on one animation"
-
-NEVER write:
-- POV format unless the video is literally a POV video
-- Wikipedia style ("Two characters engage in combat")
-- Generic process titles for content videos
-- Fake hype words like INSANE, life-changing, you won't believe
-
-Respond ONLY with valid JSON, no markdown, no extra text:
-{"titles":["title1","title2"],"hashtags":["#tag1","#tag2","#tag3","#tag4","#tag5","#tag6"],"caption":"Short ready-to-post caption, sounds human."}`;
-}
-
-function buildUserMsg(prompt) {
-  return `Video: "${prompt}"
-Platform: ${platformNames[selectedPlatform]}
-Tone: ${selectedTone}
-
-Decide if this is a content video (animation, short film, fight scene) or a process video (vlog, tutorial, devlog). Then write exactly ${selectedCount} titles that fit. Make each title feel different in structure and angle. No POV unless the video is a POV video.`;
-}
-// ── Render ──
 function renderResults(data) {
   const container = document.getElementById('results');
-  const platform = platformNames[selectedPlatform];
+  const toneLabel = selectedTone.charAt(0).toUpperCase() + selectedTone.slice(1);
+  container.innerHTML = `
+    <div class="results-header">
+      <div class="results-label">Generated titles</div>
+      <div style="display:flex;align-items:center;gap:1rem">
+        <button onclick="shareResults()" style="font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:1.5px;text-transform:uppercase;padding:.25rem .7rem;border:1px solid var(--border2);border-radius:2px;background:none;color:var(--text3);cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text3)'">Share ↗</button>
+        <div class="results-count">${toneLabel}</div>
+      </div>
+    </div>
+    <div class="names-grid" id="titlesGrid"></div>`;
 
-  container.innerHTML = `<div class="results-header"><div class="results-label">Generated for</div><div style="display:flex;align-items:center;gap:1rem"><button onclick="shareResults()" style="font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:1.5px;text-transform:uppercase;padding:.25rem .7rem;border:1px solid var(--border2);border-radius:2px;background:none;color:var(--text3);cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text3)'">Share ↗</button><div class="results-platform">${platform}</div></div></div>`;
+  const grid = document.getElementById('titlesGrid');
 
-  // Titles
-  if (data.titles?.length) {
-    const toneLabel = selectedTone.charAt(0).toUpperCase() + selectedTone.slice(1);
+  if (data.titles && data.titles.length) {
     data.titles.slice(0, selectedCount).forEach((title, i) => {
-      container.appendChild(makeCard('title', `${toneLabel} Title ${i + 1}`, title, 'type-title'));
+      grid.appendChild(makeCard('title', `Title ${i + 1}`, title, 'type-title'));
     });
   }
 
-  // Hashtags
-  if (data.hashtags?.length) {
+  if (data.hashtags && data.hashtags.length) {
     const card = document.createElement('div');
-    card.className = 'hook-card';
+    card.className = 'name-card';
     card.style.animationDelay = '0.3s';
-    card.innerHTML = `
-      <div class="card-type type-tags">Hashtags</div>
-      <div class="tags-wrap">${data.hashtags.map(t => `<span class="tag-pill" onclick="copyTag(this,'${t}')">${t}</span>`).join('')}</div>
-      <div class="card-copy" id="tagsCopy">click a tag to copy it</div>`;
-    container.appendChild(card);
+    card.innerHTML = `<div class="name-style type-hashtags">Hashtags</div><div class="tags-wrap">${data.hashtags.map(t => `<span class="tag-pill" onclick="copyTag(this,'${t}')">${t}</span>`).join('')}</div><div class="copy-hint">click a tag to copy it</div>`;
+    grid.appendChild(card);
   }
 
-  // Caption
   if (data.caption) {
-    container.appendChild(makeCard('caption', 'Ready-to-post Caption', data.caption, 'type-caption'));
+    grid.appendChild(makeCard('caption', 'Caption', data.caption, 'type-caption'));
   }
+
+  updateFavBar();
 }
 
 function makeCard(type, label, content, typeClass) {
   const card = document.createElement('div');
-  card.className = 'hook-card';
-  const delay = {title: 0, hook: 0.15, caption: 0.35}[type] || 0;
-  card.style.animationDelay = delay + 's';
+  card.className = 'name-card';
+  card.style.animationDelay = (type === 'caption' ? 0.35 : 0) + 's';
   const item = { type, label, content };
   const isFaved = getFavs().some(f => f.content === content);
-  card.innerHTML = `<button class="fav-btn ${isFaved ? 'saved' : ''}" title="Save to favorites">♥</button><div class="card-type ${typeClass}">${label}</div><div class="card-content">${content}</div><div class="card-copy">click to copy</div>`;
+  card.innerHTML = `<button class="fav-btn ${isFaved ? 'saved' : ''}" title="Save to favorites">♥</button><div class="name-style ${typeClass}">${label}</div><div class="name-text">${content}</div><div class="copy-hint">click to copy</div>`;
   card.querySelector('.fav-btn').addEventListener('click', e => { e.stopPropagation(); toggleFav(card, item); });
   card.addEventListener('click', () => {
     navigator.clipboard.writeText(content).then(() => {
       card.classList.add('copied');
-      card.querySelector('.card-copy').textContent = '✓ copied!';
-      setTimeout(() => { card.classList.remove('copied'); card.querySelector('.card-copy').textContent = 'click to copy'; }, 2000);
+      card.querySelector('.copy-hint').textContent = 'copied!';
+      setTimeout(() => { card.classList.remove('copied'); card.querySelector('.copy-hint').textContent = 'click to copy'; }, 2000);
     });
   });
   return card;
 }
 
-// ── Favorites ──
-function getFavs() { try { return JSON.parse(localStorage.getItem('phraselix_hook_favs') || '[]'); } catch { return []; } }
-function saveFavs(favs) { localStorage.setItem('phraselix_hook_favs', JSON.stringify(favs)); updateFavBar(); }
+function getFavs() { try { return JSON.parse(localStorage.getItem('phraselix_title_favs') || '[]'); } catch { return []; } }
+function saveFavs(favs) { localStorage.setItem('phraselix_title_favs', JSON.stringify(favs)); updateFavBar(); }
 function toggleFav(card, item) {
   let favs = getFavs();
   const idx = favs.findIndex(f => f.content === item.content);
@@ -616,7 +474,7 @@ function renderFavPanel() {
   favs.forEach(item => {
     const el = document.createElement('div');
     el.className = 'fav-item';
-    el.innerHTML = `<div class="fav-item-content"><div class="fav-item-type">${item.label || item.type}</div><div class="fav-item-text">${item.content}</div></div><div class="fav-item-actions"><button class="fav-item-btn" onclick="copyToClipboard('${item.content.replace(/'/g,"\'")}',this)">Copy</button><button class="fav-item-btn remove" onclick="removeFavFromPanel('${item.content.replace(/'/g,"\'")}')">✕</button></div>`;
+    el.innerHTML = `<div class="fav-item-content"><div class="fav-item-type">${item.label || item.type}</div><div class="fav-item-text">${item.content}</div></div><div class="fav-item-actions"><button class="fav-item-btn" onclick="copyToClipboard('${item.content.replace(/'/g,"\\'")}',this)">Copy</button><button class="fav-item-btn remove" onclick="removeFavFromPanel('${item.content.replace(/'/g,"\\'")}')">X</button></div>`;
     body.appendChild(el);
   });
 }
@@ -624,15 +482,15 @@ function removeFavFromPanel(content) {
   saveFavs(getFavs().filter(f => f.content !== content));
   renderFavPanel();
   document.querySelectorAll('.fav-btn').forEach(btn => {
-    const cardContent = btn.closest('.hook-card')?.querySelector('.card-content')?.textContent;
-    if (cardContent === content) btn.classList.remove('saved');
+    const cardText = btn.closest('.name-card') && btn.closest('.name-card').querySelector('.name-text');
+    if (cardText && cardText.textContent === content) btn.classList.remove('saved');
   });
 }
 function copyToClipboard(text, btn) {
-  navigator.clipboard.writeText(text).then(() => { const o = btn.textContent; btn.textContent = '✓'; setTimeout(() => btn.textContent = o, 1500); });
+  navigator.clipboard.writeText(text).then(() => { const o = btn.textContent; btn.textContent = 'ok'; setTimeout(() => btn.textContent = o, 1500); });
 }
 function shareResults() {
-  const cards = [...document.querySelectorAll('.card-content')].map(c => c.textContent).slice(0, 6);
+  const cards = [...document.querySelectorAll('.name-text')].map(c => c.textContent);
   if (!cards.length) return;
   const url = window.location.origin + window.location.pathname + '?shared=' + encodeURIComponent(cards.join('|||'));
   navigator.clipboard.writeText(url).then(() => showToast('Link copied — share it!'));
@@ -644,21 +502,28 @@ function shareFavs() {
   navigator.clipboard.writeText(url).then(() => showToast('Link copied — share it!'));
 }
 
-updateFavBar();
+const sharedParam = new URLSearchParams(window.location.search).get('shared');
+if (sharedParam) {
+  const items = decodeURIComponent(sharedParam).split('|||').filter(Boolean);
+  document.getElementById('sharedBanner').classList.add('show');
+  const grid = document.createElement('div');
+  grid.className = 'names-grid';
+  items.forEach((content, i) => grid.appendChild(makeCard('title', 'Shared Title ' + (i+1), content, 'type-title')));
+  document.getElementById('results').appendChild(grid);
+}
 
 function copyTag(el, tag) {
   navigator.clipboard.writeText(tag).then(() => {
-    el.style.background = 'rgba(0,245,212,.25)';
+    el.style.background = 'rgba(232,255,71,.15)';
     showToast(tag + ' copied!');
     setTimeout(() => el.style.background = '', 1500);
   });
 }
 
-// ── Helpers ──
-function setLoading(state, text = 'Crafting your hook...') {
+function setLoading(state, text) {
   isLoading = state;
   document.getElementById('loading').classList.toggle('show', state);
-  document.getElementById('loadingText').textContent = text;
+  document.getElementById('loadingText').textContent = text || 'Crafting your titles...';
   document.getElementById('btnGenerate').disabled = state;
 }
 function showError(msg) { const el = document.getElementById('errorMsg'); el.textContent = msg; el.classList.add('show'); }
@@ -670,19 +535,17 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2000);
 }
 
-// ── Custom cursor ──
 const cursor = document.getElementById('cursor');
 const ring = document.getElementById('cursorRing');
 let mx = 0, my = 0, rx = 0, ry = 0;
 document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; cursor.style.left = mx + 'px'; cursor.style.top = my + 'px'; });
 function animRing() { rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12; ring.style.left = rx + 'px'; ring.style.top = ry + 'px'; requestAnimationFrame(animRing); }
 animRing();
-document.querySelectorAll('a,button,.hook-card,.tag-pill').forEach(el => {
+document.querySelectorAll('a,button,.name-card,.tag-pill').forEach(el => {
   el.addEventListener('mouseenter', () => { ring.style.width = '48px'; ring.style.height = '48px'; ring.style.borderColor = 'rgba(232,255,71,.6)'; });
   el.addEventListener('mouseleave', () => { ring.style.width = '32px'; ring.style.height = '32px'; ring.style.borderColor = 'rgba(232,255,71,.3)'; });
 });
 
-// ── Touch ripple ──
 document.addEventListener('touchstart', e => {
   const touch = e.touches[0];
   const ripple = document.createElement('div');
@@ -691,16 +554,11 @@ document.addEventListener('touchstart', e => {
   ripple.style.top = touch.clientY + 'px';
   document.body.appendChild(ripple);
   setTimeout(() => ripple.remove(), 500);
+  const card = e.target.closest('.name-card');
+  if (card) { card.style.transition = 'transform .1s'; card.style.transform = 'scale(.98)'; setTimeout(() => card.style.transform = '', 150); }
 }, { passive: true });
 
-document.addEventListener('touchstart', e => {
-  const card = e.target.closest('.hook-card');
-  if (card) {
-    card.style.transition = 'transform .1s, background .1s';
-    card.style.transform = 'scale(.98)';
-    setTimeout(() => card.style.transform = '', 150);
-  }
-}, { passive: true });
+updateFavBar();
 </script>
 <script defer src="/_vercel/insights/script.js"></script>
 </body>
