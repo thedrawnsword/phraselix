@@ -271,23 +271,25 @@ document.getElementById('prompt').addEventListener('keydown', e => { if (e.key =
 function buildSystemPrompt() {
   return `You write short, punchy bios that feel human and authentic. No cringe, no buzzwords, no "passionate about".
 
-Tone rules:
-- professional: Polished and credible. Clear value proposition. What you do and why it matters. No fluff.
-- witty: Clever, dry, or self-aware. A little personality goes a long way. Avoid trying too hard.
-- minimal: As few words as possible. Every word earns its place. No filler.
-- bold: Confident, direct, unapologetic. Makes a statement. No hedging.
+YOUR #1 RULE: The person's input is your bible. Preserve their voice, energy, slang, and tone FIRST. If they write casually, write casual. If they write hype, write hype. If they write poetic, write poetic. The style setting only shapes the FORMAT and POLISH level — it never overrides the person's actual personality.
 
-NEVER write:
-- "Passionate about X"
-- "Helping people achieve Y"
-- "On a journey to Z"
-- Generic motivational phrases
+Tone rules (apply AFTER capturing their voice):
+- professional: Keep their energy but frame it as a credible value proposition. Still sounds like THEM, just polished.
+- witty: Find the clever angle in what they said. Dry, self-aware, a little personality. Never try-hard.
+- minimal: Strip it to the essential. Fewest words, maximum punch. Still their voice.
+- bold: Amplify their confidence. Direct, unapologetic. Make it land harder.
+
+NEVER:
+- Replace their personality with corporate speak
+- Write "Passionate about X" / "Helping people" / "On a journey"
+- Sound like a LinkedIn template
+- Ignore casual or slang input — lean into it
 
 Respond ONLY with valid JSON: {"items":["bio1","bio2","bio3"]}`;
 }
 
 function buildUserMsg(prompt) {
-  return `Person/Brand: "${prompt}"\nTone: ${selectedStyle}\n\nWrite EXACTLY ${selectedCount} bios. Each must have a completely different angle, structure, and personality. Match the tone strictly.`;
+  return `Person/Brand: "${prompt}"\nTone: ${selectedStyle}\n\nWrite EXACTLY ${selectedCount} bios. Each must have a completely different angle and structure. PRESERVE the person's actual voice and energy — the tone shapes delivery, not their personality. If their input is casual or raw, keep that rawness.`;
 }
 
 async function generate() {
