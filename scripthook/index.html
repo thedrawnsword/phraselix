@@ -17,8 +17,12 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 header{padding:1.4rem 0;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);margin-bottom:0;}
 .logo{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:4px;line-height:1;color:var(--accent);opacity:.65;transition:opacity .2s;text-decoration:none;}
 .logo:hover{opacity:1;}
+.header-right{display:flex;align-items:center;gap:1rem;}
 .back-btn{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--text3);text-decoration:none;transition:color .2s;display:flex;align-items:center;gap:.4rem;}
 .back-btn:hover{color:var(--accent);}
+.user-name{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--accent);opacity:.7;}
+.signout-btn{font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:1.5px;text-transform:uppercase;padding:.3rem .7rem;border:1px solid var(--border2);border-radius:2px;background:none;color:var(--text3);cursor:pointer;transition:all .15s;}
+.signout-btn:hover{border-color:var(--red);color:var(--red);}
 .hero-tagline{padding:2rem 0 1.8rem;text-align:center;border-bottom:1px solid var(--border);margin-bottom:2.5rem;}
 .tagline-text{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.8rem,6vw,5rem);letter-spacing:3px;line-height:1.1;color:var(--text);animation:fadeInUp .5s ease both;}
 .tagline-text em{font-style:normal;color:var(--accent);text-shadow:0 0 40px rgba(232,255,71,.3);}
@@ -82,10 +86,6 @@ textarea::placeholder{color:var(--text3)}
 .name-card:hover .copy-hint{color:var(--accent)}
 .name-card.copied .copy-hint{color:var(--accent)}
 .type-a{background:rgba(78,205,196,.1);color:var(--blue)}
-.type-b{background:rgba(167,139,250,.1);color:var(--purple)}
-.type-c{background:rgba(232,255,71,.1);color:var(--accent)}
-.type-d{background:rgba(255,140,66,.1);color:var(--orange)}
-.type-e{background:rgba(255,71,87,.1);color:var(--red)}
 .fav-btn{position:absolute;top:.9rem;right:.9rem;background:none;border:none;cursor:pointer;font-size:1rem;opacity:.3;transition:opacity .2s,transform .2s;padding:.2rem;color:var(--accent);}
 .fav-btn:hover{opacity:.8;transform:scale(1.2);}
 .fav-btn.saved{opacity:1;transform:scale(1.1);}
@@ -98,7 +98,7 @@ textarea::placeholder{color:var(--text3)}
 .fav-action:hover{border-color:var(--accent);color:var(--accent);}
 .fav-action.primary{border-color:var(--accent);color:var(--accent);}
 .fav-action.primary:hover{background:var(--accent);color:var(--bg);}
-.fav-panel{position:fixed;right:0;top:0;height:100vh;width:340px;background:#0d0f14;border-left:1px solid var(--border2);z-index:1000;transform:translateX(100%);transition:transform .3s cubic-bezier(.16,1,.3,1);display:flex;flex-direction:column;overflow:hidden;}
+.fav-panel{position:fixed;right:0;top:0;height:100vh;width:360px;background:#0d0f14;border-left:1px solid var(--border2);z-index:1000;transform:translateX(100%);transition:transform .3s cubic-bezier(.16,1,.3,1);display:flex;flex-direction:column;overflow:hidden;}
 .fav-panel.open{transform:translateX(0);}
 .fav-panel-header{padding:1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
 .fav-panel-title{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:3px;color:var(--accent);}
@@ -107,6 +107,7 @@ textarea::placeholder{color:var(--text3)}
 .fav-panel-body{flex:1;overflow-y:auto;padding:1rem;}
 .fav-panel-body::-webkit-scrollbar{width:3px}
 .fav-panel-body::-webkit-scrollbar-thumb{background:var(--border2)}
+.fav-section-title{font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:3px;text-transform:uppercase;color:var(--accent);padding:.5rem 0 .8rem;border-bottom:1px solid var(--border);margin-bottom:.8rem;opacity:.8;}
 .fav-item{background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:1rem 1.2rem;margin-bottom:.6rem;display:flex;align-items:flex-start;justify-content:space-between;gap:.8rem;animation:fadeUp .3s ease both;}
 .fav-item-content{flex:1;}
 .fav-item-label{font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:.3rem;}
@@ -121,10 +122,10 @@ textarea::placeholder{color:var(--text3)}
 .fav-overlay.show{opacity:1;pointer-events:all;}
 .toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(20px);background:var(--accent);color:var(--bg);font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:2px;text-transform:uppercase;padding:.6rem 1.4rem;border-radius:3px;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;z-index:9999;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-.shared-banner{background:rgba(232,255,71,.05);border:1px solid rgba(232,255,71,.15);border-radius:4px;padding:1rem 1.4rem;margin-bottom:2rem;font-family:'DM Mono',monospace;font-size:.62rem;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;display:none;}
-.shared-banner.show{display:block;}
 .error-msg{font-family:'DM Mono',monospace;font-size:.75rem;color:var(--red);padding:1rem 1.2rem;border:1px solid rgba(255,71,87,.2);border-radius:4px;background:rgba(255,71,87,.05);display:none;letter-spacing:1px;}
 .error-msg.show{display:block}
+.shared-banner{background:rgba(232,255,71,.05);border:1px solid rgba(232,255,71,.15);border-radius:4px;padding:1rem 1.4rem;margin-bottom:2rem;font-family:'DM Mono',monospace;font-size:.62rem;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;display:none;}
+.shared-banner.show{display:block;}
 footer{margin-top:6rem;padding:2rem 0 3rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
 .footer-text{font-family:'DM Mono',monospace;font-size:.58rem;color:var(--text3);letter-spacing:2px;text-transform:uppercase;}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
@@ -132,7 +133,7 @@ footer{margin-top:6rem;padding:2rem 0 3rem;border-top:1px solid var(--border);di
 .cursor-ring{position:fixed;width:32px;height:32px;border:1px solid rgba(232,255,71,.3);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .3s,height .3s,border-color .3s;}
 body{cursor:none;}
 @media(hover:none),(max-width:600px){body{cursor:auto;}.cursor,.cursor-ring{display:none;}}
-@media(max-width:600px){header{flex-direction:column;align-items:flex-start;gap:1rem}.names-grid{grid-template-columns:1fr}.btn-row{flex-wrap:wrap}.count-btn{width:28px;height:28px;font-size:.85rem;}.count-row{gap:.25rem;}}
+@media(max-width:600px){header{flex-direction:column;align-items:flex-start;gap:1rem}.names-grid{grid-template-columns:1fr}.btn-row{flex-wrap:wrap}}
 .ripple{position:fixed;border-radius:50%;background:rgba(232,255,71,.35);pointer-events:none;z-index:9999;transform:translate(-50%,-50%) scale(0);animation:rippleOut .5s cubic-bezier(.16,1,.3,1) forwards;}
 @keyframes rippleOut{0%{width:10px;height:10px;opacity:1;transform:translate(-50%,-50%) scale(0);}100%{width:80px;height:80px;opacity:0;transform:translate(-50%,-50%) scale(1);}}
 </style>
@@ -143,16 +144,23 @@ body{cursor:none;}
 <div class="wrap">
   <header>
     <a class="logo" href="/">Phraselix</a>
-    <a class="back-btn" href="/">← All Tools</a>
+    <div class="header-right">
+      <a class="back-btn" href="/">← All Tools</a>
+      <span class="user-name" id="userName"></span>
+      <button class="signout-btn" id="signoutBtn" onclick="signOut()" style="display:none">Sign Out</button>
+    </div>
   </header>
+
   <div class="hero-tagline">
-    <div class="tagline-text" id="taglineText">Hook them in the first <em>3 seconds.</em></div>
+    <div class="tagline-text" id="taglineText">Hook them in the first <em>you.</em></div>
     <div class="tagline-meta">ps — Phraselix keeps growing</div>
   </div>
+
   <div class="shared-banner" id="sharedBanner">Someone shared these with you</div>
+
   <section class="input-section">
     <div class="prompt-label">What is your video about?</div>
-    <textarea id="prompt" rows="4" maxlength="400"></textarea>
+    <textarea id="prompt" rows="4" maxlength="400" placeholder="e.g. fitness creator, loves travel, based in NYC, posts daily workouts..."></textarea>
     <div class="count-section">
       <div class="count-hint">How many <span>— pick a number</span></div>
       <div class="count-row">
@@ -165,13 +173,12 @@ body{cursor:none;}
       <div class="count-locked-tip" id="countLockedTip">More coming with premium — soon</div>
     </div>
     <div class="style-section">
-      <div class="style-hint">Style <span>— pick one</span></div>
+      <div class="style-hint">Tone <span>— pick one</span></div>
       <div class="style-row" id="styleRow">
-        <button class="style-tag active" data-style="curiosity">Curiosity Gap</button>
-        <button class="style-tag" data-style="story">Story Open</button>
-        <button class="style-tag" data-style="bold">Bold Claim</button>
-        <button class="style-tag" data-style="question">Question</button>
-        <button class="style-tag" data-style="contrast">Contrast</button>
+        <button class="style-tag active" data-style="professional">Professional</button>
+        <button class="style-tag" data-style="witty">Witty</button>
+        <button class="style-tag" data-style="minimal">Minimal</button>
+        <button class="style-tag" data-style="bold">Bold</button>
       </div>
     </div>
     <div class="error-msg" id="errorMsg"></div>
@@ -180,125 +187,277 @@ body{cursor:none;}
       <button class="btn-more" id="btnMore" onclick="generateMore()">+ More Hooks</button>
     </div>
   </section>
+
   <div class="loading" id="loading">
     <div class="loader"><span></span><span></span><span></span></div>
     <span id="loadingText">Writing your hook...</span>
   </div>
+
   <div class="fav-bar" id="favBar">
     <div class="fav-bar-left">Favorites: <span id="favCount">0</span></div>
     <div class="fav-bar-right">
-      <button class="fav-action primary" onclick="openFavPanel()">View Favorites ♥</button>
+      <button class="fav-action primary" onclick="openFavPanel()">View All Favorites ♥</button>
       <button class="fav-action" onclick="shareFavs()">Share ↗</button>
     </div>
   </div>
+
   <div id="results"></div>
+
   <footer>
     <span class="footer-text">Phraselix — Content Tools</span>
     <span class="footer-text">Script Hook Generator</span>
   </footer>
 </div>
+
 <div class="fav-overlay" id="favOverlay" onclick="closeFavPanel()"></div>
 <div class="fav-panel" id="favPanel">
   <div class="fav-panel-header">
-    <div class="fav-panel-title">Favorites</div>
+    <div class="fav-panel-title">All Favorites</div>
     <button class="fav-panel-close" onclick="closeFavPanel()">Close</button>
   </div>
   <div class="fav-panel-body" id="favPanelBody"></div>
   <div class="fav-panel-footer">
     <button class="fav-action primary" onclick="shareFavs()">Share ↗</button>
-    <button class="fav-action" onclick="clearFavs()">Clear All</button>
+    <button class="fav-action" onclick="clearToolFavs()">Clear Hook Favs</button>
   </div>
 </div>
 <div class="toast" id="toast"></div>
+
 <script>
-const FAV_KEY='phraselix_scripthook_favs';
-let selectedStyle='curiosity',selectedCount=3,isLoading=false,allItems=[],totalGenerated=0;
-const taglines=['Hook them in the first <em>3 seconds.</em>','The opening line that stops the <em>scroll.</em>','Start strong or lose them <em>forever.</em>','Your intro. Rewritten to <em>actually work.</em>','Every viral video starts with a <em>great hook.</em>'];
-document.getElementById('taglineText').innerHTML=taglines[Math.floor(Math.random()*taglines.length)];
-document.getElementById('prompt').placeholder='e.g. I tried waking up at 5am every day for 30 days...';
-document.querySelectorAll('#styleRow .style-tag').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('#styleRow .style-tag').forEach(b=>b.classList.remove('active'));btn.classList.add('active');selectedStyle=btn.dataset.style;allItems=[];totalGenerated=0;});});
-document.querySelectorAll('.count-btn').forEach(btn=>{btn.addEventListener('click',()=>{if(btn.classList.contains('locked')){document.getElementById('countLockedTip').classList.add('show');return;}document.querySelectorAll('.count-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');selectedCount=parseInt(btn.dataset.count);document.getElementById('countLockedTip').classList.remove('show');});});
-document.getElementById('prompt').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey))generate();});
-function buildSystemPrompt(){return `You write the opening 1-3 sentences of a video script that make people stay and watch.
+// ── Auth Guard ────────────────────────────────────────────
+const TOKEN = localStorage.getItem('phraselix_token');
+const USER = (() => { try { return JSON.parse(localStorage.getItem('phraselix_user')); } catch { return null; } })();
+if (!TOKEN || !USER) { window.location.href = '/login'; }
 
-YOUR #1 RULE: Mirror the creator's voice and energy from their description FIRST. If they write casually, write casual. If they're hype, be hype. If they're dry, match that. The style setting only shapes the STRUCTURE — it never overrides the creator's actual voice.
-
-Style: ${selectedStyle}
-
-Style guides (apply AFTER capturing their voice):
-- curiosity: Open a loop the viewer needs to close. Tease without revealing.
-- story: Drop straight into a moment. Present tense, action-first.
-- bold: Make a claim that stops them. Confident, maybe provocative.
-- question: Ask something they instantly relate to or want answered.
-- contrast: Set up two opposites for tension.
-
-Rules:
-- Max 3 sentences
-- Spoken language only — sounds natural out loud
-- NEVER "In this video I will..."
-- No fake enthusiasm or corporate energy
-- Must feel like a real person, not an AI template
-
-Respond ONLY with valid JSON: {"items":["hook1","hook2","hook3"]}`;
-}
-function buildUserMsg(prompt){return `Video: "${prompt}"\nStyle: ${selectedStyle}\n\nWrite EXACTLY ${selectedCount} opening hooks. Each must be a completely different approach. PRESERVE the creator's voice and energy — the style shapes structure, not personality. Max 3 sentences each.`;}
-async function generate(){const prompt=document.getElementById('prompt').value.trim();if(!prompt){document.getElementById('prompt').focus();return;}if(isLoading)return;hideError();if(isBadInput(prompt)){showError("Keep it clean — Phraselix isn't that kind of tool.");return;}setLoading(true,'Writing your hook...');allItems=[];totalGenerated=0;document.getElementById('results').innerHTML='';document.getElementById('btnMore').style.display='none';try{const result=await callAPI(buildSystemPrompt(),buildUserMsg(prompt));renderResults(result);document.getElementById('btnMore').style.display='block';}catch(e){showError('Something went wrong — try again.');console.error(e);}finally{setLoading(false);}}
-async function generateMore(){const prompt=document.getElementById('prompt').value.trim();if(!prompt||isLoading)return;hideError();setLoading(true,'Generating more...');const extra=allItems.length?'\n\nDo NOT repeat these:\n'+allItems.slice(-20).join(', '):'';try{const result=await callAPI(buildSystemPrompt(),buildUserMsg(prompt)+extra);appendResults(result);}catch(e){showError('Something went wrong — try again.');}finally{setLoading(false);}}
-function updateCount(){
-  const countEl=document.getElementById('itemCount');
-  if(countEl)countEl.textContent=document.querySelectorAll('#itemsGrid .name-card').length+' results';
-}
-function renderResults(data){
-  const container=document.getElementById('results');
-  container.innerHTML='';
-  const header=document.createElement('div');header.className='results-header';
-  const lbl=document.createElement('div');lbl.className='results-label';lbl.textContent='Generated Hooks';
-  const right=document.createElement('div');right.style.cssText='display:flex;align-items:center;gap:1rem';
-  const shareBtn=document.createElement('button');
-  shareBtn.textContent='Share';
-  shareBtn.style.cssText='font-family:DM Mono,monospace;font-size:.55rem;letter-spacing:1.5px;text-transform:uppercase;padding:.25rem .7rem;border:1px solid var(--border2);border-radius:2px;background:none;color:var(--text3);cursor:pointer;transition:all .15s';
-  shareBtn.onmouseenter=function(){this.style.borderColor='var(--accent)';this.style.color='var(--accent)';};
-  shareBtn.onmouseleave=function(){this.style.borderColor='var(--border2)';this.style.color='var(--text3)';};
-  shareBtn.onclick=shareResults;
-  const countEl=document.createElement('div');countEl.className='results-count';countEl.id='itemCount';countEl.textContent='0';
-  right.appendChild(shareBtn);right.appendChild(countEl);
-  header.appendChild(lbl);header.appendChild(right);
-  const grid=document.createElement('div');grid.className='names-grid';grid.id='itemsGrid';
-  container.appendChild(header);container.appendChild(grid);
-  const fresh=(data.items||[]).slice(0,selectedCount);
-  allItems=fresh;
-  fresh.forEach(item=>grid.appendChild(makeCard(selectedStyle.charAt(0).toUpperCase()+selectedStyle.slice(1),item,'type-a',FAV_KEY)));
-  updateCount();updateFavBar();
+function signOut() {
+  localStorage.removeItem('phraselix_token');
+  localStorage.removeItem('phraselix_user');
+  window.location.href = '/login';
 }
 
-function appendResults(data){const grid=document.getElementById('itemsGrid');if(!grid){renderResults(data);return;}const fresh=(data.items||[]).slice(0,selectedCount).filter(t=>!allItems.includes(t));allItems=[...allItems,...fresh];totalGenerated=allItems.length;const label=selectedStyle.charAt(0).toUpperCase()+selectedStyle.slice(1);[...fresh].reverse().forEach(item=>{const card=makeCard(label,item,'type-a',FAV_KEY);grid.insertBefore(card,grid.firstChild);});updateCount();updateFavBar();}
-function isBadInput(text){const banned=['porn','porno','pornstar','pornhub','onlyfans','sex','sexy','sexual','nude','naked','nsfw','xxx','erotic','hentai','horny','boobs','tits','dick','cock','pussy','vagina','penis','blowjob','handjob','cumshot','orgasm','fetish','bdsm','stripper','escort','prostitute','hooker','camgirl','fuck','shit','bitch','cunt','asshole','bastard','slut','whore','nigga','nigger','faggot','retard','murder','rape','suicide','terrorist','nazis','nazi','racist','racism','genocide','pedophile','pedo','molest'];const wb=(t,w)=>new RegExp('\\b'+w+'\\b').test(t);const t=text.toLowerCase();for(const word of banned){if(wb(t,word))return true;}const leet=t.replace(/0/g,'o').replace(/1/g,'i').replace(/3/g,'e').replace(/4/g,'a').replace(/5/g,'s').replace(/8/g,'b').replace(/\$/g,'s').replace(/@/g,'a').replace(/!/g,'i');for(const word of banned){if(wb(leet,word))return true;}return false;}
-async function callAPI(sys,msg){const r=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:sys,messages:[{role:'user',content:msg}]})});const d=await r.json();if(d.error)throw new Error(d.error.message||'API error');const raw=d.content[0].text.trim().replace(/```json|```/g,'').trim();const match=raw.match(/\{[\s\S]*\}/);if(!match)throw new Error('No JSON in response');const parsed=JSON.parse(match[0]);if(!parsed.items||!parsed.items.length)throw new Error('No items in response');return parsed;}
-function getFavs(key){try{return JSON.parse(localStorage.getItem(key)||'[]');}catch{return[];}}
-function saveFavs(key,favs){localStorage.setItem(key,JSON.stringify(favs));updateFavBar();}
-function toggleFav(card,item,key){let favs=getFavs(key);const idx=favs.findIndex(f=>f.content===item.content);const btn=card.querySelector('.fav-btn');if(idx>-1){favs.splice(idx,1);btn.classList.remove('saved');showToast('Removed from favorites');}else{favs.push(item);btn.classList.add('saved');showToast('Saved ♥');}saveFavs(key,favs);}
-function updateFavBar(){const favs=getFavs(FAV_KEY);document.getElementById('favCount').textContent=favs.length;document.getElementById('favBar').classList.toggle('show',favs.length>0);if(document.getElementById('favPanel').classList.contains('open'))renderFavPanel();}
-function openFavPanel(){renderFavPanel();document.getElementById('favPanel').classList.add('open');document.getElementById('favOverlay').classList.add('show');}
-function closeFavPanel(){document.getElementById('favPanel').classList.remove('open');document.getElementById('favOverlay').classList.remove('show');}
-function renderFavPanel(){const favs=getFavs(FAV_KEY);const body=document.getElementById('favPanelBody');if(!favs.length){body.innerHTML='<div class="fav-panel-empty">No favorites yet.<br>Hit ♥ on any card<br>to save it here.</div>';return;}body.innerHTML='';favs.forEach(item=>{const el=document.createElement('div');el.className='fav-item';el.innerHTML='<div class="fav-item-content"><div class="fav-item-label">'+(item.label||'')+'</div><div class="fav-item-text">'+item.content+'</div></div><div class="fav-item-actions"><button class="fav-item-btn" onclick="copyText(\''+item.content.replace(/'/g,"\\'")+"',this)\">Copy</button><button class=\"fav-item-btn remove\" onclick=\"removeFav('"+item.content.replace(/'/g,"\\'")+'\')">X</button></div>';body.appendChild(el);});}
-function removeFav(content){saveFavs(FAV_KEY,getFavs(FAV_KEY).filter(f=>f.content!==content));renderFavPanel();document.querySelectorAll('.fav-btn').forEach(btn=>{const t=btn.closest('.name-card')?.querySelector('.name-text')?.textContent;if(t===content)btn.classList.remove('saved');});}
-function clearFavs(){saveFavs(FAV_KEY,[]);document.querySelectorAll('.fav-btn').forEach(b=>b.classList.remove('saved'));showToast('Favorites cleared');}
-function copyText(text,btn){navigator.clipboard.writeText(text).then(()=>{const o=btn.textContent;btn.textContent='Done';setTimeout(()=>btn.textContent=o,1500);});}
-function shareResults(){const cards=[...document.querySelectorAll('.name-text')].map(c=>c.textContent);if(!cards.length)return;navigator.clipboard.writeText(window.location.origin+window.location.pathname+'?shared='+encodeURIComponent(cards.join('|||'))).then(()=>showToast('Link copied!'));}
-function shareFavs(){const favs=getFavs(FAV_KEY);if(!favs.length)return;navigator.clipboard.writeText(window.location.origin+window.location.pathname+'?shared='+encodeURIComponent(favs.map(f=>f.content).join('|||'))).then(()=>showToast('Link copied!'));}
-function makeCard(label,content,typeClass,key){const card=document.createElement('div');card.className='name-card';const item={label,content};const isFaved=getFavs(key).some(f=>f.content===content);card.innerHTML='<button class="fav-btn '+(isFaved?'saved':'')+'" title="Save">&#9829;</button><div class="name-style '+typeClass+'">'+label+'</div><div class="name-text">'+content+'</div><div class="copy-hint">click to copy</div>';card.querySelector('.fav-btn').addEventListener('click',e=>{e.stopPropagation();toggleFav(card,item,key);});card.addEventListener('click',()=>{navigator.clipboard.writeText(content).then(()=>{card.classList.add('copied');card.querySelector('.copy-hint').textContent='copied!';setTimeout(()=>{card.classList.remove('copied');card.querySelector('.copy-hint').textContent='click to copy';},2000);});});return card;}
-function setLoading(state,text){isLoading=state;document.getElementById('loading').classList.toggle('show',state);document.getElementById('loadingText').textContent=text||'Generating...';document.getElementById('btnGenerate').disabled=state;}
-function showError(msg){const el=document.getElementById('errorMsg');el.textContent=msg;el.classList.add('show');}
-function hideError(){document.getElementById('errorMsg').classList.remove('show');}
-function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
-const cursor=document.getElementById('cursor');const ring=document.getElementById('cursorRing');let mx=0,my=0,rx=0,ry=0;
-document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=mx+'px';cursor.style.top=my+'px';});
-function animRing(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(animRing);}animRing();
-document.querySelectorAll('a,button,.name-card').forEach(el=>{el.addEventListener('mouseenter',()=>{ring.style.width='48px';ring.style.height='48px';ring.style.borderColor='rgba(232,255,71,.6)';});el.addEventListener('mouseleave',()=>{ring.style.width='32px';ring.style.height='32px';ring.style.borderColor='rgba(232,255,71,.3)';});});
-document.addEventListener('touchstart',e=>{const touch=e.touches[0];const ripple=document.createElement('div');ripple.className='ripple';ripple.style.left=touch.clientX+'px';ripple.style.top=touch.clientY+'px';document.body.appendChild(ripple);setTimeout(()=>ripple.remove(),500);},{passive:true});
+// Show user name
+if (USER) {
+  document.getElementById('userName').textContent = '👤 ' + USER.name;
+  document.getElementById('signoutBtn').style.display = 'block';
+}
+
+// ── Favorites (shared across all tools) ──────────────────
+const TOOL_NAME = 'scripthook';
+const FAV_KEY = 'phraselix_all_favs';
+
+const TOOL_LABELS = {
+  bio: 'Bio Generator',
+  caption: 'Caption Generator',
+  hashtag: 'Hashtag Generator',
+  hooks: 'Title Generator',
+  scripthook: 'Script Hook',
+  ideas: 'Content Ideas',
+  username: 'Username Generator'
+};
+
+function getAllFavs() { try { return JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); } catch { return []; } }
+function getToolFavs() { return getAllFavs().filter(f => f.tool === TOOL_NAME); }
+function saveAllFavs(favs) { localStorage.setItem(FAV_KEY, JSON.stringify(favs)); updateFavBar(); }
+
+function toggleFav(card, item) {
+  let all = getAllFavs();
+  const idx = all.findIndex(f => f.content === item.content && f.tool === TOOL_NAME);
+  const btn = card.querySelector('.fav-btn');
+  if (idx > -1) { all.splice(idx, 1); btn.classList.remove('saved'); showToast('Removed from favorites'); }
+  else { all.push({ ...item, tool: TOOL_NAME }); btn.classList.add('saved'); showToast('Saved ♥'); }
+  saveAllFavs(all);
+}
+
+function updateFavBar() {
+  const favs = getToolFavs();
+  document.getElementById('favCount').textContent = favs.length;
+  document.getElementById('favBar').classList.toggle('show', favs.length > 0);
+  if (document.getElementById('favPanel').classList.contains('open')) renderFavPanel();
+}
+
+function openFavPanel() { renderFavPanel(); document.getElementById('favPanel').classList.add('open'); document.getElementById('favOverlay').classList.add('show'); }
+function closeFavPanel() { document.getElementById('favPanel').classList.remove('open'); document.getElementById('favOverlay').classList.remove('show'); }
+
+function renderFavPanel() {
+  const all = getAllFavs();
+  const body = document.getElementById('favPanelBody');
+  if (!all.length) { body.innerHTML = '<div class="fav-panel-empty">No favorites yet.<br>Hit ♥ on any card<br>to save it here.</div>'; return; }
+  body.innerHTML = '';
+  const grouped = {};
+  all.forEach(item => { if (!grouped[item.tool]) grouped[item.tool] = []; grouped[item.tool].push(item); });
+  Object.keys(grouped).forEach(tool => {
+    const section = document.createElement('div');
+    const titleEl = document.createElement('div');
+    titleEl.className = 'fav-section-title';
+    titleEl.textContent = TOOL_LABELS[tool] || tool;
+    section.appendChild(titleEl);
+    grouped[tool].forEach(item => {
+      const el = document.createElement('div');
+      el.className = 'fav-item';
+      el.innerHTML = '<div class="fav-item-content"><div class="fav-item-label">' + (item.label || '') + '</div><div class="fav-item-text">' + item.content + '</div></div><div class="fav-item-actions"><button class="fav-item-btn" onclick="copyText(\'' + item.content.replace(/'/g, "\\'") + '\',this)">Copy</button><button class="fav-item-btn remove" onclick="removeFav(\'' + item.content.replace(/'/g, "\\'") + '\',\'' + item.tool + '\')">X</button></div>';
+      section.appendChild(el);
+    });
+    body.appendChild(section);
+  });
+}
+
+function removeFav(content, tool) {
+  saveAllFavs(getAllFavs().filter(f => !(f.content === content && f.tool === tool)));
+  renderFavPanel();
+  document.querySelectorAll('.fav-btn').forEach(btn => {
+    const t = btn.closest('.name-card')?.querySelector('.name-text')?.textContent;
+    if (t === content) btn.classList.remove('saved');
+  });
+}
+
+function clearToolFavs() {
+  saveAllFavs(getAllFavs().filter(f => f.tool !== TOOL_NAME));
+  document.querySelectorAll('.fav-btn').forEach(b => b.classList.remove('saved'));
+  showToast('Hook favorites cleared');
+}
+
+function copyText(text, btn) { navigator.clipboard.writeText(text).then(() => { const o = btn.textContent; btn.textContent = 'Done'; setTimeout(() => btn.textContent = o, 1500); }); }
+
+// ── Tool Logic ────────────────────────────────────────────
+const taglines = ['Hook them in the first <em>you.</em>','Stop writing boring bios. Sound like <em>yourself.</em>','Your profile. Your vibe. Your <em>words.</em>','One sentence that makes people <em>follow.</em>','Your bio is your first impression. Make it <em>hit.</em>'];
+document.getElementById('taglineText').innerHTML = taglines[Math.floor(Math.random() * taglines.length)];
+
+let selectedStyle = 'professional', selectedCount = 3, isLoading = false, allItems = [];
+
+document.querySelectorAll('#styleRow .style-tag').forEach(btn => {
+  btn.addEventListener('click', () => { document.querySelectorAll('#styleRow .style-tag').forEach(b => b.classList.remove('active')); btn.classList.add('active'); selectedStyle = btn.dataset.style; allItems = []; });
+});
+document.querySelectorAll('.count-btn').forEach(btn => {
+  btn.addEventListener('click', () => { if (btn.classList.contains('locked')) { document.getElementById('countLockedTip').classList.add('show'); return; } document.querySelectorAll('.count-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); selectedCount = parseInt(btn.dataset.count); document.getElementById('countLockedTip').classList.remove('show'); });
+});
+document.getElementById('prompt').addEventListener('keydown', e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) generate(); });
+
+function buildSystemPrompt() {
+  return `You write short, punchy bios that feel human and authentic. No cringe, no buzzwords, no "passionate about".\n\nTone: ${selectedStyle}\n- professional: Keep their energy but frame it as a credible value proposition.\n- witty: Find the clever angle. Dry, self-aware, a little personality.\n- minimal: Strip it to the essential. Fewest words, maximum punch.\n- bold: Amplify their confidence. Direct, unapologetic.\n\nNEVER write "Passionate about X" or LinkedIn templates.\n\nRespond ONLY with valid JSON: {"items":["bio1","bio2","bio3"]}`;
+}
+function buildUserMsg(prompt) { return `Person/Brand: "${prompt}"\nTone: ${selectedStyle}\n\nWrite EXACTLY ${selectedCount} bios. Each must have a completely different angle and structure.`; }
+
+async function generate() {
+  const prompt = document.getElementById('prompt').value.trim();
+  if (!prompt) { document.getElementById('prompt').focus(); return; }
+  if (isLoading) return;
+  hideError();
+  if (isBadInput(prompt)) { showError("Keep it clean — Phraselix isn't that kind of tool."); return; }
+  setLoading(true, 'Writing your hook...');
+  allItems = [];
+  document.getElementById('results').innerHTML = '';
+  document.getElementById('btnMore').style.display = 'none';
+  try {
+    const result = await callAPI(buildSystemPrompt(), buildUserMsg(prompt));
+    renderResults(result);
+    document.getElementById('btnMore').style.display = 'block';
+  } catch(e) { showError('Something went wrong — try again.'); } finally { setLoading(false); }
+}
+
+async function generateMore() {
+  const prompt = document.getElementById('prompt').value.trim();
+  if (!prompt || isLoading) return;
+  setLoading(true, 'Generating more...');
+  const extra = allItems.length ? '\n\nDo NOT repeat these:\n' + allItems.slice(-20).join(', ') : '';
+  try {
+    const result = await callAPI(buildSystemPrompt(), buildUserMsg(prompt) + extra);
+    appendResults(result);
+  } catch(e) { showError('Something went wrong — try again.'); } finally { setLoading(false); }
+}
+
+function renderResults(data) {
+  const container = document.getElementById('results');
+  container.innerHTML = '';
+  const header = document.createElement('div'); header.className = 'results-header';
+  const lbl = document.createElement('div'); lbl.className = 'results-label'; lbl.textContent = 'Generated Hooks';
+  const right = document.createElement('div'); right.style.cssText = 'display:flex;align-items:center;gap:1rem';
+  const shareBtn = document.createElement('button');
+  shareBtn.textContent = 'Share'; shareBtn.style.cssText = 'font-family:DM Mono,monospace;font-size:.55rem;letter-spacing:1.5px;text-transform:uppercase;padding:.25rem .7rem;border:1px solid var(--border2);border-radius:2px;background:none;color:var(--text3);cursor:pointer;transition:all .15s';
+  shareBtn.onmouseenter = function(){ this.style.borderColor='var(--accent)'; this.style.color='var(--accent)'; };
+  shareBtn.onmouseleave = function(){ this.style.borderColor='var(--border2)'; this.style.color='var(--text3)'; };
+  shareBtn.onclick = shareResults;
+  const countEl = document.createElement('div'); countEl.className = 'results-count'; countEl.id = 'itemCount'; countEl.textContent = '0';
+  right.appendChild(shareBtn); right.appendChild(countEl);
+  header.appendChild(lbl); header.appendChild(right);
+  const grid = document.createElement('div'); grid.className = 'names-grid'; grid.id = 'itemsGrid';
+  container.appendChild(header); container.appendChild(grid);
+  const fresh = (data.items || []).slice(0, selectedCount);
+  allItems = fresh;
+  fresh.forEach(item => grid.appendChild(makeCard(selectedStyle.charAt(0).toUpperCase() + selectedStyle.slice(1), item, 'type-a')));
+  updateCount(); updateFavBar();
+}
+
+function appendResults(data) {
+  const grid = document.getElementById('itemsGrid');
+  if (!grid) { renderResults(data); return; }
+  const fresh = (data.items || []).slice(0, selectedCount).filter(t => !allItems.includes(t));
+  allItems = [...allItems, ...fresh];
+  const label = selectedStyle.charAt(0).toUpperCase() + selectedStyle.slice(1);
+  [...fresh].reverse().forEach(item => { const card = makeCard(label, item, 'type-a'); grid.insertBefore(card, grid.firstChild); });
+  updateCount(); updateFavBar();
+}
+
+function updateCount() { const el = document.getElementById('itemCount'); if (el) el.textContent = document.querySelectorAll('#itemsGrid .name-card').length + ' results'; }
+
+function makeCard(label, content, typeClass) {
+  const card = document.createElement('div');
+  card.className = 'name-card';
+  const item = { label, content };
+  const isFaved = getAllFavs().some(f => f.content === content && f.tool === TOOL_NAME);
+  card.innerHTML = '<button class="fav-btn ' + (isFaved ? 'saved' : '') + '" title="Save">&#9829;</button><div class="name-style ' + typeClass + '">' + label + '</div><div class="name-text">' + content + '</div><div class="copy-hint">click to copy</div>';
+  card.querySelector('.fav-btn').addEventListener('click', e => { e.stopPropagation(); toggleFav(card, item); });
+  card.addEventListener('click', () => { navigator.clipboard.writeText(content).then(() => { card.classList.add('copied'); card.querySelector('.copy-hint').textContent = 'copied!'; setTimeout(() => { card.classList.remove('copied'); card.querySelector('.copy-hint').textContent = 'click to copy'; }, 2000); }); });
+  return card;
+}
+
+function isBadInput(text) {
+  const banned = ['porn','sex','nude','naked','nsfw','xxx','erotic','fuck','shit','bitch','cunt','nigga','nigger','murder','rape','suicide','terrorist','nazi','pedophile'];
+  const t = text.toLowerCase();
+  return banned.some(w => new RegExp('\\b' + w + '\\b').test(t));
+}
+
+async function callAPI(sys, msg) {
+  const r = await fetch('/api/generate', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + TOKEN }, body: JSON.stringify({ system: sys, messages: [{ role: 'user', content: msg }] }) });
+  const d = await r.json();
+  if (d.error) throw new Error(d.error.message || 'API error');
+  const raw = d.content[0].text.trim().replace(/```json|```/g, '').trim();
+  const match = raw.match(/\{[\s\S]*\}/);
+  if (!match) throw new Error('No JSON in response');
+  const parsed = JSON.parse(match[0]);
+  if (!parsed.items || !parsed.items.length) throw new Error('No items in response');
+  return parsed;
+}
+
+function shareResults() {
+  const cards = [...document.querySelectorAll('.name-text')].map(c => c.textContent);
+  if (!cards.length) return;
+  navigator.clipboard.writeText(window.location.origin + window.location.pathname + '?shared=' + encodeURIComponent(cards.join('|||'))).then(() => showToast('Link copied!'));
+}
+function shareFavs() {
+  const favs = getToolFavs();
+  if (!favs.length) return;
+  navigator.clipboard.writeText(window.location.origin + window.location.pathname + '?shared=' + encodeURIComponent(favs.map(f => f.content).join('|||'))).then(() => showToast('Link copied!'));
+}
+function setLoading(state, text) { isLoading = state; document.getElementById('loading').classList.toggle('show', state); document.getElementById('loadingText').textContent = text || 'Generating...'; document.getElementById('btnGenerate').disabled = state; }
+function showError(msg) { const el = document.getElementById('errorMsg'); el.textContent = msg; el.classList.add('show'); }
+function hideError() { document.getElementById('errorMsg').classList.remove('show'); }
+function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2000); }
+
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; cursor.style.left=mx+'px'; cursor.style.top=my+'px'; });
+function animRing(){ rx+=(mx-rx)*.12; ry+=(my-ry)*.12; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(animRing); }
+animRing();
+document.querySelectorAll('a,button,.name-card').forEach(el => {
+  el.addEventListener('mouseenter', () => { ring.style.width='48px'; ring.style.height='48px'; ring.style.borderColor='rgba(232,255,71,.6)'; });
+  el.addEventListener('mouseleave', () => { ring.style.width='32px'; ring.style.height='32px'; ring.style.borderColor='rgba(232,255,71,.3)'; });
+});
+document.addEventListener('touchstart', e => { const touch = e.touches[0]; const ripple = document.createElement('div'); ripple.className = 'ripple'; ripple.style.left = touch.clientX + 'px'; ripple.style.top = touch.clientY + 'px'; document.body.appendChild(ripple); setTimeout(() => ripple.remove(), 500); }, {passive:true});
+
 updateFavBar();
-const sharedParam=new URLSearchParams(window.location.search).get('shared');
-if(sharedParam){const items=decodeURIComponent(sharedParam).split('|||').filter(Boolean);document.getElementById('sharedBanner').classList.add('show');const grid=document.createElement('div');grid.className='names-grid';items.forEach(content=>grid.appendChild(makeCard('Shared',content,'type-a',FAV_KEY)));document.getElementById('results').appendChild(grid);}
+const sharedParam = new URLSearchParams(window.location.search).get('shared');
+if (sharedParam) { const items = decodeURIComponent(sharedParam).split('|||').filter(Boolean); document.getElementById('sharedBanner').classList.add('show'); const grid = document.createElement('div'); grid.className = 'names-grid'; items.forEach(content => grid.appendChild(makeCard('Shared', content, 'type-a'))); document.getElementById('results').appendChild(grid); }
 </script>
 <script defer src="/_vercel/insights/script.js"></script>
 </body>
