@@ -165,7 +165,7 @@ body{cursor:none;}
     </div>
   </header>
   <div class="hero-tagline">
-    <div class="tagline-text" id="taglineText">Your vibe. Translated into a <em>you.</em></div>
+    <div class="tagline-text" id="taglineText">A bio that actually sounds like <em>you.</em></div>
     <div class="tagline-meta">ps — Phraselix keeps growing</div>
   </div>
   <div class="shared-banner" id="sharedBanner">Someone shared these with you</div>
@@ -187,7 +187,7 @@ body{cursor:none;}
       <div class="style-hint">Tone <span>— pick one</span></div>
       <div class="style-row" id="styleRow">
         <button class="style-tag active" data-style="all">All Styles</button>
-        <button class="style-tag" data-style="short">Short & Punchy</button>
+        <button class="style-tag" data-style="short">Short &amp; Punchy</button>
         <button class="style-tag" data-style="multi">Multi-Word</button>
         <button class="style-tag" data-style="coined">Coined Words</button>
         <button class="style-tag" data-style="dark">Dark / Mysterious</button>
@@ -203,7 +203,7 @@ body{cursor:none;}
   </section>
   <div class="loading" id="loading">
     <div class="loader"><span></span><span></span><span></span></div>
-    <span id="loadingText">Crafting your names...</span>
+    <span id="loadingText">Writing your bio...</span>
   </div>
   <div id="results"></div>
   <footer>
@@ -306,8 +306,8 @@ document.querySelectorAll('#styleRow .style-tag').forEach(btn=>{btn.addEventList
 document.querySelectorAll('.count-btn').forEach(btn=>{btn.addEventListener('click',()=>{if(btn.classList.contains('locked')){document.getElementById('countLockedTip').classList.add('show');return;}document.querySelectorAll('.count-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');selectedCount=parseInt(btn.dataset.count);document.getElementById('countLockedTip').classList.remove('show');});});
 document.getElementById('prompt').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey))generate();});
 
-function buildSystemPrompt(){return `You write short, punchy bios that feel human and authentic. No cringe, no buzzwords.\n\nTone: ${selectedStyle}\n- professional: Polished, still sounds like them.\n- witty: Dry, self-aware.\n- minimal: Fewest words, maximum punch.\n- bold: Direct, unapologetic.\n\nNEVER write "Passionate about X".\n\nRespond ONLY with valid JSON: {"items":["bio1","bio2"]}`;}
-function buildUserMsg(prompt){return `Person/Brand: "${prompt}"\nTone: ${selectedStyle}\n\nWrite EXACTLY ${selectedCount} bios. Each completely different angle.`;}
+function buildSystemPrompt(){var t=selectedStyle,g={'short':'Max 6 chars. Single word. No separators. Examples: vexr zael noxe ryft.','multi':'2-4 words with dots or underscores. Examples: cold.signal void_pilot quiet.storm.','coined':'Invented brand-like words that never existed. Examples: veltrox phraselix nyxara.','dark':'Void ghost echo hollow decay energy. Examples: null.spectre ashen.signal errorghost.','clean':'Elegant premium timeless. Examples: celo forma auren lune kova.','abstract':'Philosophical paradoxes. Examples: false.horizon quiet_theorem observer.effect.','all':'Mix ALL styles: short punchy multi-word invented brand dark clean abstract.'};return 'You are the best username generator ever built. Generate usernames so good people ask: how is this not taken.\n\nStyle: '+t+'\nGuide: '+(g[t]||g.all)+'\n\nRULES: NEVER use numbers. NEVER use generic names like darkwolf. Each name must feel made for this specific person.\n\nRespond ONLY with valid JSON: {"items":["username1","username2"]}';}
+function buildUserMsg(prompt){return 'Person/vibe: "'+prompt+'"\nStyle: '+selectedStyle+'\n\nGenerate EXACTLY '+selectedCount+' usernames. Each must feel made for this specific person. Make them think: how is this not taken.';}
 
 async function generate(){const prompt=document.getElementById('prompt').value.trim();if(!prompt){document.getElementById('prompt').focus();return;}if(isLoading)return;hideError();if(isBadInput(prompt)){showError("Keep it clean — Phraselix isn't that kind of tool.");return;}setLoading(true,'Crafting your names...');allItems=[];document.getElementById('results').innerHTML='';document.getElementById('btnMore').style.display='none';try{const result=await callAPI(buildSystemPrompt(),buildUserMsg(prompt));renderResults(result);document.getElementById('btnMore').style.display='block';}catch(e){showError('Something went wrong — try again.');}finally{setLoading(false);}}
 async function generateMore(){const prompt=document.getElementById('prompt').value.trim();if(!prompt||isLoading)return;setLoading(true,'Generating more...');const extra=allItems.length?'\n\nDo NOT repeat these:\n'+allItems.slice(-20).join(', '):'';try{const result=await callAPI(buildSystemPrompt(),buildUserMsg(prompt)+extra);appendResults(result);}catch(e){showError('Something went wrong — try again.');}finally{setLoading(false);}}
