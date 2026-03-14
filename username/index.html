@@ -186,10 +186,13 @@ body{cursor:none;}
     <div class="style-section">
       <div class="style-hint">Tone <span>— pick one</span></div>
       <div class="style-row" id="styleRow">
-        <button class="style-tag active" data-style="professional">Professional</button>
-        <button class="style-tag" data-style="witty">Witty</button>
-        <button class="style-tag" data-style="minimal">Minimal</button>
-        <button class="style-tag" data-style="bold">Bold</button>
+        <button class="style-tag active" data-style="all">All Styles</button>
+        <button class="style-tag" data-style="short">Short & Punchy</button>
+        <button class="style-tag" data-style="multi">Multi-Word</button>
+        <button class="style-tag" data-style="coined">Coined Words</button>
+        <button class="style-tag" data-style="dark">Dark / Mysterious</button>
+        <button class="style-tag" data-style="clean">Clean / Minimal</button>
+        <button class="style-tag" data-style="abstract">Abstract</button>
       </div>
     </div>
     <div class="error-msg" id="errorMsg"></div>
@@ -298,7 +301,7 @@ function copyText(text,btn){navigator.clipboard.writeText(text).then(()=>{const 
 
 const taglines=['Your vibe. Translated into a <em>you.</em>','Stop using your birth year as a <em>yourself.</em>','Your profile. Your vibe. Your <em>words.</em>','One sentence that makes people <em>follow.</em>'];
 document.getElementById('taglineText').innerHTML=taglines[Math.floor(Math.random()*taglines.length)];
-let selectedStyle='professional',selectedCount=3,isLoading=false,allItems=[];
+let selectedStyle='all',selectedCount=3,isLoading=false,allItems=[];
 document.querySelectorAll('#styleRow .style-tag').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('#styleRow .style-tag').forEach(b=>b.classList.remove('active'));btn.classList.add('active');selectedStyle=btn.dataset.style;allItems=[];});});
 document.querySelectorAll('.count-btn').forEach(btn=>{btn.addEventListener('click',()=>{if(btn.classList.contains('locked')){document.getElementById('countLockedTip').classList.add('show');return;}document.querySelectorAll('.count-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');selectedCount=parseInt(btn.dataset.count);document.getElementById('countLockedTip').classList.remove('show');});});
 document.getElementById('prompt').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey))generate();});
