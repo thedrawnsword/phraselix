@@ -331,10 +331,19 @@ function updateCoinDisplay(n) {
 }
 
 async function fetchCoins() {
+  // Always show localStorage first for instant display
+  var local = parseInt(localStorage.getItem('phraselix_coins') || '11');
+  updateCoinDisplay(local);
+  // Then sync with server in background
   try {
     var r = await fetch('/api/coins', { headers: { 'Authorization': 'Bearer ' + TOKEN } });
-    var d = await r.json();
-    if (d.coins !== undefined) updateCoinDisplay(d.coins);
+    if (r.ok) {
+      var d = await r.json();
+      if (d.coins !== undefined) {
+        localStorage.setItem('phraselix_coins', d.coins);
+        updateCoinDisplay(d.coins);
+      }
+    }
   } catch(e) {}
 }
 
