@@ -179,7 +179,7 @@ body{cursor:none;}
     </div>
   </header>
   <div class="hero-tagline">
-    <div class="tagline-text" id="taglineText">A bio that actually sounds like <em>you.</em></div>
+    <div class="tagline-text" id="taglineText">Loading...</div>
     <div class="tagline-meta">ps — Phraselix keeps growing</div>
   </div>
   <div class="shared-banner" id="sharedBanner">Someone shared these with you</div>
@@ -240,35 +240,11 @@ body{cursor:none;}
   </div>
   <div class="side-section" id="sectionSettings" style="display:none">
     <div class="side-section-body">
-      <div class="setting-block">
-        <div class="setting-label">// Theme</div>
-        <div class="theme-toggle">
-          <button class="theme-btn active" id="themeDark" onclick="setTheme('dark')">Dark</button>
-          <button class="theme-btn" id="themeLight" onclick="setTheme('light')">Light</button>
-        </div>
-      </div>
-      <div class="setting-block">
-        <div class="setting-label">// Display Name</div>
-        <div class="setting-row">
-          <input class="setting-input" type="text" id="newName" placeholder="New name">
-          <button class="side-action primary" onclick="changeName()">Save</button>
-        </div>
-      </div>
-      <div class="setting-block">
-        <div class="setting-label">// Password</div>
-        <div class="setting-col">
-          <input class="setting-input" type="password" id="newPassword" placeholder="New password">
-          <input class="setting-input" type="password" id="confirmPassword" placeholder="Confirm password" style="margin-top:.5rem">
-          <button class="side-action primary" onclick="changePassword()" style="margin-top:.5rem;width:100%">Update Password</button>
-        </div>
-      </div>
-      <div class="setting-block">
-        <div class="setting-label">// Danger Zone</div>
-        <button class="side-action danger" onclick="deleteAccount()" style="width:100%">Delete Account</button>
-      </div>
-      <div class="setting-block">
-        <button class="side-action signout" onclick="signOut()">Sign Out</button>
-      </div>
+      <div class="setting-block"><div class="setting-label">// Theme</div><div class="theme-toggle"><button class="theme-btn active" id="themeDark" onclick="setTheme('dark')">Dark</button><button class="theme-btn" id="themeLight" onclick="setTheme('light')">Light</button></div></div>
+      <div class="setting-block"><div class="setting-label">// Display Name</div><div class="setting-row"><input class="setting-input" type="text" id="newName" placeholder="New name"><button class="side-action primary" onclick="changeName()">Save</button></div></div>
+      <div class="setting-block"><div class="setting-label">// Password</div><div class="setting-col"><input class="setting-input" type="password" id="newPassword" placeholder="New password"><input class="setting-input" type="password" id="confirmPassword" placeholder="Confirm password" style="margin-top:.5rem"><button class="side-action primary" onclick="changePassword()" style="margin-top:.5rem;width:100%">Update Password</button></div></div>
+      <div class="setting-block"><div class="setting-label">// Danger Zone</div><button class="side-action danger" onclick="deleteAccount()" style="width:100%">Delete Account</button></div>
+      <div class="setting-block"><button class="side-action signout" onclick="signOut()">Sign Out</button></div>
     </div>
   </div>
 </div>
@@ -300,21 +276,22 @@ const TOOL_LABELS={bio:'Bio Generator',caption:'Caption Generator',hashtag:'Hash
 function getAllFavs(){try{return JSON.parse(localStorage.getItem(FAV_KEY)||'[]');}catch{return[];}}
 function saveAllFavs(favs){localStorage.setItem(FAV_KEY,JSON.stringify(favs));}
 function toggleFav(card,item){let all=getAllFavs();const idx=all.findIndex(f=>f.content===item.content&&f.tool===TOOL_NAME);const btn=card.querySelector('.fav-btn');if(idx>-1){all.splice(idx,1);btn.classList.remove('saved');showToast('Removed from favorites');}else{all.push({...item,tool:TOOL_NAME});btn.classList.add('saved');showToast('Saved ♥');}saveAllFavs(all);if(document.getElementById('sidePanel').classList.contains('open'))renderAllFavs();}
-function renderAllFavs(){const all=getAllFavs();const body=document.getElementById('allFavsBody');if(!all.length){body.innerHTML='<div class="fav-panel-empty">No favorites yet.<br>Hit ♥ on any card<br>to save it here.</div>';return;}body.innerHTML='';const grouped={};all.forEach(item=>{if(!grouped[item.tool])grouped[item.tool]=[];grouped[item.tool].push(item);});Object.keys(grouped).forEach(tool=>{const title=document.createElement('div');title.className='fav-section-title';title.textContent=TOOL_LABELS[tool]||tool;body.appendChild(title);grouped[tool].forEach(item=>{const el=document.createElement('div');el.className='fav-item';el.innerHTML='<div class="fav-item-content"><div class="fav-item-label">'+(item.label||'')+'</div><div class="fav-item-text">'+item.content+'</div></div><div class="fav-item-actions"><button class="fav-item-btn" onclick="copyText(\''+item.content.replace(/'/g,"\\'").replace(/\n/g,' ')+'\',this)">Copy</button><button class="fav-item-btn remove" onclick="removeFav(\''+item.content.replace(/'/g,"\\'").replace(/\n/g,' ')+'\',\''+item.tool+'\')">X</button></div>';body.appendChild(el);});});}
+function renderAllFavs(){const all=getAllFavs();const body=document.getElementById('allFavsBody');if(!all.length){body.innerHTML='<div class="fav-panel-empty">No favorites yet.<br>Hit ♥ on any card<br>to save it here.</div>';return;}body.innerHTML='';const grouped={};all.forEach(item=>{if(!grouped[item.tool])grouped[item.tool]=[];grouped[item.tool].push(item);});Object.keys(grouped).forEach(tool=>{const title=document.createElement('div');title.className='fav-section-title';title.textContent=TOOL_LABELS[tool]||tool;body.appendChild(title);grouped[tool].forEach(item=>{const el=document.createElement('div');el.className='fav-item';el.innerHTML='<div class="fav-item-content"><div class="fav-item-label">'+(item.label||'')+'</div><div class="fav-item-text">'+item.content+'</div></div><div class="fav-item-actions"><button class="fav-item-btn" onclick="copyText(''+item.content.replace(/'/g,"\'").replace(/\n/g,' ')+'',this)">Copy</button><button class="fav-item-btn remove" onclick="removeFav(''+item.content.replace(/'/g,"\'").replace(/\n/g,' ')+'',''+item.tool+'')">X</button></div>';body.appendChild(el);});}); }
 function removeFav(content,tool){saveAllFavs(getAllFavs().filter(f=>!(f.content===content&&f.tool===tool)));renderAllFavs();document.querySelectorAll('.fav-btn').forEach(btn=>{const t=btn.closest('.name-card')?.querySelector('.name-text')?.textContent;if(t===content)btn.classList.remove('saved');});}
 function clearAllFavs(){if(!confirm('Clear ALL favorites from all tools?'))return;saveAllFavs([]);document.querySelectorAll('.fav-btn').forEach(b=>b.classList.remove('saved'));renderAllFavs();showToast('All favorites cleared');}
 function copyText(text,btn){navigator.clipboard.writeText(text).then(()=>{const o=btn.textContent;btn.textContent='Done';setTimeout(()=>btn.textContent=o,1500);});}
 
 // ── Coins ─────────────────────────────────────────────────
-const COIN_COST = 1;
+const COIN_COST_PER_RESULT = 1;
 var _coins = 0;
 function updateCoinDisplay(n){_coins=n;var el=document.getElementById('coinCount');var btn=document.getElementById('coinsBtn');if(el)el.textContent=n;if(btn){if(n<=3)btn.classList.add('low');else btn.classList.remove('low');}}
 async function fetchCoins(){var local=parseInt(localStorage.getItem('phraselix_coins')||'0');updateCoinDisplay(local);try{var r=await fetch('/api/coins',{headers:{'Authorization':'Bearer '+TOKEN}});if(r.ok){var d=await r.json();if(d.coins!==undefined){localStorage.setItem('phraselix_coins',d.coins);updateCoinDisplay(d.coins);}}}catch(e){}}
-async function spendCoinsAPI(reason){try{var r=await fetch('/api/coins/spend',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN},body:JSON.stringify({amount:COIN_COST,reason:reason})});var d=await r.json();if(!r.ok)return false;updateCoinDisplay(d.coins);return true;}catch(e){return false;}}
+async function spendCoinsAPI(amount,reason){try{var r=await fetch('/api/coins/spend',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN},body:JSON.stringify({amount:amount,reason:reason})});var d=await r.json();if(!r.ok)return false;updateCoinDisplay(d.coins);return true;}catch(e){return false;}}
 async function checkCoins(){
   await fetchCoins();
-  if(_coins<COIN_COST){document.getElementById('noCoinsModal').classList.add('show');return false;}
-  var ok=await spendCoinsAPI('Username Generator');
+  var cost=COIN_COST_PER_RESULT*selectedCount;
+  if(_coins<cost){document.getElementById('noCoinsModal').classList.add('show');return false;}
+  var ok=await spendCoinsAPI(cost,'Username Generator x'+selectedCount);
   if(!ok){document.getElementById('noCoinsModal').classList.add('show');return false;}
   return true;
 }
@@ -327,8 +304,8 @@ let selectedStyle='all',selectedCount=3,isLoading=false,allItems=[];
 document.querySelectorAll('#styleRow .style-tag').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('#styleRow .style-tag').forEach(b=>b.classList.remove('active'));btn.classList.add('active');selectedStyle=btn.dataset.style;allItems=[];});});
 document.querySelectorAll('.count-btn').forEach(btn=>{btn.addEventListener('click',()=>{if(btn.classList.contains('locked')){document.getElementById('countLockedTip').classList.add('show');return;}document.querySelectorAll('.count-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');selectedCount=parseInt(btn.dataset.count);document.getElementById('countLockedTip').classList.remove('show');});});
 document.getElementById('prompt').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey))generate();});
-function buildSystemPrompt(){var t=selectedStyle,g={'short':'Max 6 chars. Single word. No separators. Examples: vexr zael noxe ryft.','multi':'2-4 words with dots or underscores. Examples: cold.signal void_pilot quiet.storm.','coined':'Invented brand-like words that never existed. Examples: veltrox phraselix nyxara.','dark':'Void ghost echo hollow decay energy. Examples: null.spectre ashen.signal errorghost.','clean':'Elegant premium timeless. Examples: celo forma auren lune kova.','abstract':'Philosophical paradoxes. Examples: false.horizon quiet_theorem observer.effect.','all':'Mix ALL styles: short punchy multi-word invented brand dark clean abstract.'};return 'You are the best username generator ever built. Generate usernames so good people ask: how is this not taken.\n\nStyle: '+t+'\nGuide: '+(g[t]||g.all)+'\n\nRULES: NEVER use numbers. NEVER use generic names like darkwolf. Each name must feel made for this specific person.\n\nRespond ONLY with valid JSON: {"items":["username1","username2"]}';}
-function buildUserMsg(prompt){return 'Person/vibe: "'+prompt+'"\nStyle: '+selectedStyle+'\n\nGenerate EXACTLY '+selectedCount+' usernames. Each must feel made for this specific person. Make them think: how is this not taken.';}
+function buildSystemPrompt(){var t=selectedStyle,g={'short':'Max 6 chars. Single word. No separators.','multi':'2-4 words with dots or underscores.','coined':'Invented brand-like words that never existed.','dark':'Void ghost echo hollow decay energy.','clean':'Elegant premium timeless.','abstract':'Philosophical paradoxes.','all':'Mix ALL styles.'};return 'You are the best username generator ever built.\n\nStyle: '+t+'\nGuide: '+(g[t]||g.all)+'\n\nRULES: NEVER use numbers. NEVER use generic names.\n\nRespond ONLY with valid JSON: {"items":["username1","username2"]}'}
+function buildUserMsg(prompt){return 'Person/vibe: "'+prompt+'"\nStyle: '+selectedStyle+'\n\nGenerate EXACTLY '+selectedCount+' usernames.'}
 async function generate(){const prompt=document.getElementById('prompt').value.trim();if(!prompt){document.getElementById('prompt').focus();return;}if(isLoading)return;hideError();if(isBadInput(prompt)){showError("Keep it clean — Phraselix isn't that kind of tool.");return;}var coinsOk=await checkCoins();if(!coinsOk)return;setLoading(true,'Crafting your names...');allItems=[];document.getElementById('results').innerHTML='';document.getElementById('btnMore').style.display='none';try{const result=await callAPI(buildSystemPrompt(),buildUserMsg(prompt));renderResults(result);document.getElementById('btnMore').style.display='block';}catch(e){showError('Something went wrong — try again.');}finally{setLoading(false);}}
 async function generateMore(){const prompt=document.getElementById('prompt').value.trim();if(!prompt||isLoading)return;var coinsOk=await checkCoins();if(!coinsOk)return;setLoading(true,'Generating more...');const extra=allItems.length?'\n\nDo NOT repeat these:\n'+allItems.slice(-20).join(', '):'';try{const result=await callAPI(buildSystemPrompt(),buildUserMsg(prompt)+extra);appendResults(result);}catch(e){showError('Something went wrong — try again.');}finally{setLoading(false);}}
 function renderResults(data){const container=document.getElementById('results');container.innerHTML='';const header=document.createElement('div');header.className='results-header';const lbl=document.createElement('div');lbl.className='results-label';lbl.textContent='Generated Names';const right=document.createElement('div');right.style.cssText='display:flex;align-items:center;gap:1rem';const shareBtn=document.createElement('button');shareBtn.textContent='Share';shareBtn.style.cssText='font-family:DM Mono,monospace;font-size:.55rem;letter-spacing:1.5px;text-transform:uppercase;padding:.25rem .7rem;border:1px solid var(--border2);border-radius:2px;background:none;color:var(--text3);cursor:pointer;transition:all .15s';shareBtn.onmouseenter=function(){this.style.borderColor='var(--accent)';this.style.color='var(--accent)';};shareBtn.onmouseleave=function(){this.style.borderColor='var(--border2)';this.style.color='var(--text3)';};shareBtn.onclick=shareResults;const countEl=document.createElement('div');countEl.className='results-count';countEl.id='itemCount';countEl.textContent='0';right.appendChild(shareBtn);right.appendChild(countEl);header.appendChild(lbl);header.appendChild(right);const grid=document.createElement('div');grid.className='names-grid';grid.id='itemsGrid';container.appendChild(header);container.appendChild(grid);const fresh=(data.items||[]).slice(0,selectedCount);allItems=fresh;fresh.forEach(item=>grid.appendChild(makeCard(selectedStyle.charAt(0).toUpperCase()+selectedStyle.slice(1),item,'type-a')));updateCount();}
