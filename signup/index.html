@@ -99,14 +99,47 @@ const app = initializeApp({
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
-function saveUser(user) {
-  localStorage.setItem('phraselix_token', 'firebase_' + user.uid);
-  localStorage.setItem('phraselix_user', JSON.stringify({
-    id: user.uid,
-    name: user.displayName || user.email.split('@')[0],
-    email: user.email,
-    avatar: user.photoURL || ''
-  }));
+async function saveUser(user) {
+  try {
+    // Exchange Firebase token for MongoDB JWT
+    const res = await fetch('/api/auth/firebase', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        uid: user.uid,
+        name: user.displayName || user.email.split('@')[0],
+        email: user.email
+      })
+    });
+    const data = await res.json();
+    if (data.token) {
+      localStorage.setItem('phraselix_token', data.token);
+      localStorage.setItem('phraselix_user', JSON.stringify({
+        id: data.user.id,
+        name: data.user.name,
+        email: data.user.email,
+        avatar: user.photoURL || ''
+      }));
+    } else {
+      // Fallback
+      localStorage.setItem('phraselix_token', 'firebase_' + user.uid);
+      localStorage.setItem('phraselix_user', JSON.stringify({
+        id: user.uid,
+        name: user.displayName || user.email.split('@')[0],
+        email: user.email,
+        avatar: user.photoURL || ''
+      }));
+    }
+  } catch(e) {
+    // Fallback if server unreachable
+    localStorage.setItem('phraselix_token', 'firebase_' + user.uid);
+    localStorage.setItem('phraselix_user', JSON.stringify({
+      id: user.uid,
+      name: user.displayName || user.email.split('@')[0],
+      email: user.email,
+      avatar: user.photoURL || ''
+    }));
+  }
 }
 
 window.googleSignUp = async function() {
@@ -114,7 +147,7 @@ window.googleSignUp = async function() {
   btn.disabled = true; btn.textContent = 'Opening Google...';
   try {
     const result = await signInWithPopup(auth, provider);
-    saveUser(result.user);
+    await saveUser(result.user);
     showToast('Welcome to Phraselix! 🎉');
     setTimeout(() => window.location.href = '/', 1000);
   } catch(e) {
