@@ -165,13 +165,13 @@ body{cursor:none;}
     </div>
   </header>
   <div class="hero-tagline">
-    <div class="tagline-text" id="taglineText">Hook them in the first <em>you.</em></div>
+    <div class="tagline-text" id="taglineText">A bio that actually sounds like <em>you.</em></div>
     <div class="tagline-meta">ps — Phraselix keeps growing</div>
   </div>
   <div class="shared-banner" id="sharedBanner">Someone shared these with you</div>
   <section class="input-section">
     <div class="prompt-label">What is your video about?</div>
-    <textarea id="prompt" rows="4" maxlength="400" placeholder="e.g. fitness creator, loves travel, based in NYC, posts daily workouts..."></textarea>
+    <textarea id="prompt" rows="4" maxlength="400" placeholder="e.g. I tried waking up at 5am every day for 30 days..."></textarea>
     <div class="count-section">
       <div class="count-hint">How many <span>— pick a number</span></div>
       <div class="count-row">
@@ -186,10 +186,11 @@ body{cursor:none;}
     <div class="style-section">
       <div class="style-hint">Tone <span>— pick one</span></div>
       <div class="style-row" id="styleRow">
-        <button class="style-tag active" data-style="professional">Professional</button>
-        <button class="style-tag" data-style="witty">Witty</button>
-        <button class="style-tag" data-style="minimal">Minimal</button>
-        <button class="style-tag" data-style="bold">Bold</button>
+        <button class="style-tag active" data-style="curiosity">Curiosity Gap</button>
+        <button class="style-tag" data-style="story">Story Open</button>
+        <button class="style-tag" data-style="bold">Bold Claim</button>
+        <button class="style-tag" data-style="question">Question</button>
+        <button class="style-tag" data-style="contrast">Contrast</button>
       </div>
     </div>
     <div class="error-msg" id="errorMsg"></div>
@@ -200,7 +201,7 @@ body{cursor:none;}
   </section>
   <div class="loading" id="loading">
     <div class="loader"><span></span><span></span><span></span></div>
-    <span id="loadingText">Writing your hook...</span>
+    <span id="loadingText">Writing your bio...</span>
   </div>
   <div id="results"></div>
   <footer>
@@ -296,15 +297,15 @@ function removeFav(content,tool){saveAllFavs(getAllFavs().filter(f=>!(f.content=
 function clearAllFavs(){if(!confirm('Clear ALL favorites from all tools?'))return;saveAllFavs([]);document.querySelectorAll('.fav-btn').forEach(b=>b.classList.remove('saved'));renderAllFavs();showToast('All favorites cleared');}
 function copyText(text,btn){navigator.clipboard.writeText(text).then(()=>{const o=btn.textContent;btn.textContent='Done';setTimeout(()=>btn.textContent=o,1500);});}
 
-const taglines=['Hook them in the first <em>you.</em>','The opening line that stops the <em>yourself.</em>','Your profile. Your vibe. Your <em>words.</em>','One sentence that makes people <em>follow.</em>'];
+const taglines=['Hook them in the first <em>3 seconds.</em>','The opening line that stops the <em>scroll.</em>','Start strong or lose them <em>forever.</em>'];
 document.getElementById('taglineText').innerHTML=taglines[Math.floor(Math.random()*taglines.length)];
-let selectedStyle='professional',selectedCount=3,isLoading=false,allItems=[];
+let selectedStyle='curiosity',selectedCount=3,isLoading=false,allItems=[];
 document.querySelectorAll('#styleRow .style-tag').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('#styleRow .style-tag').forEach(b=>b.classList.remove('active'));btn.classList.add('active');selectedStyle=btn.dataset.style;allItems=[];});});
 document.querySelectorAll('.count-btn').forEach(btn=>{btn.addEventListener('click',()=>{if(btn.classList.contains('locked')){document.getElementById('countLockedTip').classList.add('show');return;}document.querySelectorAll('.count-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');selectedCount=parseInt(btn.dataset.count);document.getElementById('countLockedTip').classList.remove('show');});});
 document.getElementById('prompt').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey))generate();});
 
-function buildSystemPrompt(){return `You write short, punchy bios that feel human and authentic. No cringe, no buzzwords.\n\nTone: ${selectedStyle}\n- professional: Polished, still sounds like them.\n- witty: Dry, self-aware.\n- minimal: Fewest words, maximum punch.\n- bold: Direct, unapologetic.\n\nNEVER write "Passionate about X".\n\nRespond ONLY with valid JSON: {"items":["bio1","bio2"]}`;}
-function buildUserMsg(prompt){return `Person/Brand: "${prompt}"\nTone: ${selectedStyle}\n\nWrite EXACTLY ${selectedCount} bios. Each completely different angle.`;}
+function buildSystemPrompt(){var t=selectedStyle,g={'curiosity':'Open a loop the viewer needs to close. Tease without revealing.','story':'Drop straight into a moment. Present tense action-first.','bold':'Make a claim that stops them. Confident maybe provocative.','question':'Ask something they instantly relate to or want answered.','contrast':'Set up two opposites for tension.'};return 'You write the opening 1-3 sentences of a video script that make people stay and watch.\n\nStyle: '+t+'\nGuide: '+(g[t]||g.curiosity)+'\n\nRules: Max 3 sentences. Spoken language only. NEVER say: In this video I will. No fake enthusiasm.\n\nRespond ONLY with valid JSON: {"items":["hook1","hook2"]}';}
+function buildUserMsg(prompt){return 'Video: "'+prompt+'"\nStyle: '+selectedStyle+'\n\nWrite EXACTLY '+selectedCount+' opening hooks. Each a completely different approach. Max 3 sentences each.';}
 
 async function generate(){const prompt=document.getElementById('prompt').value.trim();if(!prompt){document.getElementById('prompt').focus();return;}if(isLoading)return;hideError();if(isBadInput(prompt)){showError("Keep it clean — Phraselix isn't that kind of tool.");return;}setLoading(true,'Writing your hook...');allItems=[];document.getElementById('results').innerHTML='';document.getElementById('btnMore').style.display='none';try{const result=await callAPI(buildSystemPrompt(),buildUserMsg(prompt));renderResults(result);document.getElementById('btnMore').style.display='block';}catch(e){showError('Something went wrong — try again.');}finally{setLoading(false);}}
 async function generateMore(){const prompt=document.getElementById('prompt').value.trim();if(!prompt||isLoading)return;setLoading(true,'Generating more...');const extra=allItems.length?'\n\nDo NOT repeat these:\n'+allItems.slice(-20).join(', '):'';try{const result=await callAPI(buildSystemPrompt(),buildUserMsg(prompt)+extra);appendResults(result);}catch(e){showError('Something went wrong — try again.');}finally{setLoading(false);}}
