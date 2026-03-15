@@ -165,13 +165,13 @@ body{cursor:none;}
     </div>
   </header>
   <div class="hero-tagline">
-    <div class="tagline-text" id="taglineText">Hashtags that actually <em>you.</em></div>
+    <div class="tagline-text" id="taglineText">A bio that actually sounds like <em>you.</em></div>
     <div class="tagline-meta">ps — Phraselix keeps growing</div>
   </div>
   <div class="shared-banner" id="sharedBanner">Someone shared these with you</div>
   <section class="input-section">
     <div class="prompt-label">What is your post or video about?</div>
-    <textarea id="prompt" rows="4" maxlength="400" placeholder="e.g. fitness creator, loves travel, based in NYC, posts daily workouts..."></textarea>
+    <textarea id="prompt" rows="4" maxlength="400" placeholder="e.g. gym workout, back day, powerlifting, strength training..."></textarea>
     <div class="count-section">
       <div class="count-hint">How many <span>— pick a number</span></div>
       <div class="count-row">
@@ -186,10 +186,10 @@ body{cursor:none;}
     <div class="style-section">
       <div class="style-hint">Tone <span>— pick one</span></div>
       <div class="style-row" id="styleRow">
-        <button class="style-tag active" data-style="professional">Professional</button>
-        <button class="style-tag" data-style="witty">Witty</button>
-        <button class="style-tag" data-style="minimal">Minimal</button>
-        <button class="style-tag" data-style="bold">Bold</button>
+        <button class="style-tag active" data-style="instagram">Instagram</button>
+        <button class="style-tag" data-style="tiktok">TikTok</button>
+        <button class="style-tag" data-style="youtube">YouTube</button>
+        <button class="style-tag" data-style="twitter">X / Twitter</button>
       </div>
     </div>
     <div class="error-msg" id="errorMsg"></div>
@@ -200,7 +200,7 @@ body{cursor:none;}
   </section>
   <div class="loading" id="loading">
     <div class="loader"><span></span><span></span><span></span></div>
-    <span id="loadingText">Finding your hashtags...</span>
+    <span id="loadingText">Writing your bio...</span>
   </div>
   <div id="results"></div>
   <footer>
@@ -296,15 +296,15 @@ function removeFav(content,tool){saveAllFavs(getAllFavs().filter(f=>!(f.content=
 function clearAllFavs(){if(!confirm('Clear ALL favorites from all tools?'))return;saveAllFavs([]);document.querySelectorAll('.fav-btn').forEach(b=>b.classList.remove('saved'));renderAllFavs();showToast('All favorites cleared');}
 function copyText(text,btn){navigator.clipboard.writeText(text).then(()=>{const o=btn.textContent;btn.textContent='Done';setTimeout(()=>btn.textContent=o,1500);});}
 
-const taglines=['Hashtags that actually <em>you.</em>','Stop guessing hashtags. Get ones that <em>yourself.</em>','Your profile. Your vibe. Your <em>words.</em>','One sentence that makes people <em>follow.</em>'];
+const taglines=['Hashtags that actually <em>get views.</em>','Stop guessing hashtags. Get ones that <em>work.</em>','The right tags for the right <em>audience.</em>'];
 document.getElementById('taglineText').innerHTML=taglines[Math.floor(Math.random()*taglines.length)];
-let selectedStyle='professional',selectedCount=3,isLoading=false,allItems=[];
+let selectedStyle='instagram',selectedCount=3,isLoading=false,allItems=[];
 document.querySelectorAll('#styleRow .style-tag').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('#styleRow .style-tag').forEach(b=>b.classList.remove('active'));btn.classList.add('active');selectedStyle=btn.dataset.style;allItems=[];});});
 document.querySelectorAll('.count-btn').forEach(btn=>{btn.addEventListener('click',()=>{if(btn.classList.contains('locked')){document.getElementById('countLockedTip').classList.add('show');return;}document.querySelectorAll('.count-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');selectedCount=parseInt(btn.dataset.count);document.getElementById('countLockedTip').classList.remove('show');});});
 document.getElementById('prompt').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey))generate();});
 
-function buildSystemPrompt(){return `You write short, punchy bios that feel human and authentic. No cringe, no buzzwords.\n\nTone: ${selectedStyle}\n- professional: Polished, still sounds like them.\n- witty: Dry, self-aware.\n- minimal: Fewest words, maximum punch.\n- bold: Direct, unapologetic.\n\nNEVER write "Passionate about X".\n\nRespond ONLY with valid JSON: {"items":["bio1","bio2"]}`;}
-function buildUserMsg(prompt){return `Person/Brand: "${prompt}"\nTone: ${selectedStyle}\n\nWrite EXACTLY ${selectedCount} bios. Each completely different angle.`;}
+function buildSystemPrompt(){var t=selectedStyle,g={'instagram':'10-15 tags. Mix mega large medium niche. Include # symbol.','tiktok':'5-8 tags. Mix trending and niche. Include # symbol.','youtube':'8-12 keyword tags WITHOUT # symbol. Think SEO.','twitter':'2-3 tags max. Most relevant. Include # symbol.'};return 'You generate strategic hashtag sets for social media.\n\nPlatform: '+t+'\nRules: '+(g[t]||g.instagram)+'\n\nEach item is a full set as one string with spaces between tags. Never suggest banned tags.\n\nRespond ONLY with valid JSON: {"items":["#tag1 #tag2 #tag3"]}';}
+function buildUserMsg(prompt){return 'Content: "'+prompt+'"\nPlatform: '+selectedStyle+'\n\nGenerate EXACTLY '+selectedCount+' hashtag sets. Each with a slightly different strategy.';}
 
 async function generate(){const prompt=document.getElementById('prompt').value.trim();if(!prompt){document.getElementById('prompt').focus();return;}if(isLoading)return;hideError();if(isBadInput(prompt)){showError("Keep it clean — Phraselix isn't that kind of tool.");return;}setLoading(true,'Finding your hashtags...');allItems=[];document.getElementById('results').innerHTML='';document.getElementById('btnMore').style.display='none';try{const result=await callAPI(buildSystemPrompt(),buildUserMsg(prompt));renderResults(result);document.getElementById('btnMore').style.display='block';}catch(e){showError('Something went wrong — try again.');}finally{setLoading(false);}}
 async function generateMore(){const prompt=document.getElementById('prompt').value.trim();if(!prompt||isLoading)return;setLoading(true,'Generating more...');const extra=allItems.length?'\n\nDo NOT repeat these:\n'+allItems.slice(-20).join(', '):'';try{const result=await callAPI(buildSystemPrompt(),buildUserMsg(prompt)+extra);appendResults(result);}catch(e){showError('Something went wrong — try again.');}finally{setLoading(false);}}
