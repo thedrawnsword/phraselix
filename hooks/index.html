@@ -317,52 +317,61 @@ function clearAllFavs(){if(!confirm('Clear ALL favorites from all tools?'))retur
 function copyText(text,btn){navigator.clipboard.writeText(text).then(()=>{const o=btn.textContent;btn.textContent='Done';setTimeout(()=>btn.textContent=o,1500);});}
 
 
+
+
 // ── Coins ─────────────────────────────────────────────────
-const COIN_COST=1;
-const COINS_KEY='phraselix_coins';
-const HIST_KEY='phraselix_coin_history';
-function getCoins(){return parseInt(localStorage.getItem(COINS_KEY)||'0');}
-function updateCoinDisplay(){
-  var c=getCoins(),el=document.getElementById('coinCount'),btn=document.getElementById('coinsBtn');
-  if(el)el.textContent=c;
-  if(btn){if(c<=3)btn.classList.add('low');else btn.classList.remove('low');}
+const COIN_COST = 1;
+var _coins = 0;
+
+function updateCoinDisplay(n) {
+  _coins = n;
+  var el = document.getElementById('coinCount');
+  var btn = document.getElementById('coinsBtn');
+  if (el) el.textContent = n;
+  if (btn) { if (n <= 3) btn.classList.add('low'); else btn.classList.remove('low'); }
 }
-function spendCoins(n){
-  var newVal=Math.max(0,getCoins()-n);
-  localStorage.setItem(COINS_KEY,newVal);
-  var h=JSON.parse(localStorage.getItem(HIST_KEY)||'[]');
-  h.unshift({amount:'-'+n,reason:'Title Generator',time:Date.now()});
-  if(h.length>50)h.pop();
-  localStorage.setItem(HIST_KEY,JSON.stringify(h));
-  updateCoinDisplay();
+
+async function fetchCoins() {
+  try {
+    var r = await fetch('/api/coins', { headers: { 'Authorization': 'Bearer ' + TOKEN } });
+    var d = await r.json();
+    if (d.coins !== undefined) updateCoinDisplay(d.coins);
+  } catch(e) {}
 }
-function hasEnoughCoins(){return getCoins()>=COIN_COST;}
-function checkCoins(){
-  if(!hasEnoughCoins()){
+
+async function spendCoinsAPI(reason) {
+  try {
+    var r = await fetch('/api/coins/spend', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + TOKEN },
+      body: JSON.stringify({ amount: COIN_COST, reason: reason })
+    });
+    var d = await r.json();
+    if (!r.ok) return false;
+    updateCoinDisplay(d.coins);
+    return true;
+  } catch(e) { return false; }
+}
+
+async function checkCoins() {
+  if (_coins < COIN_COST) {
+    // Refresh from server first
+    await fetchCoins();
+  }
+  if (_coins < COIN_COST) {
     document.getElementById('noCoinsModal').classList.add('show');
     return false;
   }
-  spendCoins(COIN_COST);
+  var ok = await spendCoinsAPI('Title Generator');
+  if (!ok) {
+    document.getElementById('noCoinsModal').classList.add('show');
+    return false;
+  }
   return true;
 }
-updateCoinDisplay();
-// Auto top-up to 11 every 10 min
-(function autoTop(){
-  var K='phraselix_last_claim',FREE=11,INT=10*60*1000;
-  function run(){
-    var now=Date.now(),last=parseInt(localStorage.getItem(K)||'0');
-    if(now-last>=INT){
-      var cur=getCoins();
-      if(cur<FREE){
-        localStorage.setItem(COINS_KEY,cur+(FREE-cur));
-        updateCoinDisplay();
-      }
-      localStorage.setItem(K,now);
-    }
-  }
-  run();setInterval(run,10000);
-})();
 
+fetchCoins();
+setInterval(fetchCoins, 30000);
 const taglines=['Titles that make people <em>stop.</em>','Your video deserves a title that <em>hits.</em>','Stop using boring titles. Get ones that <em>click.</em>'];
 document.getElementById('taglineText').innerHTML=taglines[Math.floor(Math.random()*taglines.length)];
 let selectedStyle='viral',selectedCount=3,isLoading=false,allItems=[];
@@ -373,8 +382,8 @@ document.getElementById('prompt').addEventListener('keydown',e=>{if(e.key==='Ent
 function buildSystemPrompt(){var t=selectedStyle,g={'viral':'High stakes curiosity gap open loops. Use active verbs.','funny':'Relatable self-aware absurd. Sound like texting a friend.','emotional':'Match emotion. Pride tension sacrifice.','informative':'Lead with result. Front-load keyword. Use numbers.','controversial':'Challenge a common belief. Say what nobody says out loud.'};return 'You write video titles that get clicks.\n\nTone: '+t+'\nGuide: '+(g[t]||g.viral)+'\n\nNEVER: fake hype like INSANE or POV unless literally POV or Wikipedia descriptions.\n\nRespond ONLY with valid JSON: {"items":["title1","title2"]}';}
 function buildUserMsg(prompt){return 'Video: "'+prompt+'"\nTone: '+selectedStyle+'\n\nWrite EXACTLY '+selectedCount+' titles. Each must be structurally different.';}
 
-async function generate(){const prompt=document.getElementById('prompt').value.trim();if(!prompt){document.getElementById('prompt').focus();return;}if(isLoading)return;hideError();if(isBadInput(prompt)){showError("Keep it clean — Phraselix isn't that kind of tool.");return;}if(!checkCoins())return;setLoading(true,'Crafting your titles...');allItems=[];document.getElementById('results').innerHTML='';document.getElementById('btnMore').style.display='none';try{const result=await callAPI(buildSystemPrompt(),buildUserMsg(prompt));renderResults(result);document.getElementById('btnMore').style.display='block';}catch(e){showError('Something went wrong — try again.');}finally{setLoading(false);}}
-async function generateMore(){const prompt=document.getElementById('prompt').value.trim();if(!prompt||isLoading)return;setLoading(true,'Generating more...');const extra=allItems.length?'\n\nDo NOT repeat these:\n'+allItems.slice(-20).join(', '):'';try{const result=await callAPI(buildSystemPrompt(),buildUserMsg(prompt)+extra);appendResults(result);}catch(e){showError('Something went wrong — try again.');}finally{setLoading(false);}}
+async function generate(){const prompt=document.getElementById('prompt').value.trim();if(!prompt){document.getElementById('prompt').focus();return;}if(isLoading)return;hideError();if(isBadInput(prompt)){showError("Keep it clean — Phraselix isn't that kind of tool.");return;}var coinsOk=await checkCoins();if(!coinsOk)return;setLoading(true,'Crafting your titles...');allItems=[];document.getElementById('results').innerHTML='';document.getElementById('btnMore').style.display='none';try{const result=await callAPI(buildSystemPrompt(),buildUserMsg(prompt));renderResults(result);document.getElementById('btnMore').style.display='block';}catch(e){showError('Something went wrong — try again.');}finally{setLoading(false);}}
+async function generateMore(){const prompt=document.getElementById('prompt').value.trim();if(!prompt||isLoading)return;var coinsOk=await checkCoins();if(!coinsOk)return;setLoading(true,'Generating more...');const extra=allItems.length?'\n\nDo NOT repeat these:\n'+allItems.slice(-20).join(', '):'';try{const result=await callAPI(buildSystemPrompt(),buildUserMsg(prompt)+extra);appendResults(result);}catch(e){showError('Something went wrong — try again.');}finally{setLoading(false);}}
 
 function renderResults(data){const container=document.getElementById('results');container.innerHTML='';const header=document.createElement('div');header.className='results-header';const lbl=document.createElement('div');lbl.className='results-label';lbl.textContent='Generated Titles';const right=document.createElement('div');right.style.cssText='display:flex;align-items:center;gap:1rem';const shareBtn=document.createElement('button');shareBtn.textContent='Share';shareBtn.style.cssText='font-family:DM Mono,monospace;font-size:.55rem;letter-spacing:1.5px;text-transform:uppercase;padding:.25rem .7rem;border:1px solid var(--border2);border-radius:2px;background:none;color:var(--text3);cursor:pointer;transition:all .15s';shareBtn.onmouseenter=function(){this.style.borderColor='var(--accent)';this.style.color='var(--accent)';};shareBtn.onmouseleave=function(){this.style.borderColor='var(--border2)';this.style.color='var(--text3)';};shareBtn.onclick=shareResults;const countEl=document.createElement('div');countEl.className='results-count';countEl.id='itemCount';countEl.textContent='0';right.appendChild(shareBtn);right.appendChild(countEl);header.appendChild(lbl);header.appendChild(right);const grid=document.createElement('div');grid.className='names-grid';grid.id='itemsGrid';container.appendChild(header);container.appendChild(grid);const fresh=(data.items||[]).slice(0,selectedCount);allItems=fresh;fresh.forEach(item=>grid.appendChild(makeCard(selectedStyle.charAt(0).toUpperCase()+selectedStyle.slice(1),item,'type-a')));updateCount();}
 function appendResults(data){const grid=document.getElementById('itemsGrid');if(!grid){renderResults(data);return;}const fresh=(data.items||[]).slice(0,selectedCount).filter(t=>!allItems.includes(t));allItems=[...allItems,...fresh];[...fresh].reverse().forEach(item=>{grid.insertBefore(makeCard(selectedStyle.charAt(0).toUpperCase()+selectedStyle.slice(1),item,'type-a'),grid.firstChild);});updateCount();}
