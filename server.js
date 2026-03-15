@@ -6,10 +6,10 @@ const jwt = require('jsonwebtoken');
 
 const app = express();
 app.use(express.json());
-app.use(express.static(path.join(__dirname)));
+app.use(express.static(path.join(__dirname, 'public')));
 
-const MONGO_URI = 'mongodb+srv://thedrawnsword:KvGhP0nJxMsz8mQw@phraselix.fskjirp.mongodb.net/phraselix?appName=Phraselix';
-const JWT_SECRET = 'phraselix_jwt_secret_2024_change_in_production';
+const MONGO_URI = process.env.MONGO_URI;
+const JWT_SECRET = process.env.JWT_SECRET;
 
 mongoose.connect(MONGO_URI).then(() => console.log('MongoDB connected')).catch(err => console.error('MongoDB error:', err));
 
@@ -26,7 +26,7 @@ const userSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.models.User || mongoose.model('User', userSchema);
 
 function authMiddleware(req, res, next) {
   const token = req.headers.authorization?.split(' ')[1];
@@ -65,7 +65,7 @@ app.post('/api/auth/signin', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// Firebase Google sign in
+// Firebase Google Sign In
 app.post('/api/auth/firebase', async (req, res) => {
   try {
     const { uid, name, email } = req.body;
@@ -79,7 +79,7 @@ app.post('/api/auth/firebase', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// Get coins
+// Get Coins
 app.get('/api/coins', authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('coins coinHistory lastFreeCoins');
@@ -103,7 +103,7 @@ app.get('/api/coins', authMiddleware, async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// Spend coins
+// Spend Coins
 app.post('/api/coins/spend', authMiddleware, async (req, res) => {
   try {
     const { amount, reason } = req.body;
@@ -119,7 +119,7 @@ app.post('/api/coins/spend', authMiddleware, async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// Add coins (purchases)
+// Add Coins
 app.post('/api/coins/add', authMiddleware, async (req, res) => {
   try {
     const { amount, reason } = req.body;
@@ -170,8 +170,7 @@ const fileMap = {
   '/login': 'login/index.html', '/signup': 'signup/index.html', '/coins': 'coins/index.html'
 };
 Object.keys(fileMap).forEach(route => {
-  app.get(route, (req, res) => res.sendFile(path.join(__dirname, fileMap[route])));
+  app.get(route, (req, res) => res.sendFile(path.join(__dirname, 'public', fileMap[route])));
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Phraselix running on port ${PORT}`));
+module.exports = app;
