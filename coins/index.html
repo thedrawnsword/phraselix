@@ -173,119 +173,75 @@ const TOKEN = localStorage.getItem('phraselix_token');
 const USER = (()=>{try{return JSON.parse(localStorage.getItem('phraselix_user'));}catch{return null;}})();
 if(!TOKEN||!USER){window.location.href='/login';}
 
-// ── Coins System ──────────────────────────────────────────
-const COINS_KEY = 'phraselix_coins';
-const HISTORY_KEY = 'phraselix_coin_history';
-const FREE_CLAIM_KEY = 'phraselix_last_claim';
-const FREE_AMOUNT = 11;
-const FREE_INTERVAL = 10 * 60 * 1000; // 10 minutes in ms
+let nextTopupMs = 0;
 
-function getCoins(){return parseInt(localStorage.getItem(COINS_KEY)||'0');}
-function setCoins(n){localStorage.setItem(COINS_KEY,n);updateBalanceUI();}
-function addCoins(n,reason){setCoins(getCoins()+n);addHistory('+'+n,reason);}
-function spendCoins(n,reason){setCoins(Math.max(0,getCoins()-n));addHistory('-'+n,reason);}
-
-function getHistory(){try{return JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');}catch{return[];}}
-function addHistory(amount,reason){
-  const history=getHistory();
-  history.unshift({amount,reason,time:Date.now()});
-  if(history.length>50)history.pop();
-  localStorage.setItem(HISTORY_KEY,JSON.stringify(history));
-  renderHistory();
+async function loadCoins() {
+  try {
+    const r = await fetch('/api/coins', { headers: { 'Authorization': 'Bearer ' + TOKEN } });
+    if (!r.ok) { if (r.status === 401) { window.location.href = '/login'; return; } }
+    const d = await r.json();
+    if (d.coins !== undefined) {
+      localStorage.setItem('phraselix_coins', d.coins);
+      document.getElementById('balanceAmount').textContent = d.coins;
+      document.getElementById('headerCoins').textContent = d.coins;
+      nextTopupMs = d.nextTopupMs || 0;
+    }
+    renderHistory(d.history || []);
+  } catch(e) { console.error(e); }
 }
 
-function updateBalanceUI(){
-  const coins=getCoins();
-  document.getElementById('balanceAmount').textContent=coins;
-  document.getElementById('headerCoins').textContent=coins;
-}
-
-function renderHistory(){
-  const history=getHistory();
-  const list=document.getElementById('historyList');
-  if(!history.length){
-    list.innerHTML='<div class="history-empty">No transactions yet.<br>Claim your free coins to get started!</div>';
+function renderHistory(history) {
+  const list = document.getElementById('historyList');
+  if (!history.length) {
+    list.innerHTML = '<div class="history-empty">No transactions yet.</div>';
     return;
   }
-  list.innerHTML='';
-  history.forEach(item=>{
-    const el=document.createElement('div');
-    el.className='history-item';
-    const isPlus=item.amount.startsWith('+');
-    const timeAgo=getTimeAgo(item.time);
-    el.innerHTML='<div class="history-left"><div class="history-action">'+item.reason+'</div><div class="history-time">'+timeAgo+'</div></div><div class="history-amount '+(isPlus?'plus':'minus')+'">'+item.amount+' 🪙</div>';
+  list.innerHTML = '';
+  history.forEach(item => {
+    const el = document.createElement('div');
+    el.className = 'history-item';
+    const isPlus = item.amount > 0;
+    const display = (isPlus ? '+' : '') + item.amount;
+    const timeAgo = getTimeAgo(new Date(item.date));
+    el.innerHTML = '<div class="history-left"><div class="history-action">'+item.reason+'</div><div class="history-time">'+timeAgo+'</div></div><div class="history-amount '+(isPlus?'plus':'minus')+'">'+display+' 🪙</div>';
     list.appendChild(el);
   });
 }
 
-function getTimeAgo(ts){
-  const diff=Date.now()-ts;
-  const mins=Math.floor(diff/60000);
-  const hrs=Math.floor(diff/3600000);
-  const days=Math.floor(diff/86400000);
-  if(mins<1)return 'Just now';
-  if(mins<60)return mins+' min ago';
-  if(hrs<24)return hrs+' hr ago';
-  return days+' day ago';
+function getTimeAgo(date) {
+  const diff = Date.now() - date.getTime();
+  const mins = Math.floor(diff/60000);
+  const hrs = Math.floor(diff/3600000);
+  const days = Math.floor(diff/86400000);
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return mins + ' min ago';
+  if (hrs < 24) return hrs + ' hr ago';
+  return days + ' day ago';
 }
 
-// ── Auto coins ────────────────────────────────────────────
-function getLastClaim(){return parseInt(localStorage.getItem(FREE_CLAIM_KEY)||'0');}
-
-function checkAndAutoTopup(){
-  const now=Date.now();
-  const last=getLastClaim();
-  if(now-last>=FREE_INTERVAL){
-    const current=getCoins();
-    if(current<FREE_AMOUNT){
-      const toAdd=FREE_AMOUNT-current;
-      localStorage.setItem(FREE_CLAIM_KEY,now);
-      addCoins(toAdd,'Auto top-up to 11 coins');
-      showToast('🎁 Coins topped up to 11!');
-    } else {
-      // Just update the last claim time so timer resets
-      localStorage.setItem(FREE_CLAIM_KEY,now);
-    }
-  }
-  updateTimerUI();
-}
-
-function updateTimerUI(){
-  const now=Date.now();
-  const last=getLastClaim();
-  const diff=FREE_INTERVAL-(now-last);
-  const timer=document.getElementById('freeTimer');
-  if(diff<=0){
-    timer.textContent='Topping up now...';
-    timer.style.color='var(--accent)';
+function updateTimerUI() {
+  const timer = document.getElementById('freeTimer');
+  if (nextTopupMs <= 0) {
+    timer.textContent = 'Topping up on next visit...';
+    timer.style.color = 'var(--accent)';
   } else {
-    const mins=Math.floor(diff/60000);
-    const secs=Math.floor((diff%60000)/1000);
-    timer.textContent='Next top-up in: '+mins+'m '+secs+'s';
-    timer.style.color='var(--text3)';
+    nextTopupMs = Math.max(0, nextTopupMs - 1000);
+    const mins = Math.floor(nextTopupMs / 60000);
+    const secs = Math.floor((nextTopupMs % 60000) / 1000);
+    timer.textContent = 'Next top-up in: ' + mins + 'm ' + secs + 's';
+    timer.style.color = 'var(--text3)';
   }
 }
 
-// Check every second
-setInterval(()=>{checkAndAutoTopup();}, 1000);
-checkAndAutoTopup();
-
-// ── Buy coins (placeholder for payment) ──────────────────
-function buyCoins(amount, price){
+function buyCoins(amount, price) {
   showToast('Payment system coming soon! 🚀');
-  // TODO: integrate payment (Stripe, etc.)
-}
-
-// ── Init ──────────────────────────────────────────────────
-updateBalanceUI();
-renderHistory();
-
-// If first time, give welcome coins
-if(!localStorage.getItem(FREE_CLAIM_KEY) && getCoins()===0){
-  // Don't auto-claim, let them click
 }
 
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+
+loadCoins();
+setInterval(loadCoins, 30000);
+setInterval(updateTimerUI, 1000);
 
 const cursor=document.getElementById('cursor');
 const ring=document.getElementById('cursorRing');
