@@ -134,7 +134,7 @@ app.post('/api/generate', async (req, res) => {
 });
 
 // ── Page Routes ──────────────────────────────────────────
-const pages = ['/', '/username', '/bio', '/caption', '/hashtag', '/hooks', '/scripthook', '/ideas', '/login', '/signup'];
+const pages = ['/', '/username', '/bio', '/caption', '/hashtag', '/hooks', '/scripthook', '/ideas', '/login', '/signup', '/coins'];
 const fileMap = {
   '/': 'index.html',
   '/username': 'username/index.html',
@@ -145,7 +145,8 @@ const fileMap = {
   '/scripthook': 'scripthook/index.html',
   '/ideas': 'ideas/index.html',
   '/login': 'login/index.html',
-  '/signup': 'signup/index.html'
+  '/signup': 'signup/index.html',
+  '/coins': 'coins/index.html'
 };
 
 pages.forEach(route => {
