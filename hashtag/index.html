@@ -315,6 +315,53 @@ function removeFav(content,tool){saveAllFavs(getAllFavs().filter(f=>!(f.content=
 function clearAllFavs(){if(!confirm('Clear ALL favorites from all tools?'))return;saveAllFavs([]);document.querySelectorAll('.fav-btn').forEach(b=>b.classList.remove('saved'));renderAllFavs();showToast('All favorites cleared');}
 function copyText(text,btn){navigator.clipboard.writeText(text).then(()=>{const o=btn.textContent;btn.textContent='Done';setTimeout(()=>btn.textContent=o,1500);});}
 
+
+// ── Coins ─────────────────────────────────────────────────
+const COIN_COST=1;
+const COINS_KEY='phraselix_coins';
+const HIST_KEY='phraselix_coin_history';
+function getCoins(){return parseInt(localStorage.getItem(COINS_KEY)||'0');}
+function updateCoinDisplay(){
+  var c=getCoins(),el=document.getElementById('coinCount'),btn=document.getElementById('coinsBtn');
+  if(el)el.textContent=c;
+  if(btn){if(c<=3)btn.classList.add('low');else btn.classList.remove('low');}
+}
+function spendCoins(n){
+  var newVal=Math.max(0,getCoins()-n);
+  localStorage.setItem(COINS_KEY,newVal);
+  var h=JSON.parse(localStorage.getItem(HIST_KEY)||'[]');
+  h.unshift({amount:'-'+n,reason:'Hashtag Generator',time:Date.now()});
+  if(h.length>50)h.pop();
+  localStorage.setItem(HIST_KEY,JSON.stringify(h));
+  updateCoinDisplay();
+}
+function hasEnoughCoins(){return getCoins()>=COIN_COST;}
+function checkCoins(){
+  if(!hasEnoughCoins()){
+    document.getElementById('noCoinsModal').classList.add('show');
+    return false;
+  }
+  spendCoins(COIN_COST);
+  return true;
+}
+updateCoinDisplay();
+// Auto top-up to 11 every 10 min
+(function autoTop(){
+  var K='phraselix_last_claim',FREE=11,INT=10*60*1000;
+  function run(){
+    var now=Date.now(),last=parseInt(localStorage.getItem(K)||'0');
+    if(now-last>=INT){
+      var cur=getCoins();
+      if(cur<FREE){
+        localStorage.setItem(COINS_KEY,cur+(FREE-cur));
+        updateCoinDisplay();
+      }
+      localStorage.setItem(K,now);
+    }
+  }
+  run();setInterval(run,10000);
+})();
+
 const taglines=['Hashtags that actually <em>get views.</em>','Stop guessing hashtags. Get ones that <em>work.</em>','The right tags for the right <em>audience.</em>'];
 document.getElementById('taglineText').innerHTML=taglines[Math.floor(Math.random()*taglines.length)];
 let selectedStyle='instagram',selectedCount=3,isLoading=false,allItems=[];
@@ -325,7 +372,7 @@ document.getElementById('prompt').addEventListener('keydown',e=>{if(e.key==='Ent
 function buildSystemPrompt(){var t=selectedStyle,g={'instagram':'10-15 tags. Mix mega large medium niche. Include # symbol.','tiktok':'5-8 tags. Mix trending and niche. Include # symbol.','youtube':'8-12 keyword tags WITHOUT # symbol. Think SEO.','twitter':'2-3 tags max. Most relevant. Include # symbol.'};return 'You generate strategic hashtag sets for social media.\n\nPlatform: '+t+'\nRules: '+(g[t]||g.instagram)+'\n\nEach item is a full set as one string with spaces between tags. Never suggest banned tags.\n\nRespond ONLY with valid JSON: {"items":["#tag1 #tag2 #tag3"]}';}
 function buildUserMsg(prompt){return 'Content: "'+prompt+'"\nPlatform: '+selectedStyle+'\n\nGenerate EXACTLY '+selectedCount+' hashtag sets. Each with a slightly different strategy.';}
 
-async function generate(){const prompt=document.getElementById('prompt').value.trim();if(!prompt){document.getElementById('prompt').focus();return;}if(isLoading)return;hideError();if(isBadInput(prompt)){showError("Keep it clean — Phraselix isn't that kind of tool.");return;}setLoading(true,'Finding your hashtags...');allItems=[];document.getElementById('results').innerHTML='';document.getElementById('btnMore').style.display='none';try{const result=await callAPI(buildSystemPrompt(),buildUserMsg(prompt));renderResults(result);document.getElementById('btnMore').style.display='block';}catch(e){showError('Something went wrong — try again.');}finally{setLoading(false);}}
+async function generate(){const prompt=document.getElementById('prompt').value.trim();if(!prompt){document.getElementById('prompt').focus();return;}if(isLoading)return;hideError();if(isBadInput(prompt)){showError("Keep it clean — Phraselix isn't that kind of tool.");return;}if(!checkCoins())return;setLoading(true,'Finding your hashtags...');allItems=[];document.getElementById('results').innerHTML='';document.getElementById('btnMore').style.display='none';try{const result=await callAPI(buildSystemPrompt(),buildUserMsg(prompt));renderResults(result);document.getElementById('btnMore').style.display='block';}catch(e){showError('Something went wrong — try again.');}finally{setLoading(false);}}
 async function generateMore(){const prompt=document.getElementById('prompt').value.trim();if(!prompt||isLoading)return;setLoading(true,'Generating more...');const extra=allItems.length?'\n\nDo NOT repeat these:\n'+allItems.slice(-20).join(', '):'';try{const result=await callAPI(buildSystemPrompt(),buildUserMsg(prompt)+extra);appendResults(result);}catch(e){showError('Something went wrong — try again.');}finally{setLoading(false);}}
 
 function renderResults(data){const container=document.getElementById('results');container.innerHTML='';const header=document.createElement('div');header.className='results-header';const lbl=document.createElement('div');lbl.className='results-label';lbl.textContent='Generated Hashtag Sets';const right=document.createElement('div');right.style.cssText='display:flex;align-items:center;gap:1rem';const shareBtn=document.createElement('button');shareBtn.textContent='Share';shareBtn.style.cssText='font-family:DM Mono,monospace;font-size:.55rem;letter-spacing:1.5px;text-transform:uppercase;padding:.25rem .7rem;border:1px solid var(--border2);border-radius:2px;background:none;color:var(--text3);cursor:pointer;transition:all .15s';shareBtn.onmouseenter=function(){this.style.borderColor='var(--accent)';this.style.color='var(--accent)';};shareBtn.onmouseleave=function(){this.style.borderColor='var(--border2)';this.style.color='var(--text3)';};shareBtn.onclick=shareResults;const countEl=document.createElement('div');countEl.className='results-count';countEl.id='itemCount';countEl.textContent='0';right.appendChild(shareBtn);right.appendChild(countEl);header.appendChild(lbl);header.appendChild(right);const grid=document.createElement('div');grid.className='names-grid';grid.id='itemsGrid';container.appendChild(header);container.appendChild(grid);const fresh=(data.items||[]).slice(0,selectedCount);allItems=fresh;fresh.forEach(item=>grid.appendChild(makeCard(selectedStyle.charAt(0).toUpperCase()+selectedStyle.slice(1),item,'type-a')));updateCount();}
@@ -348,78 +395,7 @@ document.addEventListener('touchstart',e=>{const touch=e.touches[0];const ripple
 
 const sharedParam=new URLSearchParams(window.location.search).get('shared');
 if(sharedParam){const items=decodeURIComponent(sharedParam).split('|||').filter(Boolean);document.getElementById('sharedBanner').classList.add('show');const grid=document.createElement('div');grid.className='names-grid';items.forEach(content=>grid.appendChild(makeCard('Shared',content,'type-a')));document.getElementById('results').appendChild(grid);}
-// ── Coins System ──────────────────────────────────────────
-const COIN_COST = 1;
-const COINS_KEY = 'phraselix_coins';
-const HISTORY_KEY = 'phraselix_coin_history';
 
-function getCoins(){return parseInt(localStorage.getItem(COINS_KEY)||'0');}
-function setCoins(n){localStorage.setItem(COINS_KEY,n);updateCoinDisplay();}
-function spendCoins(n,reason){
-  setCoins(Math.max(0,getCoins()-n));
-  const history=getHistory();
-  history.unshift({amount:'-'+n,reason:reason,time:Date.now()});
-  if(history.length>50)history.pop();
-  localStorage.setItem(HISTORY_KEY,JSON.stringify(history));
-}
-function getHistory(){try{return JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');}catch{return[];}}
-function hasEnoughCoins(){return getCoins()>=COIN_COST;}
-
-function checkCoinsAndGenerate(originalGenerate){
-  if(!hasEnoughCoins()){
-    showToast('Not enough coins! 🪙 Go buy more.');
-    setTimeout(()=>window.location.href='/coins',1500);
-    return false;
-  }
-  return true;
-}
-
-// Update coin display
-
-function updateCoinDisplay(){
-  const c=getCoins();
-  const el=document.getElementById('coinCount');
-  const btn=document.getElementById('coinsBtn');
-  if(el)el.textContent=c;
-  if(btn){
-    if(c<=3)btn.classList.add('low');
-    else btn.classList.remove('low');
-  }
-}
-updateCoinDisplay();
-
-// ── Auto coins top-up ─────────────────────────────────────
-(function autoTopup(){
-  const FREE_INTERVAL = 10 * 60 * 1000;
-  const FREE_AMOUNT = 11;
-  const CLAIM_KEY = 'phraselix_last_claim';
-  const COINS_KEY2 = 'phraselix_coins';
-  const HISTORY_KEY2 = 'phraselix_coin_history';
-
-  function run(){
-    const now = Date.now();
-    const last = parseInt(localStorage.getItem(CLAIM_KEY)||'0');
-    if(now - last >= FREE_INTERVAL){
-      const current = parseInt(localStorage.getItem(COINS_KEY2)||'0');
-      if(current < FREE_AMOUNT){
-        const toAdd = FREE_AMOUNT - current;
-        localStorage.setItem(COINS_KEY2, current + toAdd);
-        localStorage.setItem(CLAIM_KEY, now);
-        const history = JSON.parse(localStorage.getItem(HISTORY_KEY2)||'[]');
-        history.unshift({amount:'+'+toAdd,reason:'Auto top-up to 11 coins',time:now});
-        localStorage.setItem(HISTORY_KEY2, JSON.stringify(history));
-        const el = document.getElementById('coinCount');
-        if(el) el.textContent = current + toAdd;
-        showToast('🎁 Coins topped up!');
-      } else {
-        localStorage.setItem(CLAIM_KEY, now);
-      }
-    }
-  }
-
-  run();
-  setInterval(run, 10000);
-})();
 
 </script>
 <script defer src="/_vercel/insights/script.js"></script>
