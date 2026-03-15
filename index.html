@@ -160,6 +160,11 @@ header{padding:3.5rem 0 0;display:grid;grid-template-columns:1fr auto;align-item
 
 .coins-btn{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:#f5c518;text-decoration:none;display:flex;align-items:center;gap:.3rem;padding:.3rem .7rem;border:1px solid rgba(245,197,24,.3);border-radius:3px;transition:all .15s;}
 .coins-btn:hover{border-color:#f5c518;background:rgba(245,197,24,.05);}
+
+.buy-more-btn{font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:2px;text-transform:uppercase;color:var(--bg);background:#f5c518;text-decoration:none;padding:.3rem .7rem;border-radius:3px;transition:all .15s;flex-shrink:0;}
+.buy-more-btn:hover{background:#c8e000;transform:translateY(-1px);}
+.coins-btn.low{color:var(--red) !important;border-color:rgba(255,71,87,.4) !important;animation:redPulse 1s ease-in-out infinite;}
+@keyframes redPulse{0%,100%{border-color:rgba(255,71,87,.2);}50%{border-color:rgba(255,71,87,.8);box-shadow:0 0 12px rgba(255,71,87,.3);}}
 </style>
 </head>
 <body>
@@ -182,6 +187,7 @@ header{padding:3.5rem 0 0;display:grid;grid-template-columns:1fr auto;align-item
         Status: <span>online</span>
       </div>
       <a class="coins-btn" href="/coins" id="coinsBtn">🪙 <span id="coinCount">0</span></a>
+      <a class="buy-more-btn" href="/coins">Buy More</a>
       <div class="auth-area" id="authArea"></div>
     </div>
   </header>
@@ -305,8 +311,17 @@ const auth=getAuth(app);
 window.changeName=async function(){const name=document.getElementById('newName').value.trim();if(!name){showToast('Enter a name first');return;}try{if(auth.currentUser)await updateProfile(auth.currentUser,{displayName:name});const u=JSON.parse(localStorage.getItem('phraselix_user')||'{}');u.name=name;localStorage.setItem('phraselix_user',JSON.stringify(u));renderAuth();
 
 // ── Coins display ─────────────────────────────────────────
+
 function getCoins(){return parseInt(localStorage.getItem('phraselix_coins')||'0');}
-document.getElementById('coinCount').textContent = getCoins();
+function updateCoinDisplay(){
+  const c=getCoins();
+  const el=document.getElementById('coinCount');
+  const btn=document.getElementById('coinsBtn');
+  if(el)el.textContent=c;
+  if(btn){if(c<=3)btn.classList.add('low');else btn.classList.remove('low');}
+}
+updateCoinDisplay();
+setInterval(updateCoinDisplay,5000);
 document.getElementById('newName').value='';showToast('Name updated ✓');}catch(e){showToast('Error: '+e.message);}};
 window.changePassword=async function(){const pw=document.getElementById('newPassword').value;const c=document.getElementById('confirmPassword').value;if(!pw){showToast('Enter a password');return;}if(pw!==c){showToast('Passwords do not match');return;}if(pw.length<6){showToast('Password too short');return;}try{if(auth.currentUser)await updatePassword(auth.currentUser,pw);document.getElementById('newPassword').value='';document.getElementById('confirmPassword').value='';showToast('Password updated ✓');}catch(e){showToast(e.code==='auth/requires-recent-login'?'Sign in again first':'Error: '+e.message);}};
 window.deleteAccount=async function(){if(!confirm('Delete your account permanently?'))return;try{if(auth.currentUser)await deleteUser(auth.currentUser);localStorage.removeItem('phraselix_token');localStorage.removeItem('phraselix_user');window.location.href='/signup';}catch(e){showToast(e.code==='auth/requires-recent-login'?'Sign in again first':'Error: '+e.message);}};
@@ -363,8 +378,17 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 renderAuth();
 
 // ── Coins display ─────────────────────────────────────────
+
 function getCoins(){return parseInt(localStorage.getItem('phraselix_coins')||'0');}
-document.getElementById('coinCount').textContent = getCoins();
+function updateCoinDisplay(){
+  const c=getCoins();
+  const el=document.getElementById('coinCount');
+  const btn=document.getElementById('coinsBtn');
+  if(el)el.textContent=c;
+  if(btn){if(c<=3)btn.classList.add('low');else btn.classList.remove('low');}
+}
+updateCoinDisplay();
+setInterval(updateCoinDisplay,5000);
 
 
 // ── Cursor ───────────────────────────────────────────────
