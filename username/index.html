@@ -93,6 +93,8 @@ footer{margin-top:6rem;padding:2rem 0 3rem;border-top:1px solid var(--border);di
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 .cursor{position:fixed;width:8px;height:8px;background:var(--accent);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:difference;}
 .cursor-ring{position:fixed;width:32px;height:32px;border:1px solid rgba(232,255,71,.3);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .3s,height .3s,border-color .3s;}
+.coins-btn{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:#f5c518;text-decoration:none;display:flex;align-items:center;gap:.3rem;padding:.3rem .7rem;border:1px solid rgba(245,197,24,.3);border-radius:3px;transition:all .15s;}
+.coins-btn:hover{border-color:#f5c518;background:rgba(245,197,24,.05);}
 body{cursor:none;}
 @media(hover:none),(max-width:600px){body{cursor:auto;}.cursor,.cursor-ring{display:none;}.side-toggle{width:20px;height:44px;}}
 @media(max-width:600px){header{flex-direction:column;align-items:flex-start;gap:1rem}.names-grid{grid-template-columns:1fr}.btn-row{flex-wrap:wrap}}
@@ -162,6 +164,7 @@ body{cursor:none;}
     <div class="header-right">
       <a class="back-btn" href="/">← All Tools</a>
       <span class="user-name" id="userName"></span>
+      <a class="coins-btn" href="/coins" id="coinsBtn">🪙 <span id="coinCount">0</span></a>
     </div>
   </header>
   <div class="hero-tagline">
@@ -184,7 +187,7 @@ body{cursor:none;}
       <div class="count-locked-tip" id="countLockedTip">More coming with premium — soon</div>
     </div>
     <div class="style-section">
-      <div class="style-hint">Tone <span>— pick one</span></div>
+      <div class="style-hint">Style <span>— pick one</span></div>
       <div class="style-row" id="styleRow">
         <button class="style-tag active" data-style="all">All Styles</button>
         <button class="style-tag" data-style="short">Short &amp; Punchy</button>
@@ -332,6 +335,35 @@ document.addEventListener('touchstart',e=>{const touch=e.touches[0];const ripple
 
 const sharedParam=new URLSearchParams(window.location.search).get('shared');
 if(sharedParam){const items=decodeURIComponent(sharedParam).split('|||').filter(Boolean);document.getElementById('sharedBanner').classList.add('show');const grid=document.createElement('div');grid.className='names-grid';items.forEach(content=>grid.appendChild(makeCard('Shared',content,'type-a')));document.getElementById('results').appendChild(grid);}
+// ── Coins System ──────────────────────────────────────────
+const COIN_COST = 1;
+const COINS_KEY = 'phraselix_coins';
+const HISTORY_KEY = 'phraselix_coin_history';
+
+function getCoins(){return parseInt(localStorage.getItem(COINS_KEY)||'0');}
+function setCoins(n){localStorage.setItem(COINS_KEY,n);document.getElementById('coinCount').textContent=n;}
+function spendCoins(n,reason){
+  setCoins(Math.max(0,getCoins()-n));
+  const history=getHistory();
+  history.unshift({amount:'-'+n,reason:reason,time:Date.now()});
+  if(history.length>50)history.pop();
+  localStorage.setItem(HISTORY_KEY,JSON.stringify(history));
+}
+function getHistory(){try{return JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');}catch{return[];}}
+function hasEnoughCoins(){return getCoins()>=COIN_COST;}
+
+function checkCoinsAndGenerate(originalGenerate){
+  if(!hasEnoughCoins()){
+    showToast('Not enough coins! 🪙 Go buy more.');
+    setTimeout(()=>window.location.href='/coins',1500);
+    return false;
+  }
+  return true;
+}
+
+// Update coin display
+document.getElementById('coinCount').textContent=getCoins();
+
 </script>
 <script defer src="/_vercel/insights/script.js"></script>
 </body>
